@@ -1,10 +1,10 @@
 {
   "name": "Spark Transportation",
-  "short_name": "Spark Transport",
+  "short_name": "Spark",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07111f",
-  "theme_color": "#0b1624",
+  "theme_color": "#07111f",
   "icons": [
     {
       "src": "icon-192.png",
