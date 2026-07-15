@@ -1,13 +1,10 @@
-Spark Transportation v1.3.4 — Home Header Redesign
+Spark Transportation v1.3.5 — Restore Currency Values
 
-Changes:
-- Replaced the crowded header with one centered, full-width official logo.
-- Removed duplicate Spark Transportation title and tracker text.
-- Removed the version badge from the Home header.
-- App version remains available on the Data/Setup screen.
-- Removed the duplicate tagline below the greeting.
-- Added a smaller profile/settings button beside Today's Run.
-- Improved header spacing and bottom-navigation alignment.
-- Preserved all data, pay rules, reports, saved locations, and custom activity order.
+Fixed Driver & Pay Rates:
+- Saved pay amounts repopulate whenever Setup opens.
+- Dollar signs remain visible.
+- Monetary values display with two decimals.
+- Mileage Rate and Weekend Mileage Rate remain plain numeric fields.
+- Existing stored rates are preserved under sparkTransportationData.
 
 Upload all individual files to the root of the existing GitHub repository.
