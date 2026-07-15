@@ -138,7 +138,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.7</div>
+  <div class="version">v1.2.8</div>
 </header>
 
 <section id="home" class="active">
@@ -208,6 +208,7 @@ padding:8px
       <button class="quick-btn" data-activity="Live Load"><span class="quick-icon">📦</span>Live Load</button>
       <button class="quick-btn" data-activity="Live Unload"><span class="quick-icon">📤</span>Live Unload</button>
       <button class="quick-btn" data-activity="Wait Time"><span class="quick-icon">⏱️</span>Wait Time</button>
+      <button class="quick-btn" data-activity="Breakdown"><span class="quick-icon">🛠️</span>Breakdown</button>
       <button class="quick-btn" data-activity="Hook"><span class="quick-icon">🔗</span>Hook</button>
       <button class="quick-btn" data-activity="Stop"><span class="quick-icon">🛑</span>Stop</button>
       <button class="quick-btn" data-activity="Arrive"><span class="quick-icon">📍</span>Arrive</button>
@@ -291,14 +292,14 @@ padding:8px
           <label>Activity</label>
           <select id="activityType" onchange="updateActivityFields()">
             <option value="">Select activity</option>
-            <option>Live Load</option><option>Live Unload</option><option>Wait Time</option>
+            <option>Live Load</option><option>Live Unload</option><option>Wait Time</option><option>Breakdown</option>
             <option>Meeting</option><option>Survey</option><option>Training</option>
             <option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option>
             <option>Layover</option><option>Chain</option><option>Regional Pay</option>
           </select>
 
           <div id="timedFields" class="hidden">
-          <div class="muted small">Live Load, Live Unload, and Wait Time begin paying after the first 45 minutes.</div>
+          <div class="muted small">Live Load, Live Unload, Wait Time, and Breakdown begin paying after the first 45 minutes.</div>
             <div class="row">
               <div><label>Start time</label><input id="activityStart" type="time"></div>
               <div><label>Stop time</label><input id="activityStop" type="time"></div>
@@ -446,7 +447,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.7</b></div>
+    <div class="kv"><span>App version</span><b>1.2.8</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -511,7 +512,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.7',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.8',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -577,16 +578,17 @@ function greetingForNow(){const h=new Date().getHours();return h<12?'Good Mornin
 
 function showPage(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');currentPage=id;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100;}
-function hasUnpaid45MinuteThreshold(t){return ['Live Load','Live Unload','Wait Time'].includes(t);}
+function hasUnpaid45MinuteThreshold(t){return ['Live Load','Live Unload','Wait Time','Breakdown'].includes(t);}
 function paidTimedHours(t,totalHours){
  const unpaid=hasUnpaid45MinuteThreshold(t)?0.75:0;
  return Math.max(0,Math.round((num(totalHours)-unpaid)*100)/100);
 }
-function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t);}
+function isTimed(t){return ['Live Load','Live Unload','Wait Time','Breakdown','Meeting','Survey','Training'].includes(t);}
 function defaultRate(t){
  if(t==='Live Load')return num(state.setup.liveLoadRate);
  if(t==='Live Unload')return num(state.setup.liveUnloadRate);
  if(t==='Wait Time')return num(state.setup.waitRate);
+ if(t==='Breakdown')return num(state.setup.waitRate);
  if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;
  return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0;
 }

@@ -1,16 +1,18 @@
-Spark Transportation v1.2.7 — 45-Minute Unpaid Threshold
+Spark Transportation v1.2.8 — Breakdown Activity
 
-Pay rule:
-- Live Load: first 45 minutes unpaid
-- Live Unload: first 45 minutes unpaid
-- Wait Time: first 45 minutes unpaid
+Added Breakdown to:
+- Quick Add Activity grid
+- Main activity selector
+- Saved activity history and pay totals
+
+Breakdown pay rules:
+- Uses the same hourly rate as Wait Time
+- First 45 minutes are unpaid
+- Pay begins after 45 minutes for each Breakdown entry
 
 Examples:
-- 30 minutes total = 0 paid hours
-- 45 minutes total = 0 paid hours
-- 60 minutes total = 0.25 paid hours
-- 90 minutes total = 0.75 paid hours
-- 120 minutes total = 1.25 paid hours
+- 45 minutes = $0.00
+- 60 minutes = 0.25 paid hours
+- 90 minutes = 0.75 paid hours
 
-The app records full elapsed time and separately calculates paid hours.
-The 45-minute threshold applies to each individual activity entry.
+The app continues using sparkTransportationData.
