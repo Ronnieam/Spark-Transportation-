@@ -1,18 +1,12 @@
-Spark Transportation v1.2.8 — Breakdown Activity
+Spark Transportation v1.2.9 — Hold Completed Day Totals
 
-Added Breakdown to:
-- Quick Add Activity grid
-- Main activity selector
-- Saved activity history and pay totals
+After ending a day:
+- Today's Estimated Pay continues showing the completed day's total.
+- Pay Summary continues showing mileage pay, activity pay, PTO pay, and total.
+- Miles, locations, and activity counts continue showing the completed day.
+- Dashboard status changes to Day Complete.
 
-Breakdown pay rules:
-- Uses the same hourly rate as Wait Time
-- First 45 minutes are unpaid
-- Pay begins after 45 minutes for each Breakdown entry
+Those values remain visible until Start New Day is used.
+Starting a new day switches the dashboard to the new active day's totals.
 
-Examples:
-- 45 minutes = $0.00
-- 60 minutes = 0.25 paid hours
-- 90 minutes = 0.75 paid hours
-
-The app continues using sparkTransportationData.
+Existing data remains stored under sparkTransportationData.

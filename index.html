@@ -138,7 +138,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.8</div>
+  <div class="version">v1.2.9</div>
 </header>
 
 <section id="home" class="active">
@@ -447,7 +447,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.8</b></div>
+    <div class="kv"><span>App version</span><b>1.2.9</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -512,7 +512,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.8',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.9',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -575,6 +575,10 @@ function toggleDashboardLocation(){
 function callDashboardLocation(){const l=currentDashboardLocation();if(!l||!l.phone){alert('No phone number saved for the current location.');return;}callLocation(l.phone,l.extension||'');}
 function directionsDashboardLocation(){const l=currentDashboardLocation();if(!l){alert('No current location selected.');return;}mapLocation(l);}
 function greetingForNow(){const h=new Date().getHours();return h<12?'Good Morning':h<18?'Good Afternoon':'Good Evening';}
+function lastCompletedDay(){
+ return state.entries&&state.entries.length?state.entries[state.entries.length-1]:null;
+}
+
 
 function showPage(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');currentPage=id;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100;}
@@ -735,12 +739,19 @@ function render(){
  const now=new Date();
  $('todayDateLabel').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
  $('dashboardGreeting').textContent=greetingForNow()+(state.setup.driverName?', '+state.setup.driverName:'');
- const activityCount=state.locations.reduce((s,l)=>s+(l.activities||[]).length,0);
- const activePay=state.active?running():0;
- $('dashboardStatus').textContent=state.active?'On Duty':'Ready to Start';
- $('dashboardStatusMeta').textContent=state.active?`Started ${state.active.startTime} • ${activityCount} activities`:'No active day';
- $('statusDot').style.background=state.active?'#44d17a':'#ffb000';
- $('dashboardPrimaryButton').textContent=state.active?'Resume Day':'Start Day';
+ const completedDay=state.active?null:lastCompletedDay();
+ const activityCount=state.active
+  ?state.locations.reduce((s,l)=>s+(l.activities||[]).length,0)
+  :completedDay?(completedDay.locations||[]).reduce((s,l)=>s+(l.activities||[]).length,0):0;
+ const activePay=state.active?running():(completedDay?num(completedDay.total):0);
+ $('dashboardStatus').textContent=state.active?'On Duty':completedDay?'Day Complete':'Ready to Start';
+ $('dashboardStatusMeta').textContent=state.active
+  ?`Started ${state.active.startTime} • ${activityCount} activities`
+  :completedDay
+   ?`${completedDay.date} • ${completedDay.miles||0} miles • ${activityCount} activities`
+   :'No active day';
+ $('statusDot').style.background=state.active?'#44d17a':completedDay?'#3d8bfd':'#ffb000';
+ $('dashboardPrimaryButton').textContent=state.active?'Resume Day':'Start New Day';
  const dl=currentDashboardLocation();
  $('dashboardLocationTitle').textContent=dl?`${dl.type} #${dl.number}`:'No location selected';
  $('dashboardLocationName').textContent=dl?(dl.name||'Current activity location'):'Start or resume your day to add a location.';
@@ -751,15 +762,31 @@ function render(){
  $('dashboardNotes').textContent=dl&&dl.notes||'';
  $('dashboardCallButton').disabled=!(dl&&dl.phone);
  $('dashboardDirectionsButton').disabled=!(dl&&(dl.address||dl.city||dl.state));
- const dashMp=state.active?mileagePreview():0,dashAp=state.active?activityTotal():0,dashPp=state.active?ptoPreview():0;
- $('dashboardMileagePay').textContent=money(dashMp);$('dashboardActivityPay').textContent=money(dashAp);$('dashboardPtoPay').textContent=money(dashPp);$('dashboardTotalPay').textContent=money(dashMp+dashAp+dashPp);
+ const dashMp=state.active?mileagePreview():(completedDay?num(completedDay.mileagePay):0);
+ const dashAp=state.active?activityTotal():(completedDay?num(completedDay.activityPay):0);
+ const dashPp=state.active?ptoPreview():(completedDay?num(completedDay.ptoPay):0);
+ const dashboardGrandTotal=state.active?(dashMp+dashAp+dashPp):(completedDay?num(completedDay.total):0);
+ $('dashboardMileagePay').textContent=money(dashMp);
+ $('dashboardActivityPay').textContent=money(dashAp);
+ $('dashboardPtoPay').textContent=money(dashPp);
+ $('dashboardTotalPay').textContent=money(dashboardGrandTotal);
 
- $('homeStatus').textContent=state.active?`Day in progress: ${state.active.date} • ${state.active.startTime} • mileage ${state.active.beginMileage}`:'No active day.';
- $('runningTotal').textContent=money(state.active?running():0);
- $('runningDetail').textContent=state.active?`${state.locations.length} locations • ${state.locations.reduce((s,l)=>s+(l.activities||[]).length,0)} activities`:'No active day';
- $('milesToday').textContent=state.active&&$('endMileage').value?Math.max(0,num($('endMileage').value)-num($('editBeginMileage').value||state.active.beginMileage)):0;
- $('locationsToday').textContent=state.locations.length;
- $('activitiesToday').textContent=state.locations.reduce((s,l)=>s+(l.activities||[]).length,0);
+ $('homeStatus').textContent=state.active
+  ?`Day in progress: ${state.active.date} • ${state.active.startTime} • mileage ${state.active.beginMileage}`
+  :completedDay
+   ?`Completed day: ${completedDay.date}`
+   :'No active day.';
+ $('runningTotal').textContent=money(dashboardGrandTotal);
+ $('runningDetail').textContent=state.active
+  ?`${state.locations.length} locations • ${state.locations.reduce((s,l)=>s+(l.activities||[]).length,0)} activities`
+  :completedDay
+   ?`${(completedDay.locations||[]).length} locations • ${activityCount} activities`
+   :'No active day';
+ $('milesToday').textContent=state.active&&$('endMileage').value
+  ?Math.max(0,num($('endMileage').value)-num($('editBeginMileage').value||state.active.beginMileage))
+  :completedDay?num(completedDay.miles):0;
+ $('locationsToday').textContent=state.active?state.locations.length:(completedDay?(completedDay.locations||[]).length:0);
+ $('activitiesToday').textContent=activityCount;
  $('adpToday').textContent=money(state.setup.manualAdp);
  $('dayCount').textContent=state.entries.length;
  $('totalPay').textContent=money(state.entries.reduce((s,e)=>s+num(e.total),0));
