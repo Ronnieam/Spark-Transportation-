@@ -138,7 +138,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.6</div>
+  <div class="version">v1.2.7</div>
 </header>
 
 <section id="home" class="active">
@@ -298,6 +298,7 @@ padding:8px
           </select>
 
           <div id="timedFields" class="hidden">
+          <div class="muted small">Live Load, Live Unload, and Wait Time begin paying after the first 45 minutes.</div>
             <div class="row">
               <div><label>Start time</label><input id="activityStart" type="time"></div>
               <div><label>Stop time</label><input id="activityStop" type="time"></div>
@@ -445,7 +446,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.6</b></div>
+    <div class="kv"><span>App version</span><b>1.2.7</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -510,7 +511,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.6',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.7',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -576,6 +577,11 @@ function greetingForNow(){const h=new Date().getHours();return h<12?'Good Mornin
 
 function showPage(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');currentPage=id;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100;}
+function hasUnpaid45MinuteThreshold(t){return ['Live Load','Live Unload','Wait Time'].includes(t);}
+function paidTimedHours(t,totalHours){
+ const unpaid=hasUnpaid45MinuteThreshold(t)?0.75:0;
+ return Math.max(0,Math.round((num(totalHours)-unpaid)*100)/100);
+}
 function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t);}
 function defaultRate(t){
  if(t==='Live Load')return num(state.setup.liveLoadRate);
@@ -619,7 +625,8 @@ function addActivity(){
  if(isTimed(t)){
   if(!$('activityStart').value||!$('activityStop').value){alert('Enter start and stop times.');return;}
   const h=decimalHours($('activityStart').value,$('activityStop').value),r=num($('activityHourlyRate').value);
-  a={type:t,kind:'timed',start:$('activityStart').value,stop:$('activityStop').value,hours:h,rate:r,note:$('activityNote').value,pay:h*r};
+  const paidHours=paidTimedHours(t,h);
+  a={type:t,kind:'timed',start:$('activityStart').value,stop:$('activityStop').value,hours:h,paidHours,unpaidThresholdHours:hasUnpaid45MinuteThreshold(t)?0.75:0,rate:r,note:$('activityNote').value,pay:paidHours*r};
  }else{
   const q=Math.max(1,num($('activityQty').value)),r=num($('activityFlatRate').value);
   a={type:t,kind:'flat',qty:q,rate:r,note:$('activityNote').value,pay:q*r};
@@ -707,7 +714,7 @@ function renderSavedLocations(){
 function renderHistory(){
  const q=($('historySearch').value||'').toLowerCase();
  const rows=state.entries.map((e,i)=>({e,i})).filter(({e})=>[e.date,...(e.locations||[]).flatMap(l=>[l.type,l.number,l.name])].join(' ').toLowerCase().includes(q));
- $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
+ $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
 }
 
 function render(){
@@ -761,7 +768,7 @@ function render(){
   const l=state.locations[state.activeLocationIndex];$('activeLocationTitle').textContent=`${l.type} #${l.number}`;$('activeLocationSubtitle').textContent=l.name||'Activities added here belong to this location.';
  }
 
- $('locationGroups').innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}<div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${(l.activities||[]).length}</b></div><div class="kv"><span>Location total</span><b>${money((l.activities||[]).reduce((s,a)=>s+num(a.pay),0))}</b></div>${(l.activities||[]).map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<b>${money(a.pay)}</b><button class="danger top-gap-sm" onclick="removeActivity(${li},${ai})">Remove</button></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added.</div>';
+ $('locationGroups').innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}<div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${(l.activities||[]).length}</b></div><div class="kv"><span>Location total</span><b>${money((l.activities||[]).reduce((s,a)=>s+num(a.pay),0))}</b></div>${(l.activities||[]).map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<b>${money(a.pay)}</b><button class="danger top-gap-sm" onclick="removeActivity(${li},${ai})">Remove</button></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added.</div>';
 
  const mp=mileagePreview(),ap=activityTotal(),pp=ptoPreview();
  $('previewMileage').textContent=money(mp);$('previewActivity').textContent=money(ap);$('previewPto').textContent=money(pp);$('previewTotal').textContent=money(mp+ap+pp);
