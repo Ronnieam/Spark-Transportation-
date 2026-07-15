@@ -1,12 +1,12 @@
-Spark Transportation v1.0 Beta 8
+Spark Transportation v1.0 Beta 9
 
-Typography update:
-- Text is centered in all input fields.
-- Date and time values are centered on iPhone.
-- Dropdown selections are centered.
-- Placeholder text is centered.
-- Text areas are centered.
-- Applies across Home, Day, Locations, History, and Setup pages.
+Day Page Field Alignment Fix:
+- Date value is vertically centered.
+- Beginning mileage value is vertically centered.
+- Start time value is vertically centered.
+- The same vertical centering applies to similar fields throughout the app.
+- Text remains horizontally centered.
+- Text areas keep normal multi-line spacing.
 
 Replace the existing GitHub Pages files with:
 index.html
