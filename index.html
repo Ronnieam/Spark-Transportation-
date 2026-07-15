@@ -111,7 +111,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.3</div>
+  <div class="version">v1.2.4</div>
 </header>
 
 <section id="home" class="active">
@@ -414,7 +414,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.3</b></div>
+    <div class="kv"><span>App version</span><b>1.2.4</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -479,7 +479,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.3',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.4',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -762,9 +762,15 @@ render();
 (function(){
   const row=document.getElementById('quickActivityRow');
   if(!row)return;
-  const LONG_PRESS=450;
-  let timer=null,active=null,ghost=null,pointerId=null,dragging=false,suppressClick=false;
-  let startX=0,startY=0,offsetX=0,offsetY=0;
+
+  const LONG_PRESS=500;
+  const MAX_TAP_TIME=260;
+  const MAX_TAP_MOVE=7;
+  const OPEN_DELAY=170;
+
+  let timer=null,active=null,ghost=null,pointerId=null,dragging=false;
+  let startX=0,startY=0,offsetX=0,offsetY=0,downTime=0;
+  let moved=false,openTimer=null;
 
   const items=()=>Array.from(row.querySelectorAll('.quick-btn[data-activity]'));
 
@@ -775,6 +781,7 @@ render();
       localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
     }catch(e){console.warn(e);}
   }
+
   function restoreOrder(){
     try{
       const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
@@ -785,72 +792,147 @@ render();
       });
     }catch(e){console.warn(e);}
   }
-  function clearPress(){if(timer){clearTimeout(timer);timer=null;}}
+
+  function clearPress(){
+    if(timer){clearTimeout(timer);timer=null;}
+  }
+
+  function clearOpen(){
+    if(openTimer){clearTimeout(openTimer);openTimer=null;}
+  }
+
   function begin(button,e){
-    dragging=true;suppressClick=true;active=button;
-    row.classList.add('reordering');active.classList.add('drag-source');
+    dragging=true;
+    active=button;
+    row.classList.add('reordering');
+    active.classList.add('drag-source');
+
     const r=active.getBoundingClientRect();
-    offsetX=e.clientX-r.left;offsetY=e.clientY-r.top;
+    offsetX=e.clientX-r.left;
+    offsetY=e.clientY-r.top;
+
     ghost=active.cloneNode(true);
     ghost.classList.add('quick-drag-ghost');
-    ghost.style.width=r.width+'px';ghost.style.height=r.height+'px';
-    ghost.style.left=(e.clientX-offsetX)+'px';ghost.style.top=(e.clientY-offsetY)+'px';
+    ghost.style.width=r.width+'px';
+    ghost.style.height=r.height+'px';
+    ghost.style.left=(e.clientX-offsetX)+'px';
+    ghost.style.top=(e.clientY-offsetY)+'px';
     document.body.appendChild(ghost);
+
     try{active.setPointerCapture(pointerId);}catch(_){}
     if(navigator.vibrate)navigator.vibrate(20);
   }
+
   function move(e){
+    if(!ghost||!active)return;
+
     ghost.style.left=(e.clientX-offsetX)+'px';
     ghost.style.top=(e.clientY-offsetY)+'px';
+
     const others=items().filter(b=>b!==active);
     let placed=false;
+
     for(const other of others){
       const r=other.getBoundingClientRect();
       if(e.clientX<r.left+r.width/2){
         if(active.nextSibling!==other)row.insertBefore(active,other);
-        placed=true;break;
+        placed=true;
+        break;
       }
     }
+
     if(!placed)row.appendChild(active);
+
     const rr=row.getBoundingClientRect();
     if(e.clientX<rr.left+42)row.scrollLeft-=18;
     else if(e.clientX>rr.right-42)row.scrollLeft+=18;
   }
-  function end(){
+
+  function finishDrag(){
     clearPress();
+
     if(ghost)ghost.remove();
     ghost=null;
+
     if(active)active.classList.remove('drag-source');
     row.classList.remove('reordering');
+
     if(dragging)saveOrder();
-    dragging=false;active=null;pointerId=null;
-    setTimeout(()=>suppressClick=false,250);
+
+    dragging=false;
+    active=null;
+    pointerId=null;
   }
 
   row.addEventListener('pointerdown',e=>{
     const button=e.target.closest('.quick-btn[data-activity]');
     if(!button)return;
-    pointerId=e.pointerId;active=button;startX=e.clientX;startY=e.clientY;
-    clearPress();timer=setTimeout(()=>begin(button,e),LONG_PRESS);
+
+    clearOpen();
+    pointerId=e.pointerId;
+    active=button;
+    startX=e.clientX;
+    startY=e.clientY;
+    downTime=Date.now();
+    moved=false;
+
+    clearPress();
+    timer=setTimeout(()=>begin(button,e),LONG_PRESS);
   },{passive:true});
 
   row.addEventListener('pointermove',e=>{
     if(e.pointerId!==pointerId)return;
+
+    const distance=Math.hypot(e.clientX-startX,e.clientY-startY);
+    if(distance>MAX_TAP_MOVE)moved=true;
+
     if(!dragging){
-      if(Math.hypot(e.clientX-startX,e.clientY-startY)>8)clearPress();
+      if(moved)clearPress();
       return;
     }
-    e.preventDefault();move(e);
+
+    e.preventDefault();
+    move(e);
   },{passive:false});
 
-  row.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)end();});
-  row.addEventListener('pointercancel',e=>{if(e.pointerId===pointerId)end();});
+  row.addEventListener('pointerup',e=>{
+    if(e.pointerId!==pointerId)return;
+
+    const button=e.target.closest('.quick-btn[data-activity]')||active;
+    const elapsed=Date.now()-downTime;
+
+    if(dragging){
+      finishDrag();
+      return;
+    }
+
+    clearPress();
+    pointerId=null;
+    active=null;
+
+    // Open only after a deliberate, quick, mostly stationary tap.
+    if(button&&!moved&&elapsed<=MAX_TAP_TIME){
+      clearOpen();
+      openTimer=setTimeout(()=>{
+        quickAddActivity(button.dataset.activity);
+        openTimer=null;
+      },OPEN_DELAY);
+    }
+  });
+
+  row.addEventListener('pointercancel',()=>{
+    clearOpen();
+    finishDrag();
+  });
+
+  // Block the browser-generated click so pointer handling is the only opener.
   row.addEventListener('click',e=>{
     const button=e.target.closest('.quick-btn[data-activity]');
-    if(!button)return;
-    if(suppressClick){e.preventDefault();e.stopImmediatePropagation();return;}
-    quickAddActivity(button.dataset.activity);
-  });
+    if(button){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  },true);
 
   restoreOrder();
 })();

@@ -1,11 +1,11 @@
-Spark Transportation v1.2.3 — Corrected Build
+Spark Transportation v1.2.4 — Quick Add Tap Delay
 
-Corrects the accidental v1.2.0 rollback and properly includes:
-- Correct visible version: v1.2.3
-- Horizontal swipe through all 13 activities
-- Long-press and drag reordering
-- Auto-scroll near both edges while dragging
-- Saved custom activity order
-- Permanent data key: sparkTransportationData
+Fixed:
+- Quick activities no longer open immediately when touched.
+- An activity opens only after a short, deliberate tap.
+- Holding for about half a second enters reorder mode.
+- Moving your finger cancels activity opening and allows scrolling/reordering.
+- Browser-generated click events are blocked to prevent accidental double-opening.
+- Custom order remains saved in sparkTransportationData.
 
-Upload every individual file to the root of the same GitHub repository.
+Upload all individual files to the root of the existing GitHub repository.
