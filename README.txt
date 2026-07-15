@@ -1,13 +1,13 @@
-Spark Transportation v1.0 Beta 5
+Spark Transportation v1.0 Beta 6
 
-Day Page Improvements:
-- All inputs remain inside their cards.
-- Even two-column spacing on larger iPhones.
-- Automatic single-column layout on smaller screens.
-- Larger touch-friendly fields and buttons.
-- Day Details, Choose Location, and End Day are grouped into clear sections.
-- Cards prevent accidental horizontal overflow.
-- Swipe navigation and all previous features remain included.
+Changes:
+- Region has been changed to Driver ID.
+- Driver ID now appears in Driver & Pay Rates and in the app header.
+- Existing saved Region data is automatically copied into Driver ID so it is not lost.
+- Day page paired fields now use equal-width columns.
+- Labels and controls align more consistently.
+- Inputs no longer overhang or compress unevenly.
+- Small iPhones still stack fields into a single column.
 
 Replace the existing GitHub Pages files with:
 index.html

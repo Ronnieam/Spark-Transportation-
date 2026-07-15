@@ -20,7 +20,7 @@ h1{font-size:20px;margin:0}.muted{color:var(--muted)}.small{font-size:12px}.vers
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#091522;border:1px solid var(--line);border-radius:14px;padding:13px}.metric b{display:block;font-size:20px;margin-top:4px}
 label{display:block;font-size:13px;color:var(--muted);margin:11px 0 6px}
 input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;padding:14px;border-radius:12px;border:1px solid var(--line);background:#081522;color:#fff;font-size:16px;box-sizing:border-box}
-textarea{min-height:80px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+textarea{min-height:80px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;align-items:start}
 button{display:block;width:100%;max-width:100%;min-height:48px;padding:13px;border:0;border-radius:13px;font-size:15px;font-weight:800;box-sizing:border-box}.primary{background:var(--gold);color:#2b1700}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
 .hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
@@ -36,6 +36,13 @@ section.slide-in-left{display:block;animation:slideInLeft .28s ease}
 .day-group{background:#0b1927;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}
 .day-group h3{margin-bottom:10px}
 .field-hint{font-size:12px;color:var(--muted);margin-top:5px}
+.row>div{min-width:0;width:100%}
+.row>div input,.row>div select,.row>div textarea{width:100%;min-width:0}
+.row label{min-height:18px}
+@media(min-width:431px){
+ .row>div{display:flex;flex-direction:column}
+ .row>div input,.row>div select{min-height:50px}
+}
 @media(max-width:430px){
  .row,.actions{grid-template-columns:1fr}
  .app{padding-left:10px;padding-right:10px}
@@ -48,7 +55,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 5</div>
+<div class="version">v1.0 Beta 6</div>
 </header>
 
 <section id="home" class="active">
@@ -88,7 +95,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <select id="savedLocationSelect"><option value="">Choose saved location</option></select>
 <button class="secondary" style="margin-top:10px" onclick="useSavedLocation()">Use Saved Location</button>
 
-<div class="row"><div><label>Location type</label><select id="locationType"><option>Store</option><option>Vendor</option><option>DC</option></select></div><div><label>Number</label><input id="locationNumber"></div></div>
+<div class="row"><div><label>Location type</label><select id="locationType"><option>Store</option><option>Vendor</option><option>DC</option></select></div><div><label>Location number</label><input id="locationNumber" placeholder="Store, Vendor, or DC number"></div></div>
 <label>Name or notes</label><input id="locationName">
 <button class="primary" style="margin-top:12px" onclick="startLocation()">Start New Location</button>
 
@@ -101,7 +108,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <option>Live Load</option><option>Live Unload</option><option>Wait Time</option>
 <option>Meeting</option><option>Survey</option><option>Training</option>
 <option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option>
-<option>Layover</option><option>Chain</option><option>Regional Pay</option>
+<option>Layover</option><option>Chain</option><option>Driver IDal Pay</option>
 </select>
 
 <div id="timedFields" class="hidden">
@@ -160,9 +167,9 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <section id="history"><div class="card"><h3>History</h3><div id="historyList" class="muted">No entries.</div></div></section>
 
 <section id="setup">
-<div class="card"><h3>Driver & Regional Rates</h3>
+<div class="card"><h3>Driver & Pay Rates</h3>
 <label>Driver name</label><input id="driverName">
-<label>Region</label><input id="regionName">
+<label>Driver ID</label><input id="driverId" placeholder="Enter driver ID">
 <label>Regular mileage rate</label><input id="mileageRate" type="number" step="0.001">
 <label>Weekend mileage rate</label><input id="weekendRate" type="number" step="0.001">
 <label>Live Load / hr</label><input id="liveLoadRate" type="number" step="0.01">
@@ -175,7 +182,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <label>Arrive Drop</label><input id="arriveDropRate" type="number" step="0.01">
 <label>Layover</label><input id="layoverRate" type="number" step="0.01">
 <label>Chain</label><input id="chainRate" type="number" step="0.01">
-<label>Regional Pay</label><input id="regionalRate" type="number" step="0.01">
+<label>Driver IDal Pay</label><input id="regionalRate" type="number" step="0.01">
 <button class="primary" onclick="saveSetup()">Save Setup</button>
 </div>
 </section>
@@ -191,7 +198,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 
 <script>
 const KEY='sparkTransportationV1Beta';
-const defaults={driverName:'',regionName:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6};
+const defaults={driverName:'',driverId:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6};
 let state={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
 const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
 
@@ -210,10 +217,10 @@ function show(id,direction=null){
  render()
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
-function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};state.locations=state.locations||[];state.savedLocations=state.savedLocations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
+function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};if(!state.setup.driverId&&state.setup.regionName)state.setup.driverId=state.setup.regionName;state.locations=state.locations||[];state.savedLocations=state.savedLocations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
 function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t)}
-function defaultRate(t){if(t==='Live Load')return num(state.setup.liveLoadRate);if(t==='Live Unload')return num(state.setup.liveUnloadRate);if(t==='Wait Time')return num(state.setup.waitRate);if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0}
+function defaultRate(t){if(t==='Live Load')return num(state.setup.liveLoadRate);if(t==='Live Unload')return num(state.setup.liveUnloadRate);if(t==='Wait Time')return num(state.setup.waitRate);if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Driver IDal Pay':state.setup.regionalRate}[t]||0}
 function updateActivityFields(){const t=activityType.value;timedFields.classList.toggle('hidden',!isTimed(t));flatFields.classList.toggle('hidden',!t||isTimed(t));commonFields.classList.toggle('hidden',!t);if(!t)return;if(isTimed(t))activityHourlyRate.value=defaultRate(t);else activityFlatRate.value=defaultRate(t)}
 function startDay(){if(!dayDate.value||!beginMileage.value||!startTime.value){alert('Enter date, beginning mileage and start time.');return}state.active={date:dayDate.value,beginMileage:num(beginMileage.value),startTime:startTime.value};state.locations=[];state.activeLocationIndex=null;save()}
 function startLocationFromData(data){state.locations.push({type:data.type,number:data.number,name:data.name||'',activities:[]});state.activeLocationIndex=state.locations.length-1;save()}
@@ -290,7 +297,7 @@ function clearSavedLocationForm(){
  cancelLocationEditButton.classList.add('hidden')
 }
 function deleteSavedLocation(i){state.savedLocations.splice(i,1);save()}
-function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','regionName'].includes(k)?$(k).value:num($(k).value));save();show('home')}
+function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','driverId'].includes(k)?$(k).value:num($(k).value));save();show('home')}
 function editHistoryDay(i){
  const e=state.entries[i]
  state.editingEntryIndex=i
@@ -328,7 +335,7 @@ function mapLocation(l){
  window.location.href='https://maps.apple.com/?q='+encodeURIComponent(parts)
 }
 function render(){
- driverLine.textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.regionName||'Driver Pay & Activity Tracker')
+ driverLine.textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.driverId||'Driver Pay & Activity Tracker')
  startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
  dayHeading.textContent=state.editingEntryIndex===null||state.editingEntryIndex===undefined?'Start / Edit Day':'Edit Saved Day'
  saveDayButton.textContent=state.editingEntryIndex===null||state.editingEntryIndex===undefined?'End Day & Save':'Save History Changes'
