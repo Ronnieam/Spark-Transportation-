@@ -1,10 +1,17 @@
-Spark Transportation v1.2.1 — Swipe & Reorder Quick Activities
+Spark Transportation v1.2.2 — Activity Drag Fix
 
-New in this release:
-- Swipe left and right through every Quick Add Activity.
-- Press and hold an activity icon for about half a second, then drag it to a new position.
-- The custom order is saved in the permanent Spark Transportation app data.
-- Reset Order restores the original activity arrangement.
-- Includes all activities: Live Load, Live Unload, Wait Time, Hook, Stop, Arrive, Arrive Drop, Layover, Chain, Regional Pay, Meeting, Survey, and Training.
+Fixed:
+- Long-press now enters reorder mode.
+- The selected activity follows your finger.
+- Activities swap positions while dragging.
+- The row auto-scrolls near the left and right edges.
+- Normal horizontal swiping still works when you are not reordering.
+- The customized order is saved in sparkTransportationData.
 
-Upload all individual files to the root of the existing GitHub repository. Do not upload only the ZIP file. Existing records continue to use the permanent localStorage key sparkTransportationData.
+How to use:
+1. Press and hold an activity for about half a second.
+2. After the brief vibration/visual change, keep holding.
+3. Slide your finger left or right.
+4. Lift your finger to place the activity.
+
+Upload all individual files to the root of the existing GitHub repository.
