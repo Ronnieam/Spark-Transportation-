@@ -1,9 +1,23 @@
-Spark Transportation v1.0 Beta 12
+Spark Transportation v1.1.0 — Foundation Release
 
-Actual app correction:
-- "Driver IDal Pay" is corrected to "Regional Pay" on the Driver & Pay Rates page.
-- The activity selector now also says "Regional Pay".
-- The Regional Pay calculation mapping is corrected.
-- Permanent data storage and migration from Beta 11 remain included.
+Included:
+- Original Spark Transportation logo everywhere
+- Modular project structure
+- Permanent storage key
+- Automatic migration from older Spark Transportation versions
+- Export and import backup
+- Dashboard
+- Day workflow
+- Saved Locations with call and directions
+- Editable History
+- Reports summary
+- Driver ID and editable pay rates
+- Regional Pay label and calculation
+- Swipe navigation
+- Collapsible Add Saved Location form
+- Centered, equal-height fields
 
-Replace the existing GitHub Pages files with all files in this package.
+Update:
+Upload the entire contents of this ZIP to the same GitHub Pages repository.
+Keep the same GitHub Pages URL.
+Open the website in Safari after deployment before opening the Home Screen app.

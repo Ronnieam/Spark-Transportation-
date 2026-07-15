@@ -6,520 +6,284 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="css/app.css">
 <title>Spark Transportation</title>
-<style>
-:root{--bg:#07111f;--card:#102033;--line:#294056;--text:#fff;--muted:#a9b8c7;--gold:#ffb000;--green:#2ec4b6;--red:#ff6b6b}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(#07111f,#0c1b2b);color:var(--text)}
-.app{max-width:620px;margin:auto;min-height:100vh;padding:12px 14px 98px}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-.brand{display:flex;align-items:center;gap:9px;min-width:0}.logo{width:56px;height:56px;border-radius:14px;flex:0 0 auto}
-h1{font-size:20px;margin:0;line-height:1.05}.muted{color:var(--muted)}.small{font-size:12px}.version{font-size:11px;color:#ffd166;border:1px solid #6b4d10;padding:7px 10px;border-radius:999px;white-space:nowrap;line-height:1}
-.card{background:#102033;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;overflow:hidden}
-.hero{background:linear-gradient(135deg,#8e570a,#d98200);border:none}.big{font-size:34px;font-weight:800;margin:4px 0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#091522;border:1px solid var(--line);border-radius:14px;padding:13px}.metric b{display:block;font-size:20px;margin-top:4px}
-label{display:block;font-size:13px;color:var(--muted);margin:11px 0 6px}
-input,select,textarea{
-display:flex;width:100%;max-width:100%;min-width:0;height:56px;
-padding:0 14px;border-radius:12px;border:1px solid var(--line);
-background:#081522;color:#fff;font-size:16px;line-height:56px;box-sizing:border-box;
--webkit-appearance:none;appearance:none;
-text-align:center;text-align-last:center;
-align-items:center;justify-content:center;
-vertical-align:middle
-}
-textarea{display:block;height:auto;min-height:88px;padding:14px;text-align:center;line-height:1.4}
-input[type="date"],input[type="time"],input[type="number"],input[type="text"],input[type="tel"]{
-height:56px;min-height:56px;max-height:56px;
-padding-top:0;padding-bottom:0;line-height:56px
-}
-input[type="date"]::-webkit-date-and-time-value,
-input[type="time"]::-webkit-date-and-time-value{
-display:flex;align-items:center;justify-content:center;
-text-align:center;margin:0;width:100%;height:56px;line-height:56px
-}
-select option{text-align:center}
-input::placeholder,textarea::placeholder{text-align:center}
-textarea{min-height:80px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;align-items:start}
-button{display:block;width:100%;max-width:100%;min-height:48px;padding:13px;border:0;border-radius:13px;font-size:15px;font-weight:800;box-sizing:border-box}.primary{background:var(--gold);color:#2b1700;border-radius:16px}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
-.hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
-.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#3b290c;color:#ffd166;font-size:12px}
-.collapse-header{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
-.collapse-header h3{margin:0}
-.collapse-toggle{width:auto;min-height:40px;padding:8px 12px;border-radius:999px;background:#17304a;color:#fff}
-.collapse-content{margin-top:14px}
-section{display:none;opacity:0;transform:translateX(0);transition:transform .28s ease,opacity .28s ease}
-section.active{display:block;opacity:1}
-section.slide-in-right{display:block;animation:slideInRight .28s ease}
-section.slide-in-left{display:block;animation:slideInLeft .28s ease}
-@keyframes slideInRight{from{opacity:.3;transform:translateX(45px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideInLeft{from{opacity:.3;transform:translateX(-45px)}to{opacity:1;transform:translateX(0)}}
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,620px);display:grid;grid-template-columns:repeat(6,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
-.nav button{background:transparent;color:var(--muted);font-size:11px;padding:9px 2px}.nav button.active{background:#3b290c;color:#ffd166}
-.day-group{background:#0b1927;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}
-.day-group h3{margin-bottom:10px}
-.field-hint{font-size:12px;color:var(--muted);margin-top:5px}
-.row>div{min-width:0;width:100%}
-.row>div input,.row>div select,.row>div textarea{width:100%;min-width:0}
-.row label{min-height:18px}
-@media(min-width:431px){
- .row>div{display:flex;flex-direction:column}
- .row>div input,.row>div select{min-height:50px}
-}
-@media(max-width:430px){
- .row,.actions{grid-template-columns:1fr}
- .app{padding-left:10px;padding-right:10px}
- .card,.day-group{padding:13px}
-}
-hr{border:0;border-top:1px solid var(--line);margin:16px 0}
-</style>
 </head>
 <body>
 <div class="app">
 <header>
-<div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 12</div>
+  <div class="brand">
+    <img src="assets/logo.png" class="logo" alt="Spark Transportation">
+    <div class="brand-copy">
+      <h1>Spark Transportation</h1>
+      <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
+    </div>
+  </div>
+  <div class="version">v1.1.0</div>
 </header>
 
 <section id="home" class="active">
-<div class="card hero">
-<div>Today's running total</div>
-<div class="big" id="runningTotal">$0.00</div>
-<div id="runningDetail">No active day</div>
-</div>
-<div class="grid">
-<div class="metric"><span class="muted">Miles today</span><b id="milesToday">0</b></div>
-<div class="metric"><span class="muted">Locations today</span><b id="locationsToday">0</b></div>
-<div class="metric"><span class="muted">Activities today</span><b id="activitiesToday">0</b></div>
-<div class="metric"><span class="muted">Current ADP</span><b id="adpToday">$0.00</b></div>
-</div>
-<div class="card"><h3>Daily Workflow</h3><div id="homeStatus" class="muted">No active day.</div><div class="actions"><button class="primary" onclick="show('day')">Start / Resume Day</button><button class="secondary" onclick="show('locations')">Saved Locations</button></div></div>
-<div class="card"><div class="kv"><span>Completed days</span><b id="dayCount">0</b></div><div class="kv"><span>Total saved pay</span><b id="totalPay">$0.00</b></div></div>
+  <div class="hero card">
+    <div>Today's running total</div>
+    <div class="big" id="runningTotal">$0.00</div>
+    <div id="runningDetail">No active day</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="metric"><span>Miles today</span><b id="milesToday">0</b></div>
+    <div class="metric"><span>Locations today</span><b id="locationsToday">0</b></div>
+    <div class="metric"><span>Activities today</span><b id="activitiesToday">0</b></div>
+    <div class="metric"><span>Current ADP</span><b id="adpToday">$0.00</b></div>
+  </div>
+
+  <div class="card">
+    <h2>Daily Workflow</h2>
+    <div id="homeStatus" class="muted">No active day.</div>
+    <div class="actions">
+      <button class="primary" onclick="showPage('day')">Start / Resume Day</button>
+      <button class="secondary" onclick="showPage('locations')">Saved Locations</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="kv"><span>Completed days</span><b id="dayCount">0</b></div>
+    <div class="kv"><span>Total saved pay</span><b id="totalPay">$0.00</b></div>
+  </div>
 </section>
 
 <section id="day">
-<div class="card">
-<h3 id="dayHeading">Start / Edit Day</h3>
-<div id="startBox">
-<label>Date</label><input id="dayDate" type="date">
-<label>Beginning mileage</label><input id="beginMileage" type="number">
-<label>Start time</label><input id="startTime" type="time">
-<button class="primary" style="margin-top:12px" onclick="startDay()">Start Day</button>
-</div>
+  <div class="card">
+    <h2 id="dayHeading">Start / Edit Day</h2>
 
-<div id="activeBox" class="hidden">
-<div class="day-group"><h3>Day Details</h3>
-<label>Date</label><input id="editDayDate" type="date">
-<div class="row"><div><label>Beginning mileage</label><input id="editBeginMileage" type="number"></div><div><label>Start time</label><input id="editStartTime" type="time"></div></div>
-</div>
+    <div id="startBox">
+      <label>Date</label>
+      <input id="dayDate" type="date">
+      <label>Beginning mileage</label>
+      <input id="beginMileage" type="number" inputmode="decimal">
+      <label>Start time</label>
+      <input id="startTime" type="time">
+      <button class="primary top-gap" onclick="startDay()">Start Day</button>
+    </div>
 
-<div class="day-group"><h3>Choose Location</h3>
-<label>Saved location</label>
-<select id="savedLocationSelect"><option value="">Choose saved location</option></select>
-<button class="secondary" style="margin-top:10px" onclick="useSavedLocation()">Use Saved Location</button>
+    <div id="activeBox" class="hidden">
+      <div class="day-group">
+        <h3>Day Details</h3>
+        <label>Date</label>
+        <input id="editDayDate" type="date">
+        <div class="row">
+          <div>
+            <label>Beginning mileage</label>
+            <input id="editBeginMileage" type="number" inputmode="decimal">
+          </div>
+          <div>
+            <label>Start time</label>
+            <input id="editStartTime" type="time">
+          </div>
+        </div>
+      </div>
 
-<div class="row"><div><label>Location type</label><select id="locationType"><option>Store</option><option>Vendor</option><option>DC</option></select></div><div><label>Location number</label><input id="locationNumber" placeholder="Store, Vendor, or DC number"></div></div>
-<label>Name or notes</label><input id="locationName">
-<button class="primary" style="margin-top:12px" onclick="startLocation()">Start New Location</button>
+      <div class="day-group">
+        <h3>Choose Location</h3>
+        <label>Saved location</label>
+        <select id="savedLocationSelect"><option value="">Choose saved location</option></select>
+        <button class="secondary top-gap-sm" onclick="useSavedLocation()">Use Saved Location</button>
 
-<div id="activeLocationBox" class="hidden">
-<div class="location-card"><b id="activeLocationTitle"></b><div class="muted small" id="activeLocationSubtitle"></div></div>
-<h3 style="margin-top:16px">Add Activity</h3>
-<label>Activity</label>
-<select id="activityType" onchange="updateActivityFields()">
-<option value="">Select activity</option>
-<option>Live Load</option><option>Live Unload</option><option>Wait Time</option>
-<option>Meeting</option><option>Survey</option><option>Training</option>
-<option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option>
-<option>Layover</option><option>Chain</option><option>Regional Pay</option>
-</select>
+        <div class="row">
+          <div>
+            <label>Location type</label>
+            <select id="locationType"><option>Store</option><option>Vendor</option><option>DC</option></select>
+          </div>
+          <div>
+            <label>Location number</label>
+            <input id="locationNumber" placeholder="Store, Vendor, or DC number">
+          </div>
+        </div>
+        <label>Name or notes</label>
+        <input id="locationName" placeholder="Optional">
+        <button class="primary top-gap-sm" onclick="startLocation()">Start New Location</button>
 
-<div id="timedFields" class="hidden">
-<div class="row"><div><label>Start time</label><input id="activityStart" type="time"></div><div><label>Stop time</label><input id="activityStop" type="time"></div></div>
-<label>Hourly rate</label><input id="activityHourlyRate" type="number" step="0.01">
-</div>
+        <div id="activeLocationBox" class="hidden">
+          <div class="location-card">
+            <b id="activeLocationTitle"></b>
+            <div id="activeLocationSubtitle" class="muted small"></div>
+          </div>
 
-<div id="flatFields" class="hidden">
-<div class="row"><div><label>Quantity</label><input id="activityQty" type="number" min="1" value="1"></div><div><label>Rate each</label><input id="activityFlatRate" type="number" step="0.01"></div></div>
-</div>
+          <h3 class="section-gap">Add Activity</h3>
+          <label>Activity</label>
+          <select id="activityType" onchange="updateActivityFields()">
+            <option value="">Select activity</option>
+            <option>Live Load</option><option>Live Unload</option><option>Wait Time</option>
+            <option>Meeting</option><option>Survey</option><option>Training</option>
+            <option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option>
+            <option>Layover</option><option>Chain</option><option>Regional Pay</option>
+          </select>
 
-<div id="commonFields" class="hidden">
-<label>Activity notes</label><input id="activityNote">
-<button class="secondary" style="margin-top:12px" onclick="addActivity()">Save Activity</button>
-</div>
-</div>
+          <div id="timedFields" class="hidden">
+            <div class="row">
+              <div><label>Start time</label><input id="activityStart" type="time"></div>
+              <div><label>Stop time</label><input id="activityStop" type="time"></div>
+            </div>
+            <label>Hourly rate</label>
+            <input id="activityHourlyRate" type="number" step="0.01" inputmode="decimal">
+          </div>
 
-<div id="locationGroups"></div></div>
+          <div id="flatFields" class="hidden">
+            <div class="row">
+              <div><label>Quantity</label><input id="activityQty" type="number" min="1" value="1"></div>
+              <div><label>Rate each</label><input id="activityFlatRate" type="number" step="0.01" inputmode="decimal"></div>
+            </div>
+          </div>
 
-<div class="day-group"><h3>End Day</h3>
-<div class="row"><div><label>Ending mileage</label><input id="endMileage" type="number"><div class="field-hint">Used to calculate paid miles.</div></div><div><label>End time</label><input id="endTime" type="time"><div class="field-hint">Used for the daily timeline.</div></div></div>
-<label>PTO</label><select id="ptoType"><option value="none">None</option><option>Vacation</option><option>Sick</option><option>Safety</option></select>
-<label>PTO hours</label><input id="ptoHours" type="number" step="0.25" value="0">
-</div>
+          <div id="commonFields" class="hidden">
+            <label>Activity notes</label>
+            <input id="activityNote" placeholder="Optional">
+            <button class="secondary top-gap-sm" onclick="addActivity()">Save Activity</button>
+          </div>
+        </div>
 
-<div class="card" style="margin-top:14px">
-<div class="kv"><span>Mileage pay</span><b id="previewMileage">$0.00</b></div>
-<div class="kv"><span>Activity pay</span><b id="previewActivity">$0.00</b></div>
-<div class="kv"><span>PTO pay</span><b id="previewPto">$0.00</b></div>
-<div class="kv"><span>Running total</span><b id="previewTotal">$0.00</b></div>
-</div>
-<button id="saveDayButton" class="green" onclick="saveDay()">End Day & Save</button>
-<button class="danger" style="margin-top:8px" onclick="cancelDay()">Cancel Day</button>
-</div>
-</div>
+        <div id="locationGroups"></div>
+      </div>
+
+      <div class="day-group">
+        <h3>End Day</h3>
+        <div class="row">
+          <div>
+            <label>Ending mileage</label>
+            <input id="endMileage" type="number" inputmode="decimal">
+          </div>
+          <div>
+            <label>End time</label>
+            <input id="endTime" type="time">
+          </div>
+        </div>
+        <label>PTO</label>
+        <select id="ptoType"><option value="none">None</option><option>Vacation</option><option>Sick</option><option>Safety</option></select>
+        <label>PTO hours</label>
+        <input id="ptoHours" type="number" step="0.25" value="0" inputmode="decimal">
+      </div>
+
+      <div class="card inset">
+        <div class="kv"><span>Mileage pay</span><b id="previewMileage">$0.00</b></div>
+        <div class="kv"><span>Activity pay</span><b id="previewActivity">$0.00</b></div>
+        <div class="kv"><span>PTO pay</span><b id="previewPto">$0.00</b></div>
+        <div class="kv"><span>Running total</span><b id="previewTotal">$0.00</b></div>
+      </div>
+
+      <button id="saveDayButton" class="green" onclick="saveDay()">End Day & Save</button>
+      <button class="danger top-gap-sm" onclick="cancelDay()">Cancel Day</button>
+    </div>
+  </div>
 </section>
 
 <section id="locations">
-<div class="card">
-<div class="collapse-header" onclick="toggleSavedLocationForm()">
-<h3>Add Saved Location</h3>
-<button id="savedLocationToggleButton" class="collapse-toggle" type="button">Show</button>
-</div>
-<div id="savedLocationForm" class="collapse-content hidden">
-<div class="row"><div><label>Type</label><select id="savedType"><option>Store</option><option>Vendor</option><option>DC</option></select></div><div><label>Number</label><input id="savedNumber"></div></div>
-<label>Name</label><input id="savedName">
-<label>Address</label><input id="savedAddress">
-<div class="row"><div><label>City</label><input id="savedCity"></div><div><label>State</label><input id="savedState"></div></div>
-<div class="row"><div><label>Phone number</label><input id="savedPhone" type="tel" placeholder="555-555-5555"></div><div><label>Extension</label><input id="savedExtension" placeholder="Optional"></div></div>
-<label>Contact person</label><input id="savedContact">
-<label>Receiving hours</label><input id="savedHours" placeholder="Example: Mon–Fri 6 AM–2 PM">
-<div class="row"><div><label>Gate code</label><input id="savedGateCode"></div><div><label>Appointment number</label><input id="savedAppointment"></div></div>
-<label>Driver notes</label><textarea id="savedNotes" placeholder="Guard shack, receiving door, check-in instructions..."></textarea>
-<input id="editingSavedLocationIndex" type="hidden" value="">
-<button id="saveLocationButton" class="primary" onclick="saveLocation()">Save Location</button>
-<button id="cancelLocationEditButton" class="secondary hidden" style="margin-top:8px" onclick="cancelLocationEdit()">Cancel Edit</button>
-</div>
-</div>
-<div class="card"><h3>Saved Locations</h3><div id="savedLocationList" class="muted">No saved locations.</div></div>
+  <div class="card">
+    <div class="collapse-header" onclick="toggleSavedLocationForm()">
+      <h2>Add Saved Location</h2>
+      <button id="savedLocationToggleButton" class="collapse-toggle" type="button">Show</button>
+    </div>
+
+    <div id="savedLocationForm" class="collapse-content hidden">
+      <div class="row">
+        <div><label>Type</label><select id="savedType"><option>Store</option><option>Vendor</option><option>DC</option></select></div>
+        <div><label>Number</label><input id="savedNumber"></div>
+      </div>
+      <label>Name</label><input id="savedName">
+      <label>Address</label><input id="savedAddress">
+      <div class="row">
+        <div><label>City</label><input id="savedCity"></div>
+        <div><label>State</label><input id="savedState"></div>
+      </div>
+      <div class="row">
+        <div><label>Phone number</label><input id="savedPhone" type="tel"></div>
+        <div><label>Extension</label><input id="savedExtension"></div>
+      </div>
+      <label>Contact person</label><input id="savedContact">
+      <label>Receiving hours</label><input id="savedHours">
+      <div class="row">
+        <div><label>Gate code</label><input id="savedGateCode"></div>
+        <div><label>Appointment number</label><input id="savedAppointment"></div>
+      </div>
+      <label>Driver notes</label><textarea id="savedNotes"></textarea>
+      <input id="editingSavedLocationIndex" type="hidden" value="">
+      <button id="saveLocationButton" class="primary" onclick="saveLocation()">Save Location</button>
+      <button id="cancelLocationEditButton" class="secondary hidden top-gap-sm" onclick="cancelLocationEdit()">Cancel Edit</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Saved Locations</h2>
+    <input id="locationSearch" placeholder="Search saved locations" oninput="renderSavedLocations()">
+    <div id="savedLocationList" class="muted top-gap-sm">No saved locations.</div>
+  </div>
 </section>
 
-<section id="history"><div class="card"><h3>History</h3><div id="historyList" class="muted">No entries.</div></div></section>
+<section id="history">
+  <div class="card">
+    <h2>History</h2>
+    <input id="historySearch" placeholder="Search by date, Store, Vendor, or DC" oninput="renderHistory()">
+    <div id="historyList" class="muted top-gap-sm">No entries.</div>
+  </div>
+</section>
+
+<section id="reports">
+  <div class="card">
+    <h2>Reports</h2>
+    <div class="kv"><span>Total days</span><b id="reportDays">0</b></div>
+    <div class="kv"><span>Total miles</span><b id="reportMiles">0</b></div>
+    <div class="kv"><span>Total activities</span><b id="reportActivities">0</b></div>
+    <div class="kv"><span>Total estimated pay</span><b id="reportPay">$0.00</b></div>
+  </div>
+</section>
 
 <section id="setup">
-<div class="card"><h3>Driver & Pay Rates</h3>
-<label>Driver name</label><input id="driverName">
-<label>Driver ID</label><input id="driverId" placeholder="Enter driver ID">
-<label>Regular mileage rate</label><input id="mileageRate" type="number" step="0.001">
-<label>Weekend mileage rate</label><input id="weekendRate" type="number" step="0.001">
-<label>Live Load / hr</label><input id="liveLoadRate" type="number" step="0.01">
-<label>Live Unload / hr</label><input id="liveUnloadRate" type="number" step="0.01">
-<label>Wait Time / hr</label><input id="waitRate" type="number" step="0.01">
-<label>Manual ADP</label><input id="manualAdp" type="number" step="0.01">
-<label>Hook</label><input id="hookRate" type="number" step="0.01">
-<label>Stop</label><input id="stopRate" type="number" step="0.01">
-<label>Arrive</label><input id="arriveRate" type="number" step="0.01">
-<label>Arrive Drop</label><input id="arriveDropRate" type="number" step="0.01">
-<label>Layover</label><input id="layoverRate" type="number" step="0.01">
-<label>Chain</label><input id="chainRate" type="number" step="0.01">
-<label>Regional Pay</label><input id="regionalRate" type="number" step="0.01">
-<button class="primary" onclick="saveSetup()">Save Setup</button>
-</div>
+  <div class="card">
+    <h2>Driver & Pay Rates</h2>
+    <label>Driver name</label><input id="driverName">
+    <label>Driver ID</label><input id="driverId">
+    <label>Regular mileage rate</label><input id="mileageRate" type="number" step="0.001">
+    <label>Weekend mileage rate</label><input id="weekendRate" type="number" step="0.001">
+    <label>Live Load / hr</label><input id="liveLoadRate" type="number" step="0.01">
+    <label>Live Unload / hr</label><input id="liveUnloadRate" type="number" step="0.01">
+    <label>Wait Time / hr</label><input id="waitRate" type="number" step="0.01">
+    <label>Manual ADP</label><input id="manualAdp" type="number" step="0.01">
+    <label>Hook</label><input id="hookRate" type="number" step="0.01">
+    <label>Stop</label><input id="stopRate" type="number" step="0.01">
+    <label>Arrive</label><input id="arriveRate" type="number" step="0.01">
+    <label>Arrive Drop</label><input id="arriveDropRate" type="number" step="0.01">
+    <label>Layover</label><input id="layoverRate" type="number" step="0.01">
+    <label>Chain</label><input id="chainRate" type="number" step="0.01">
+    <label>Regional Pay</label><input id="regionalRate" type="number" step="0.01">
+    <button class="primary" onclick="saveSetup()">Save Setup</button>
+  </div>
 </section>
+
 <section id="data">
-<div class="card"><h3>Data Protection</h3>
-<div class="muted small">Use Export Backup before major updates or changing phones.</div>
-<button class="primary" style="margin-top:12px" onclick="exportBackup()">Export Backup</button>
-<label>Import backup file</label>
-<input id="importFile" type="file" accept=".json,application/json">
-<button class="secondary" style="margin-top:10px" onclick="importBackup()">Import Backup</button>
-<div class="kv" style="margin-top:12px"><span>Permanent storage key</span><b>Active</b></div>
-<div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
-</div>
+  <div class="card">
+    <h2>Data Protection</h2>
+    <p class="muted small">The app uses one permanent storage key for all future updates.</p>
+    <button class="primary" onclick="exportBackup()">Export Backup</button>
+    <label>Import backup file</label>
+    <input id="importFile" type="file" accept=".json,application/json">
+    <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
+    <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
+    <div class="kv"><span>App version</span><b>1.1.0</b></div>
+    <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
+  </div>
 </section>
 </div>
 
-<div class="nav">
-<button class="active" data-page="home" onclick="show('home')">Home</button>
-<button data-page="day" onclick="show('day')">Day</button>
-<button data-page="locations" onclick="show('locations')">Locations</button>
-<button data-page="history" onclick="show('history')">History</button>
-<button data-page="setup" onclick="show('setup')">Setup</button>
-<button data-page="data" onclick="show('data')">Data</button>
-</div>
+<nav class="nav">
+<button class="active" data-page="home" onclick="showPage('home')">Home</button>
+<button data-page="day" onclick="showPage('day')">Day</button>
+<button data-page="locations" onclick="showPage('locations')">Locations</button>
+<button data-page="history" onclick="showPage('history')">History</button>
+<button data-page="reports" onclick="showPage('reports')">Reports</button>
+<button data-page="setup" onclick="showPage('setup')">Setup</button>
+<button data-page="data" onclick="showPage('data')">Data</button>
+</nav>
 
-<script>
-const KEY='sparkTransportationData';
-const LEGACY_KEYS=[
- 'sparkTransportationPWA1',
- 'sparkTransportationV03',
- 'sparkTransportationV04',
- 'sparkTransportationV05',
- 'sparkTransportationV07',
- 'sparkTransportationV1Beta',
- 'sparkTransportationV1Beta1',
- 'sparkTransportationV1Beta2',
- 'sparkTransportationV1Beta3',
- 'sparkTransportationV1Beta4',
- 'sparkTransportationV1Beta5',
- 'sparkTransportationV1Beta6',
- 'sparkTransportationV1Beta7',
- 'sparkTransportationV1Beta8',
- 'sparkTransportationV1Beta9',
- 'sparkTransportationV1Beta10'
-];
-const defaults={driverName:'',driverId:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6};
-let state={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
-const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
-
-const pageOrder=['home','day','locations','history','setup','data']
-let currentPage='home'
-function show(id,direction=null){
- const oldIndex=pageOrder.indexOf(currentPage)
- const newIndex=pageOrder.indexOf(id)
- document.querySelectorAll('section').forEach(s=>s.classList.remove('active','slide-in-left','slide-in-right'))
- const target=$(id)
- target.classList.add('active')
- if(direction==='left'||(direction===null&&newIndex<oldIndex))target.classList.add('slide-in-left')
- if(direction==='right'||(direction===null&&newIndex>oldIndex))target.classList.add('slide-in-right')
- currentPage=id
- document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id))
- render()
-}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
-function findLegacyData(){
- const dynamicKeys=[]
- for(let i=0;i<localStorage.length;i++){
-   const k=localStorage.key(i)
-   if(k&&k!==KEY&&k.toLowerCase().includes('sparktransportation'))dynamicKeys.push(k)
- }
- for(const key of [...LEGACY_KEYS,...dynamicKeys]){
-   const raw=localStorage.getItem(key)
-   if(!raw)continue
-   try{
-     const parsed=JSON.parse(raw)
-     if(parsed&&typeof parsed==='object')return {key,data:parsed}
-   }catch(e){}
- }
- return null
-}
-function mergeLegacyState(legacy){
- if(!legacy)return
- const old=legacy.data
- state.setup={...state.setup,...(old.setup||{})}
- if(Array.isArray(old.entries)&&old.entries.length)state.entries=old.entries
- if(Array.isArray(old.savedLocations)&&old.savedLocations.length)state.savedLocations=old.savedLocations
- if(old.active)state.active=old.active
- if(Array.isArray(old.locations))state.locations=old.locations
- if(Number.isInteger(old.activeLocationIndex)||old.activeLocationIndex===null)state.activeLocationIndex=old.activeLocationIndex
- localStorage.setItem(KEY,JSON.stringify(state))
- localStorage.setItem('sparkTransportationMigratedFrom',legacy.key)
-}
-function load(){const s=localStorage.getItem(KEY);
-if(s){try{state=JSON.parse(s)}catch(e){}}
-else{mergeLegacyState(findLegacyData())}state.setup={...defaults,...state.setup};if(!state.setup.driverId&&state.setup.regionName)state.setup.driverId=state.setup.regionName;state.locations=state.locations||[];state.savedLocations=state.savedLocations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
-function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
-function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t)}
-function defaultRate(t){if(t==='Live Load')return num(state.setup.liveLoadRate);if(t==='Live Unload')return num(state.setup.liveUnloadRate);if(t==='Wait Time')return num(state.setup.waitRate);if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0}
-function updateActivityFields(){const t=activityType.value;timedFields.classList.toggle('hidden',!isTimed(t));flatFields.classList.toggle('hidden',!t||isTimed(t));commonFields.classList.toggle('hidden',!t);if(!t)return;if(isTimed(t))activityHourlyRate.value=defaultRate(t);else activityFlatRate.value=defaultRate(t)}
-function startDay(){if(!dayDate.value||!beginMileage.value||!startTime.value){alert('Enter date, beginning mileage and start time.');return}state.active={date:dayDate.value,beginMileage:num(beginMileage.value),startTime:startTime.value};state.locations=[];state.activeLocationIndex=null;save()}
-function startLocationFromData(data){state.locations.push({type:data.type,number:data.number,name:data.name||'',activities:[]});state.activeLocationIndex=state.locations.length-1;save()}
-function startLocation(){if(!locationNumber.value.trim()){alert('Enter a Store, Vendor or DC number.');return}startLocationFromData({type:locationType.value,number:locationNumber.value.trim(),name:locationName.value.trim()});locationNumber.value='';locationName.value=''}
-function useSavedLocation(){const id=savedLocationSelect.value;const loc=state.savedLocations.find(x=>x.id===id);if(!loc){alert('Choose a saved location.');return}startLocationFromData(loc)}
-function addActivity(){if(state.activeLocationIndex===null){alert('Choose a location first.');return}const t=activityType.value;if(!t){alert('Select an activity.');return}let a;if(isTimed(t)){if(!activityStart.value||!activityStop.value){alert('Enter start and stop times.');return}const h=decimalHours(activityStart.value,activityStop.value),r=num(activityHourlyRate.value);a={type:t,kind:'timed',start:activityStart.value,stop:activityStop.value,hours:h,rate:r,note:activityNote.value,pay:h*r}}else{const q=Math.max(1,num(activityQty.value)),r=num(activityFlatRate.value);a={type:t,kind:'flat',qty:q,rate:r,note:activityNote.value,pay:q*r}}state.locations[state.activeLocationIndex].activities.push(a);activityType.value='';activityStart.value=activityStop.value=activityHourlyRate.value=activityFlatRate.value=activityNote.value='';activityQty.value=1;updateActivityFields();save()}
-function selectLocation(i){state.activeLocationIndex=i;save()}
-function removeActivity(li,ai){state.locations[li].activities.splice(ai,1);save()}
-function removeLocation(i){if(confirm('Remove this location and all activities?')){state.locations.splice(i,1);state.activeLocationIndex=null;save()}}
-function activityTotal(){return state.locations.reduce((s,l)=>s+l.activities.reduce((x,a)=>x+a.pay,0),0)}
-function mileagePreview(){if(!state.active)return 0;const bm=num(editBeginMileage.value||state.active.beginMileage),em=num(endMileage.value);if(!em||em<bm)return 0;const d=new Date((editDayDate.value||state.active.date)+'T12:00:00'),r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate);return (em-bm)*r}
-function ptoPreview(){return ptoType.value==='none'?0:num(ptoHours.value)*(num(state.setup.manualAdp)/10)}
-function running(){return activityTotal()+mileagePreview()+ptoPreview()}
-function saveDay(){const date=editDayDate.value,bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value;if(!date||!bm||!em||!st||!et){alert('Complete the day fields.');return}if(em<bm){alert('Ending mileage cannot be lower.');return}const d=new Date(date+'T12:00:00'),r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate),miles=em-bm,mp=miles*r,ap=activityTotal(),pp=ptoPreview();const entry={date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay:mp,locations:JSON.parse(JSON.stringify(state.locations)),activityPay:ap,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay:pp,total:mp+ap+pp}
-if(state.editingEntryIndex===null||state.editingEntryIndex===undefined){state.entries.push(entry)}
-else{state.entries[state.editingEntryIndex]=entry}
-state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save();show('history')}
-function cancelDay(){if(confirm('Cancel this day?')){state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save()}}
-function toggleSavedLocationForm(forceState=null){
- const form=$('savedLocationForm')
- const button=$('savedLocationToggleButton')
- let shouldOpen
- if(forceState===true)shouldOpen=true
- else if(forceState===false)shouldOpen=false
- else shouldOpen=form.classList.contains('hidden')
- form.classList.toggle('hidden',!shouldOpen)
- button.textContent=shouldOpen?'Hide':'Show'
-}
-function saveLocation(){
- if(!savedNumber.value.trim()){alert('Enter a location number.');return}
- const location={
-   id:Date.now().toString(),
-   type:savedType.value,
-   number:savedNumber.value.trim(),
-   name:savedName.value.trim(),
-   address:savedAddress.value.trim(),
-   city:savedCity.value.trim(),
-   state:savedState.value.trim(),
-   phone:savedPhone.value.trim(),
-   extension:savedExtension.value.trim(),
-   contact:savedContact.value.trim(),
-   hours:savedHours.value.trim(),
-   gateCode:savedGateCode.value.trim(),
-   appointment:savedAppointment.value.trim(),
-   notes:savedNotes.value.trim()
- }
- const idx=editingSavedLocationIndex.value
- if(idx===''){state.savedLocations.push(location)}
- else{
-   const old=state.savedLocations[Number(idx)]
-   location.id=old.id
-   state.savedLocations[Number(idx)]=location
- }
- clearSavedLocationForm()
- toggleSavedLocationForm(false)
- save()
-}
-function editSavedLocation(i){
- const l=state.savedLocations[i]
- savedType.value=l.type
- savedNumber.value=l.number
- savedName.value=l.name||''
- savedAddress.value=l.address||''
- savedCity.value=l.city||''
- savedState.value=l.state||''
- savedPhone.value=l.phone||''
- savedExtension.value=l.extension||''
- savedContact.value=l.contact||''
- savedHours.value=l.hours||''
- savedGateCode.value=l.gateCode||''
- savedAppointment.value=l.appointment||''
- savedNotes.value=l.notes||''
- editingSavedLocationIndex.value=i
- saveLocationButton.textContent='Update Location'
- cancelLocationEditButton.classList.remove('hidden')
- show('locations')
- toggleSavedLocationForm(true)
- window.scrollTo({top:0,behavior:'smooth'})
-}
-function cancelLocationEdit(){clearSavedLocationForm()}
-function clearSavedLocationForm(){
- savedNumber.value=savedName.value=savedAddress.value=savedCity.value=savedState.value=savedPhone.value=savedExtension.value=savedContact.value=savedHours.value=savedGateCode.value=savedAppointment.value=savedNotes.value=''
- savedType.value='Store'
- editingSavedLocationIndex.value=''
- saveLocationButton.textContent='Save Location'
- cancelLocationEditButton.classList.add('hidden')
-}
-function deleteSavedLocation(i){state.savedLocations.splice(i,1);save()}
-function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','driverId'].includes(k)?$(k).value:num($(k).value));save();show('home')}
-function editHistoryDay(i){
- const e=state.entries[i]
- state.editingEntryIndex=i
- state.active={date:e.date,beginMileage:e.beginMileage,startTime:e.startTime}
- state.locations=JSON.parse(JSON.stringify(e.locations||[]))
- state.activeLocationIndex=state.locations.length?0:null
- show('day')
- setTimeout(()=>{
-   editDayDate.value=e.date
-   editBeginMileage.value=e.beginMileage
-   editStartTime.value=e.startTime
-   endMileage.value=e.endMileage
-   endTime.value=e.endTime
-   ptoType.value=e.ptoType||'none'
-   ptoHours.value=e.ptoHours||0
-   render()
- },0)
-}
-function deleteHistoryDay(i){
- if(confirm('Delete this saved day from History?')){
-   state.entries.splice(i,1)
-   save()
- }
-}
-function toggleHistory(i){const e=$('history'+i);if(e)e.classList.toggle('hidden')}
-function cleanPhone(phone){return String(phone||'').replace(/[^0-9+]/g,'')}
-function callLocation(phone,ext){
- const p=cleanPhone(phone)
- if(!p){alert('No phone number saved.');return}
- window.location.href='tel:'+p+(ext?','+String(ext).replace(/[^0-9]/g,''):'')
-}
-function mapLocation(l){
- const parts=[l.address,l.city,l.state].filter(Boolean).join(', ')
- if(!parts){alert('No address saved.');return}
- window.location.href='https://maps.apple.com/?q='+encodeURIComponent(parts)
-}
-function exportBackup(){
- const payload={app:'Spark Transportation',version:'1.0 Beta 11',exportedAt:new Date().toISOString(),data:state}
- const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'})
- const a=document.createElement('a')
- a.href=URL.createObjectURL(blob)
- a.download='spark-transportation-backup-'+new Date().toISOString().slice(0,10)+'.json'
- a.click()
- setTimeout(()=>URL.revokeObjectURL(a.href),1000)
-}
-function importBackup(){
- const input=document.getElementById('importFile')
- const file=input&&input.files?input.files[0]:null
- if(!file){alert('Choose a backup file first.');return}
- const reader=new FileReader()
- reader.onload=()=>{
-   try{
-     const parsed=JSON.parse(reader.result)
-     const restored=parsed.data||parsed
-     if(!restored||typeof restored!=='object'||!Array.isArray(restored.entries))throw new Error('Invalid')
-     state=restored
-     localStorage.setItem(KEY,JSON.stringify(state))
-     alert('Backup restored successfully.')
-     location.reload()
-   }catch(e){alert('This is not a valid Spark Transportation backup file.')}
- }
- reader.readAsText(file)
-}
-function render(){
- const ms=document.getElementById('migrationStatus')
- if(ms)ms.textContent=localStorage.getItem('sparkTransportationMigratedFrom')||'None'
- driverLine.textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.driverId||'Driver Pay & Activity Tracker')
- startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
- dayHeading.textContent=state.editingEntryIndex===null||state.editingEntryIndex===undefined?'Start / Edit Day':'Edit Saved Day'
- saveDayButton.textContent=state.editingEntryIndex===null||state.editingEntryIndex===undefined?'End Day & Save':'Save History Changes'
- if(state.active){if(!editDayDate.value)editDayDate.value=state.active.date;if(!editBeginMileage.value)editBeginMileage.value=state.active.beginMileage;if(!editStartTime.value)editStartTime.value=state.active.startTime}
- homeStatus.textContent=state.active?`Day in progress: ${state.active.date} • ${state.active.startTime} • mileage ${state.active.beginMileage}`:'No active day.'
- runningTotal.textContent=money(state.active?running():0);runningDetail.textContent=state.active?`${state.locations.length} locations • ${state.locations.reduce((s,l)=>s+l.activities.length,0)} activities`:'No active day'
- milesToday.textContent=state.active&&endMileage.value?Math.max(0,num(endMileage.value)-num(editBeginMileage.value||state.active.beginMileage)):0
- locationsToday.textContent=state.locations.length;activitiesToday.textContent=state.locations.reduce((s,l)=>s+l.activities.length,0);adpToday.textContent=money(state.setup.manualAdp)
- dayCount.textContent=state.entries.length;totalPay.textContent=money(state.entries.reduce((s,e)=>s+e.total,0))
- savedLocationSelect.innerHTML='<option value="">Choose saved location</option>'+state.savedLocations.map(l=>`<option value="${l.id}">${l.type} #${l.number} ${l.name||''}</option>`).join('')
- activeLocationBox.classList.toggle('hidden',state.activeLocationIndex===null)
- if(state.activeLocationIndex!==null&&state.locations[state.activeLocationIndex]){const l=state.locations[state.activeLocationIndex];activeLocationTitle.textContent=`${l.type} #${l.number}`;activeLocationSubtitle.textContent=l.name||'Activities added here belong to this location.'}
- locationGroups.innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}<div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${l.activities.length}</b></div><div class="kv"><span>Location total</span><b>${money(l.activities.reduce((s,a)=>s+a.pay,0))}</b></div>${l.activities.map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<b>${money(a.pay)}</b><button class="danger" style="margin-top:8px" onclick="removeActivity(${li},${ai})">Remove</button></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added.</div>'
- const mp=mileagePreview(),ap=activityTotal(),pp=ptoPreview();previewMileage.textContent=money(mp);previewActivity.textContent=money(ap);previewPto.textContent=money(pp);previewTotal.textContent=money(mp+ap+pp)
- savedLocationList.innerHTML=state.savedLocations.length?state.savedLocations.map((l,i)=>`<div class="entry">
-<b>${l.type} #${l.number}</b>
-<div>${l.name||''}</div>
-<div class="muted small">${[l.address,l.city,l.state].filter(Boolean).join(', ')}</div>
-${l.phone?`<div class="kv"><span>Phone</span><b>${l.phone}${l.extension?' ext. '+l.extension:''}</b></div>`:''}
-${l.contact?`<div class="kv"><span>Contact</span><b>${l.contact}</b></div>`:''}
-${l.hours?`<div class="kv"><span>Receiving hours</span><b>${l.hours}</b></div>`:''}
-${l.gateCode?`<div class="kv"><span>Gate code</span><b>${l.gateCode}</b></div>`:''}
-${l.appointment?`<div class="kv"><span>Appointment</span><b>${l.appointment}</b></div>`:''}
-${l.notes?`<div class="small" style="margin-top:8px">${l.notes}</div>`:''}
-<div class="actions">
-${l.phone?`<button class="green" onclick="callLocation('${l.phone.replace(/'/g,"\\'")}','${(l.extension||'').replace(/'/g,"\\'")}')">Call</button>`:'<button class="secondary" disabled>No Phone</button>'}
-${l.address||l.city?`<button class="primary" onclick='mapLocation(${JSON.stringify(l)})'>Directions</button>`:'<button class="secondary" disabled>No Address</button>'}
-</div>
-<div class="actions"><button class="secondary" onclick="editSavedLocation(${i})">Edit</button><button class="danger" onclick="deleteSavedLocation(${i})">Delete</button></div>
-</div>`).join(''):'No saved locations.'
- historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,rev)=>{const i=state.entries.length-1-rev;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${e.locations.length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger" style="margin-top:8px" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${e.locations.map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${l.activities.map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`}).join(''):'No entries.'
-}
-document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render()})
-let touchStartX=null,touchStartY=null,touchEndX=null,touchEndY=null
-document.addEventListener('touchstart',e=>{
- const t=e.changedTouches[0]
- touchStartX=t.screenX
- touchStartY=t.screenY
-},{passive:true})
-document.addEventListener('touchend',e=>{
- if(touchStartX===null)return
- const t=e.changedTouches[0]
- touchEndX=t.screenX
- touchEndY=t.screenY
- const dx=touchEndX-touchStartX
- const dy=touchEndY-touchStartY
- touchStartX=touchStartY=null
- if(Math.abs(dx)<60||Math.abs(dx)<=Math.abs(dy))return
- const index=pageOrder.indexOf(currentPage)
- if(dx<0&&index<pageOrder.length-1)show(pageOrder[index+1],'right')
- else if(dx>0&&index>0)show(pageOrder[index-1],'left')
-},{passive:true})
-load()
-</script>
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
