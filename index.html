@@ -14,7 +14,7 @@
 .card{background:#102033;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}h1{font-size:20px;margin:0}h3{margin:0 0 12px}
 label{display:block;font-size:13px;color:var(--muted);margin:11px 0 6px}input,select,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:#081522;color:#fff;font-size:16px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{width:100%;padding:13px;border:0;border-radius:13px;font-weight:800;font-size:15px}.primary{background:var(--gold);color:#2b1700}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
-.hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.details{margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}.activity-detail{padding:9px 0;border-bottom:1px solid var(--line)}.activity-detail:last-child{border-bottom:0}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,580px);display:grid;grid-template-columns:repeat(4,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
 .nav button{background:transparent;color:var(--muted);font-size:11px}.nav button.active{background:#3b290c;color:#ffd166}
 section{display:none}section.active{display:block}.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -22,7 +22,7 @@ section{display:none}section.active{display:block}.kv{display:flex;justify-conte
 </head>
 <body>
 <div class="app">
-<div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small">v0.5 • Unified Activities</div></div></div>
+<div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small">v0.6 • Date & Detailed History</div></div></div>
 
 <section id="home" class="active">
 <div class="card"><h3>Current Day</h3><div id="homeStatus" class="muted">No active day.</div><button class="primary" style="margin-top:12px" onclick="show('day')">Open Day</button></div>
@@ -33,12 +33,14 @@ section{display:none}section.active{display:block}.kv{display:flex;justify-conte
 <div class="card">
 <h3>Start / Edit Day</h3>
 <div id="startBox">
+<label>Date</label><input id="dayDate" type="date">
 <label>Beginning mileage</label><input id="beginMileage" type="number">
 <label>Start time</label><input id="startTime" type="time">
 <button class="primary" style="margin-top:12px" onclick="startDay()">Start Day</button>
 </div>
 
 <div id="activeBox" class="hidden">
+<label>Date</label><input id="editDayDate" type="date">
 <div class="row"><div><label>Beginning mileage</label><input id="editBeginMileage" type="number"></div><div><label>Start time</label><input id="editStartTime" type="time"></div></div>
 
 <hr>
@@ -117,7 +119,7 @@ const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.Nu
 
 function show(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render()}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
-function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});render()}
+function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
 function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t)}
 function defaultRate(t){
@@ -137,8 +139,8 @@ function updateActivityFields(){
  else activityFlatRate.value=defaultRate(t)
 }
 function startDay(){
- if(!beginMileage.value||!startTime.value){alert('Enter beginning mileage and start time.');return}
- state.active={date:new Date().toISOString().slice(0,10),beginMileage:num(beginMileage.value),startTime:startTime.value}
+ if(!dayDate.value||!beginMileage.value||!startTime.value){alert('Enter the date, beginning mileage and start time.');return}
+ state.active={date:dayDate.value,beginMileage:num(beginMileage.value),startTime:startTime.value}
  state.activities=[];save()
 }
 function addActivity(){
@@ -161,23 +163,24 @@ function editActivity(i){
 }
 function removeActivity(i){state.activities.splice(i,1);save()}
 function saveDay(){
- const bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value
- if(!bm||!em||!st||!et){alert('Enter beginning and ending mileage and start and end times.');return}
+ const date=editDayDate.value,bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value
+ if(!date||!bm||!em||!st||!et){alert('Enter date, beginning and ending mileage, and start and end times.');return}
  if(em<bm){alert('Ending mileage cannot be lower.');return}
  const miles=em-bm,rate=(new Date(state.active.date+'T12:00:00').getDay()%6===0)?num(state.setup.weekendRate):num(state.setup.mileageRate)
  const mileagePay=miles*rate,activityPay=state.activities.reduce((s,a)=>s+a.pay,0),ptoPay=ptoType.value==='none'?0:num(ptoHours.value)*(num(state.setup.manualAdp)/10)
- state.entries.push({date:state.active.date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay,activities:[...state.activities],activityPay,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay,total:mileagePay+activityPay+ptoPay})
+ state.entries.push({date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay,activities:[...state.activities],activityPay,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay,total:mileagePay+activityPay+ptoPay})
  state.active=null;state.activities=[];save();show('home')
 }
 function cancelDay(){state.active=null;state.activities=[];save()}
 function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','regionName'].includes(k)?$(k).value:num($(k).value));save();show('home')}
+function toggleHistoryDetails(i){const el=$('historyDetails'+i);if(el)el.classList.toggle('hidden')}
 function render(){
  startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
- if(state.active){if(!editBeginMileage.value)editBeginMileage.value=state.active.beginMileage;if(!editStartTime.value)editStartTime.value=state.active.startTime}
+ if(state.active){if(!editDayDate.value)editDayDate.value=state.active.date;if(!editBeginMileage.value)editBeginMileage.value=state.active.beginMileage;if(!editStartTime.value)editStartTime.value=state.active.startTime}
  homeStatus.textContent=state.active?`Day in progress: ${state.active.startTime}, mileage ${state.active.beginMileage}`:'No active day.'
  dayCount.textContent=state.entries.length;totalPay.textContent=money(state.entries.reduce((s,e)=>s+e.total,0))
  activityList.innerHTML=state.activities.length?state.activities.map((a,i)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<div><b>${money(a.pay)}</b></div><div class="actions"><button class="secondary" onclick="editActivity(${i})">Edit</button><button class="danger" onclick="removeActivity(${i})">Remove</button></div></div>`).join(''):'<div class="muted small">No activities added.</div>'
- historyList.innerHTML=state.entries.length?[...state.entries].reverse().map(e=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Activities (${e.activities.length})</span><b>${money(e.activityPay)}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div></div>`).join(''):'No entries.'
+ historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,revIndex)=>{const i=state.entries.length-1-revIndex;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Activities (${e.activities.length})</span><b>${money(e.activityPay)}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><button class="secondary" style="margin-top:9px" onclick="toggleHistoryDetails(${i})">View Activities</button><div id="historyDetails${i}" class="details hidden">${e.activities.length?e.activities.map(a=>`<div class="activity-detail"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} decimal hours • ${money(a.rate)}/hr`:`Quantity ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div class="small">${a.note}</div>`:''}<div><b>${money(a.pay)}</b></div></div>`).join(''):'<div class="muted small">No activities recorded.</div>'}</div></div>`}).join(''):'No entries.'
 }
 load()
 </script>
