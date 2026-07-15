@@ -1,9 +1,13 @@
-Spark Transportation v1.1.1 — Flat iPhone/GitHub Package
+Spark Transportation v1.1.2 — Official Logo Update
 
-Why v1.1.0 did not load correctly:
-The prior package used css/, js/, and assets/ folders. Uploading from an iPhone can flatten or omit folders, causing broken file references.
+This package uses the supplied navy, gold, and white Spark Transportation logo for:
+- App header
+- Browser favicon
+- iPhone Home Screen icon
+- PWA 192×192 icon
+- PWA 512×512 icon
 
-This corrected package has every required file at the repository's main level:
+Upload all files directly to the main/root level of the existing GitHub repository:
 - index.html
 - manifest.json
 - sw.js
@@ -11,14 +15,7 @@ This corrected package has every required file at the repository's main level:
 - icon-192.png
 - icon-512.png
 
-Update steps:
-1. Unzip this package.
-2. Delete or replace the old app files in the GitHub repository.
-3. Upload all six files to the repository's main/root level.
-4. Do not place them inside another folder.
-5. Commit the changes.
-6. Wait for GitHub Pages to deploy.
-7. Open the GitHub Pages website in Safari and refresh.
-8. Reopen the Home Screen app.
-
-The permanent storage key remains unchanged, so existing data can be retained and migrated.
+After GitHub Pages deploys:
+1. Open the website in Safari and refresh.
+2. Reopen the Home Screen app.
+3. If iOS still shows the old icon, remove only the Home Screen shortcut and add it again from Safari.

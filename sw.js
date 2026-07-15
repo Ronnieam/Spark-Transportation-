@@ -1,4 +1,4 @@
-const CACHE='spark-v1-1-1-flat';
+const CACHE='spark-v1-1-2-branding';
 const ASSETS=['./','index.html','manifest.json','icon-192.png','icon-512.png','logo.png'];
 self.addEventListener('install',e=>{
   self.skipWaiting();
