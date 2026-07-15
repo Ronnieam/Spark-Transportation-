@@ -15,13 +15,13 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .brand{display:flex;align-items:center;gap:10px}.logo{width:58px;height:58px;border-radius:14px}
 h1{font-size:20px;margin:0}.muted{color:var(--muted)}.small{font-size:12px}.version{font-size:11px;color:#ffd166;border:1px solid #6b4d10;padding:5px 8px;border-radius:999px}
-.card{background:#102033;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+.card{background:#102033;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;overflow:hidden}
 .hero{background:linear-gradient(135deg,#8e570a,#d98200);border:none}.big{font-size:34px;font-weight:800;margin:4px 0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#091522;border:1px solid var(--line);border-radius:14px;padding:13px}.metric b{display:block;font-size:20px;margin-top:4px}
 label{display:block;font-size:13px;color:var(--muted);margin:11px 0 6px}
-input,select,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:#081522;color:#fff;font-size:16px}
-textarea{min-height:80px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-button{width:100%;padding:13px;border:0;border-radius:13px;font-size:15px;font-weight:800}.primary{background:var(--gold);color:#2b1700}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
+input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;padding:14px;border-radius:12px;border:1px solid var(--line);background:#081522;color:#fff;font-size:16px;box-sizing:border-box}
+textarea{min-height:80px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+button{display:block;width:100%;max-width:100%;min-height:48px;padding:13px;border:0;border-radius:13px;font-size:15px;font-weight:800;box-sizing:border-box}.primary{background:var(--gold);color:#2b1700}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
 .hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
 .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#3b290c;color:#ffd166;font-size:12px}
@@ -33,6 +33,14 @@ section.slide-in-left{display:block;animation:slideInLeft .28s ease}
 @keyframes slideInLeft{from{opacity:.3;transform:translateX(-45px)}to{opacity:1;transform:translateX(0)}}
 .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,620px);display:grid;grid-template-columns:repeat(5,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
 .nav button{background:transparent;color:var(--muted);font-size:11px;padding:9px 2px}.nav button.active{background:#3b290c;color:#ffd166}
+.day-group{background:#0b1927;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}
+.day-group h3{margin-bottom:10px}
+.field-hint{font-size:12px;color:var(--muted);margin-top:5px}
+@media(max-width:430px){
+ .row,.actions{grid-template-columns:1fr}
+ .app{padding-left:10px;padding-right:10px}
+ .card,.day-group{padding:13px}
+}
 hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 </style>
 </head>
@@ -40,7 +48,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 4</div>
+<div class="version">v1.0 Beta 5</div>
 </header>
 
 <section id="home" class="active">
@@ -70,11 +78,12 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 </div>
 
 <div id="activeBox" class="hidden">
+<div class="day-group"><h3>Day Details</h3>
 <label>Date</label><input id="editDayDate" type="date">
 <div class="row"><div><label>Beginning mileage</label><input id="editBeginMileage" type="number"></div><div><label>Start time</label><input id="editStartTime" type="time"></div></div>
+</div>
 
-<hr>
-<h3>Choose Location</h3>
+<div class="day-group"><h3>Choose Location</h3>
 <label>Saved location</label>
 <select id="savedLocationSelect"><option value="">Choose saved location</option></select>
 <button class="secondary" style="margin-top:10px" onclick="useSavedLocation()">Use Saved Location</button>
@@ -110,12 +119,13 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 </div>
 </div>
 
-<div id="locationGroups"></div>
+<div id="locationGroups"></div></div>
 
-<hr>
-<div class="row"><div><label>Ending mileage</label><input id="endMileage" type="number"></div><div><label>End time</label><input id="endTime" type="time"></div></div>
+<div class="day-group"><h3>End Day</h3>
+<div class="row"><div><label>Ending mileage</label><input id="endMileage" type="number"><div class="field-hint">Used to calculate paid miles.</div></div><div><label>End time</label><input id="endTime" type="time"><div class="field-hint">Used for the daily timeline.</div></div></div>
 <label>PTO</label><select id="ptoType"><option value="none">None</option><option>Vacation</option><option>Sick</option><option>Safety</option></select>
 <label>PTO hours</label><input id="ptoHours" type="number" step="0.25" value="0">
+</div>
 
 <div class="card" style="margin-top:14px">
 <div class="kv"><span>Mileage pay</span><b id="previewMileage">$0.00</b></div>

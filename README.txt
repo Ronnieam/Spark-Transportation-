@@ -1,14 +1,15 @@
-Spark Transportation v1.0 Beta 4
+Spark Transportation v1.0 Beta 5
 
-New:
-- Swipe left or right between pages.
-- Smooth iPhone-style slide animations.
-- Swipe order:
-  Home ⇄ Day ⇄ Locations ⇄ History ⇄ Setup
-- Bottom navigation still works.
-- Vertical scrolling is protected so normal scrolling does not accidentally change pages.
+Day Page Improvements:
+- All inputs remain inside their cards.
+- Even two-column spacing on larger iPhones.
+- Automatic single-column layout on smaller screens.
+- Larger touch-friendly fields and buttons.
+- Day Details, Choose Location, and End Day are grouped into clear sections.
+- Cards prevent accidental horizontal overflow.
+- Swipe navigation and all previous features remain included.
 
-Update the same GitHub Pages repository by replacing:
+Replace the existing GitHub Pages files with:
 index.html
 manifest.json
 sw.js
