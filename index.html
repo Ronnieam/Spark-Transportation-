@@ -64,12 +64,32 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
 }
 .nav button{background:transparent;color:var(--muted);font-size:10px;padding:8px 1px;min-height:44px}
 .nav button.active{background:#3b290c;color:#ffd166}
+
+/* v1.2 dashboard */
+.today-header{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 14px}
+.today-title{font-size:29px;font-weight:850;letter-spacing:-.7px}.today-date{font-size:15px;color:var(--muted);margin-top:3px}
+.profile-dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#1c3853;border:1px solid #45617b;font-size:22px}
+.greeting{font-size:23px;font-weight:850;margin-bottom:3px}.tagline{color:#d2dbe4;font-size:14px}
+.status-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#12314c;border:1px solid #2f5979;border-radius:16px;padding:13px 14px;margin-bottom:14px}
+.status-left{display:flex;align-items:center;gap:9px;font-weight:800}.status-dot{width:11px;height:11px;border-radius:50%;background:#44d17a;box-shadow:0 0 0 4px rgba(68,209,122,.12)}
+.status-meta{font-size:13px;color:#d6e0e8;white-space:nowrap}
+.dashboard-hero{background:linear-gradient(135deg,#d98500,#ffb000);color:#241500;border:0;box-shadow:0 12px 26px rgba(0,0,0,.18)}
+.dashboard-hero .eyebrow{font-size:14px;font-weight:750}.dashboard-hero .big{font-size:43px;margin:2px 0 12px}.hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid rgba(54,31,0,.28);padding-top:11px;text-align:center}.hero-grid span{font-size:12px;opacity:.76}.hero-grid b{display:block;font-size:18px;margin-top:2px}
+.section-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}.section-title-row h2{margin:0}.chevron-btn{width:auto;min-height:38px;padding:7px 11px;background:#17304a;color:#fff}
+.current-location-main{display:flex;gap:12px;align-items:center}.location-icon{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;background:#ffc247;color:#2b1700;font-size:24px;flex:0 0 auto}.location-copy{min-width:0;flex:1}.location-copy b{font-size:18px}.location-copy div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.location-actions{grid-template-columns:repeat(2,1fr)}.location-details{margin-top:12px;padding-top:5px;border-top:1px solid var(--line)}
+.pay-card .kv{padding:10px 0}.pay-card .total-row{font-size:20px;color:#ffd166}.pay-card .total-row b{font-size:24px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.quick-btn{min-height:78px;background:#10243a;border:1px solid #35506a;color:#fff;padding:8px 5px}.quick-btn .quick-icon{display:block;font-size:24px;margin-bottom:5px}.quick-btn.more{background:#2b3440;color:#fff}
+.primary-dashboard{min-height:59px;font-size:18px;box-shadow:0 9px 20px rgba(255,176,0,.15)}
+.dashboard-note{text-align:center;color:var(--muted);font-size:12px;margin:-4px 0 10px}
+
 @media(max-width:430px){
   .row,.actions{grid-template-columns:1fr}
   .app{padding-left:10px;padding-right:10px}
   .card,.day-group{padding:13px}
   .logo{width:60px;height:60px}
   .nav button{font-size:9px}
+  .today-title{font-size:27px}.dashboard-hero .big{font-size:40px}.quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 
 </style>
@@ -85,35 +105,83 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.1.2</div>
+  <div class="version">v1.2.0</div>
 </header>
 
 <section id="home" class="active">
-  <div class="hero card">
-    <div>Today's running total</div>
-    <div class="big" id="runningTotal">$0.00</div>
-    <div id="runningDetail">No active day</div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="metric"><span>Miles today</span><b id="milesToday">0</b></div>
-    <div class="metric"><span>Locations today</span><b id="locationsToday">0</b></div>
-    <div class="metric"><span>Activities today</span><b id="activitiesToday">0</b></div>
-    <div class="metric"><span>Current ADP</span><b id="adpToday">$0.00</b></div>
+  <div class="today-header">
+    <div>
+      <div class="today-title">Today's Run</div>
+      <div class="today-date" id="todayDateLabel"></div>
+    </div>
+    <div class="profile-dot">👤</div>
   </div>
 
   <div class="card">
-    <h2>Daily Workflow</h2>
-    <div id="homeStatus" class="muted">No active day.</div>
-    <div class="actions">
-      <button class="primary" onclick="showPage('day')">Start / Resume Day</button>
-      <button class="secondary" onclick="showPage('locations')">Saved Locations</button>
+    <div class="greeting" id="dashboardGreeting">Good morning</div>
+    <div class="tagline">Know Your Day. Know Your Pay.</div>
+  </div>
+
+  <div class="status-strip">
+    <div class="status-left"><span class="status-dot" id="statusDot"></span><span id="dashboardStatus">Ready to Start</span></div>
+    <div class="status-meta" id="dashboardStatusMeta">No active day</div>
+  </div>
+
+  <div class="card dashboard-hero">
+    <div class="eyebrow">Today's Estimated Pay</div>
+    <div class="big" id="runningTotal">$0.00</div>
+    <div class="hero-grid">
+      <div><span>Miles</span><b id="milesToday">0</b></div>
+      <div><span>Locations</span><b id="locationsToday">0</b></div>
+      <div><span>Activities</span><b id="activitiesToday">0</b></div>
+    </div>
+    <div id="runningDetail" class="hidden"></div>
+  </div>
+
+  <div class="card" id="currentLocationCard">
+    <div class="section-title-row"><h2>Current Location</h2><button class="chevron-btn" onclick="toggleDashboardLocation()" id="locationToggle">Details</button></div>
+    <div class="current-location-main">
+      <div class="location-icon">📍</div>
+      <div class="location-copy"><b id="dashboardLocationTitle">No location selected</b><div class="muted small" id="dashboardLocationName">Start or resume your day to add a location.</div></div>
+    </div>
+    <div class="actions location-actions">
+      <button class="green" id="dashboardCallButton" onclick="callDashboardLocation()">Call</button>
+      <button class="primary" id="dashboardDirectionsButton" onclick="directionsDashboardLocation()">Directions</button>
+    </div>
+    <div class="location-details hidden" id="dashboardLocationDetails">
+      <div class="kv"><span>Contact</span><b id="dashboardContact">—</b></div>
+      <div class="kv"><span>Receiving hours</span><b id="dashboardHours">—</b></div>
+      <div class="kv"><span>Gate code</span><b id="dashboardGate">—</b></div>
+      <div class="kv"><span>Appointment</span><b id="dashboardAppointment">—</b></div>
+      <div class="top-gap-sm small" id="dashboardNotes"></div>
     </div>
   </div>
 
+  <div class="card pay-card">
+    <h2>Pay Summary</h2>
+    <div class="kv"><span>Mileage Pay</span><b id="dashboardMileagePay">$0.00</b></div>
+    <div class="kv"><span>Activity Pay</span><b id="dashboardActivityPay">$0.00</b></div>
+    <div class="kv"><span>PTO Pay</span><b id="dashboardPtoPay">$0.00</b></div>
+    <div class="kv total-row"><span>Today's Total</span><b id="dashboardTotalPay">$0.00</b></div>
+  </div>
+
   <div class="card">
-    <div class="kv"><span>Completed days</span><b id="dayCount">0</b></div>
-    <div class="kv"><span>Total saved pay</span><b id="totalPay">$0.00</b></div>
+    <h2>Quick Add Activity</h2>
+    <div class="quick-grid">
+      <button class="quick-btn" onclick="quickAddActivity('Live Load')"><span class="quick-icon">📦</span>Live Load</button>
+      <button class="quick-btn" onclick="quickAddActivity('Live Unload')"><span class="quick-icon">📤</span>Live Unload</button>
+      <button class="quick-btn" onclick="quickAddActivity('Wait Time')"><span class="quick-icon">⏱️</span>Wait Time</button>
+      <button class="quick-btn" onclick="quickAddActivity('Hook')"><span class="quick-icon">🔗</span>Hook</button>
+      <button class="quick-btn" onclick="quickAddActivity('Stop')"><span class="quick-icon">🛑</span>Stop</button>
+      <button class="quick-btn more" onclick="showPage('day')"><span class="quick-icon">•••</span>More</button>
+    </div>
+  </div>
+
+  <button class="primary primary-dashboard" id="dashboardPrimaryButton" onclick="dashboardPrimaryAction()">Start Day</button>
+  <div class="dashboard-note" id="homeStatus">Your saved data remains on this device.</div>
+
+  <div class="card hidden" aria-hidden="true">
+    <b id="adpToday">$0.00</b><b id="dayCount">0</b><b id="totalPay">$0.00</b>
   </div>
 </section>
 
@@ -397,7 +465,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.1.0',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.0',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -441,6 +509,26 @@ const pageOrder=['home','day','locations','history','reports','setup','data'];
 let currentPage='home';
 
 function save(){savePersistentState(state);render();}
+
+function dashboardPrimaryAction(){showPage('day');}
+function quickAddActivity(type){
+ if(!state.active){showPage('day');return;}
+ showPage('day');
+ setTimeout(()=>{if($('activityType')){$('activityType').value=type;updateActivityFields();$('activityType').scrollIntoView({behavior:'smooth',block:'center'});}},80);
+}
+function currentDashboardLocation(){
+ if(state.activeLocationIndex===null||!state.locations[state.activeLocationIndex])return null;
+ const active=state.locations[state.activeLocationIndex];
+ return state.savedLocations.find(l=>l.type===active.type&&String(l.number)===String(active.number))||active;
+}
+function toggleDashboardLocation(){
+ const box=$('dashboardLocationDetails');box.classList.toggle('hidden');
+ $('locationToggle').textContent=box.classList.contains('hidden')?'Details':'Hide';
+}
+function callDashboardLocation(){const l=currentDashboardLocation();if(!l||!l.phone){alert('No phone number saved for the current location.');return;}callLocation(l.phone,l.extension||'');}
+function directionsDashboardLocation(){const l=currentDashboardLocation();if(!l){alert('No current location selected.');return;}mapLocation(l);}
+function greetingForNow(){const h=new Date().getHours();return h<12?'Good Morning':h<18?'Good Afternoon':'Good Evening';}
+
 function showPage(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');currentPage=id;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100;}
 function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t);}
@@ -588,6 +676,29 @@ function render(){
   if(!$('editBeginMileage').value)$('editBeginMileage').value=state.active.beginMileage;
   if(!$('editStartTime').value)$('editStartTime').value=state.active.startTime;
  }
+
+
+ const now=new Date();
+ $('todayDateLabel').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+ $('dashboardGreeting').textContent=greetingForNow()+(state.setup.driverName?', '+state.setup.driverName:'');
+ const activityCount=state.locations.reduce((s,l)=>s+(l.activities||[]).length,0);
+ const activePay=state.active?running():0;
+ $('dashboardStatus').textContent=state.active?'On Duty':'Ready to Start';
+ $('dashboardStatusMeta').textContent=state.active?`Started ${state.active.startTime} • ${activityCount} activities`:'No active day';
+ $('statusDot').style.background=state.active?'#44d17a':'#ffb000';
+ $('dashboardPrimaryButton').textContent=state.active?'Resume Day':'Start Day';
+ const dl=currentDashboardLocation();
+ $('dashboardLocationTitle').textContent=dl?`${dl.type} #${dl.number}`:'No location selected';
+ $('dashboardLocationName').textContent=dl?(dl.name||'Current activity location'):'Start or resume your day to add a location.';
+ $('dashboardContact').textContent=dl&&dl.contact||'—';
+ $('dashboardHours').textContent=dl&&dl.hours||'—';
+ $('dashboardGate').textContent=dl&&dl.gateCode||'—';
+ $('dashboardAppointment').textContent=dl&&dl.appointment||'—';
+ $('dashboardNotes').textContent=dl&&dl.notes||'';
+ $('dashboardCallButton').disabled=!(dl&&dl.phone);
+ $('dashboardDirectionsButton').disabled=!(dl&&(dl.address||dl.city||dl.state));
+ const dashMp=state.active?mileagePreview():0,dashAp=state.active?activityTotal():0,dashPp=state.active?ptoPreview():0;
+ $('dashboardMileagePay').textContent=money(dashMp);$('dashboardActivityPay').textContent=money(dashAp);$('dashboardPtoPay').textContent=money(dashPp);$('dashboardTotalPay').textContent=money(dashMp+dashAp+dashPp);
 
  $('homeStatus').textContent=state.active?`Day in progress: ${state.active.date} • ${state.active.startTime} • mileage ${state.active.beginMileage}`:'No active day.';
  $('runningTotal').textContent=money(state.active?running():0);
