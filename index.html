@@ -55,7 +55,7 @@ section.slide-in-right{display:block;animation:slideInRight .28s ease}
 section.slide-in-left{display:block;animation:slideInLeft .28s ease}
 @keyframes slideInRight{from{opacity:.3;transform:translateX(45px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideInLeft{from{opacity:.3;transform:translateX(-45px)}to{opacity:1;transform:translateX(0)}}
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,620px);display:grid;grid-template-columns:repeat(5,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,620px);display:grid;grid-template-columns:repeat(6,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
 .nav button{background:transparent;color:var(--muted);font-size:11px;padding:9px 2px}.nav button.active{background:#3b290c;color:#ffd166}
 .day-group{background:#0b1927;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}
 .day-group h3{margin-bottom:10px}
@@ -79,7 +79,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 10</div>
+<div class="version">v1.0 Beta 11</div>
 </header>
 
 <section id="home" class="active">
@@ -216,6 +216,17 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <button class="primary" onclick="saveSetup()">Save Setup</button>
 </div>
 </section>
+<section id="data">
+<div class="card"><h3>Data Protection</h3>
+<div class="muted small">Use Export Backup before major updates or changing phones.</div>
+<button class="primary" style="margin-top:12px" onclick="exportBackup()">Export Backup</button>
+<label>Import backup file</label>
+<input id="importFile" type="file" accept=".json,application/json">
+<button class="secondary" style="margin-top:10px" onclick="importBackup()">Import Backup</button>
+<div class="kv" style="margin-top:12px"><span>Permanent storage key</span><b>Active</b></div>
+<div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
+</div>
+</section>
 </div>
 
 <div class="nav">
@@ -224,15 +235,34 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <button data-page="locations" onclick="show('locations')">Locations</button>
 <button data-page="history" onclick="show('history')">History</button>
 <button data-page="setup" onclick="show('setup')">Setup</button>
+<button data-page="data" onclick="show('data')">Data</button>
 </div>
 
 <script>
-const KEY='sparkTransportationV1Beta';
+const KEY='sparkTransportationData';
+const LEGACY_KEYS=[
+ 'sparkTransportationPWA1',
+ 'sparkTransportationV03',
+ 'sparkTransportationV04',
+ 'sparkTransportationV05',
+ 'sparkTransportationV07',
+ 'sparkTransportationV1Beta',
+ 'sparkTransportationV1Beta1',
+ 'sparkTransportationV1Beta2',
+ 'sparkTransportationV1Beta3',
+ 'sparkTransportationV1Beta4',
+ 'sparkTransportationV1Beta5',
+ 'sparkTransportationV1Beta6',
+ 'sparkTransportationV1Beta7',
+ 'sparkTransportationV1Beta8',
+ 'sparkTransportationV1Beta9',
+ 'sparkTransportationV1Beta10'
+];
 const defaults={driverName:'',driverId:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6};
 let state={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
 const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
 
-const pageOrder=['home','day','locations','history','setup']
+const pageOrder=['home','day','locations','history','setup','data']
 let currentPage='home'
 function show(id,direction=null){
  const oldIndex=pageOrder.indexOf(currentPage)
@@ -247,7 +277,37 @@ function show(id,direction=null){
  render()
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
-function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};if(!state.setup.driverId&&state.setup.regionName)state.setup.driverId=state.setup.regionName;state.locations=state.locations||[];state.savedLocations=state.savedLocations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
+function findLegacyData(){
+ const dynamicKeys=[]
+ for(let i=0;i<localStorage.length;i++){
+   const k=localStorage.key(i)
+   if(k&&k!==KEY&&k.toLowerCase().includes('sparktransportation'))dynamicKeys.push(k)
+ }
+ for(const key of [...LEGACY_KEYS,...dynamicKeys]){
+   const raw=localStorage.getItem(key)
+   if(!raw)continue
+   try{
+     const parsed=JSON.parse(raw)
+     if(parsed&&typeof parsed==='object')return {key,data:parsed}
+   }catch(e){}
+ }
+ return null
+}
+function mergeLegacyState(legacy){
+ if(!legacy)return
+ const old=legacy.data
+ state.setup={...state.setup,...(old.setup||{})}
+ if(Array.isArray(old.entries)&&old.entries.length)state.entries=old.entries
+ if(Array.isArray(old.savedLocations)&&old.savedLocations.length)state.savedLocations=old.savedLocations
+ if(old.active)state.active=old.active
+ if(Array.isArray(old.locations))state.locations=old.locations
+ if(Number.isInteger(old.activeLocationIndex)||old.activeLocationIndex===null)state.activeLocationIndex=old.activeLocationIndex
+ localStorage.setItem(KEY,JSON.stringify(state))
+ localStorage.setItem('sparkTransportationMigratedFrom',legacy.key)
+}
+function load(){const s=localStorage.getItem(KEY);
+if(s){try{state=JSON.parse(s)}catch(e){}}
+else{mergeLegacyState(findLegacyData())}state.setup={...defaults,...state.setup};if(!state.setup.driverId&&state.setup.regionName)state.setup.driverId=state.setup.regionName;state.locations=state.locations||[];state.savedLocations=state.savedLocations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
 function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t)}
 function defaultRate(t){if(t==='Live Load')return num(state.setup.liveLoadRate);if(t==='Live Unload')return num(state.setup.liveUnloadRate);if(t==='Wait Time')return num(state.setup.waitRate);if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Driver IDal Pay':state.setup.regionalRate}[t]||0}
@@ -376,7 +436,36 @@ function mapLocation(l){
  if(!parts){alert('No address saved.');return}
  window.location.href='https://maps.apple.com/?q='+encodeURIComponent(parts)
 }
+function exportBackup(){
+ const payload={app:'Spark Transportation',version:'1.0 Beta 11',exportedAt:new Date().toISOString(),data:state}
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'})
+ const a=document.createElement('a')
+ a.href=URL.createObjectURL(blob)
+ a.download='spark-transportation-backup-'+new Date().toISOString().slice(0,10)+'.json'
+ a.click()
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+}
+function importBackup(){
+ const input=document.getElementById('importFile')
+ const file=input&&input.files?input.files[0]:null
+ if(!file){alert('Choose a backup file first.');return}
+ const reader=new FileReader()
+ reader.onload=()=>{
+   try{
+     const parsed=JSON.parse(reader.result)
+     const restored=parsed.data||parsed
+     if(!restored||typeof restored!=='object'||!Array.isArray(restored.entries))throw new Error('Invalid')
+     state=restored
+     localStorage.setItem(KEY,JSON.stringify(state))
+     alert('Backup restored successfully.')
+     location.reload()
+   }catch(e){alert('This is not a valid Spark Transportation backup file.')}
+ }
+ reader.readAsText(file)
+}
 function render(){
+ const ms=document.getElementById('migrationStatus')
+ if(ms)ms.textContent=localStorage.getItem('sparkTransportationMigratedFrom')||'None'
  driverLine.textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.driverId||'Driver Pay & Activity Tracker')
  startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
  dayHeading.textContent=state.editingEntryIndex===null||state.editingEntryIndex===undefined?'Start / Edit Day':'Edit Saved Day'
