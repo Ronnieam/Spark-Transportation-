@@ -1,12 +1,185 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07111f"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><title>Spark Transportation</title>
-<style>:root{--b:#07111f;--c:#102033;--l:#294056;--t:#fff;--m:#a9b8c7;--g:#ffb000;--gr:#2ec4b6}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(#07111f,#0c1b2b);color:var(--t)}.app{max-width:580px;margin:auto;padding:12px 14px 95px}.head{display:flex;gap:10px;align-items:center}.logo{width:62px;height:62px;border-radius:14px;object-fit:cover;background:#fff}h1{font-size:20px;margin:0}.muted{color:var(--m)}.small{font-size:12px}.card{background:linear-gradient(#13263a,#102033);border:1px solid var(--l);border-radius:18px;padding:16px;margin:14px 0}.hero{background:linear-gradient(135deg,#8e570a,#d98200);border:0}.big{font-size:34px;font-weight:800}.grid,.row,.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#091522;border:1px solid var(--l);border-radius:14px;padding:12px}.metric b{display:block;font-size:20px}label{display:block;color:var(--m);font-size:13px;margin:10px 0 5px}input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid var(--l);background:#081522;color:#fff;font-size:16px}button{width:100%;padding:12px;border:0;border-radius:12px;font-weight:800}.primary{background:var(--g);color:#2b1700}.secondary{background:#17304a;color:#fff;border:1px solid #31506e}.green{background:var(--gr);color:#042822}.danger{background:#52232a;color:#ffdce1}.entry{border:1px solid var(--l);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--l)}.pill{display:inline-block;background:#3a2a0b;color:#ffd166;border-radius:999px;padding:4px 8px;font-size:12px}.hidden{display:none!important}section{display:none}section.active{display:block}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,580px);display:grid;grid-template-columns:repeat(5,1fr);background:#08131f;border-top:1px solid var(--l);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}.nav button{background:transparent;color:var(--m);font-size:11px}.nav button.active{background:#3b290c;color:#ffd166}.notice{background:#2d2716;border:1px solid #5b4a1d;color:#ffe2a1;padding:10px;border-radius:12px;font-size:13px}hr{border:0;border-top:1px solid var(--l);margin:16px 0}</style></head>
-<body><div class="app"><div class="head"><img class="logo" src="logo.png"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker • v0.4</div></div></div>
-<section id="home" class="active"><div class="card hero"><div>Estimated total pay</div><div class="big" id="totalPay">$0.00</div><div id="dayCount">0 completed days</div></div><div class="grid"><div class="metric"><span class="muted">Miles</span><b id="milesTotal">0</b></div><div class="metric"><span class="muted">Hours</span><b id="hoursTotal">0.00</b></div><div class="metric"><span class="muted">ADP</span><b id="adpDisplay">$0.00</b></div><div class="metric"><span class="muted">Region</span><b id="regionDisplay">Not set</b></div></div><div class="card"><h3>Today</h3><div id="todayText" class="muted">No active day.</div><div class="actions" style="margin-top:10px"><button class="primary" onclick="show('day')">Start / Edit Day</button><button class="secondary" onclick="show('history')">History</button></div></div></section>
-<section id="day"><div class="card"><h3>Day Entry</h3><div id="startBox"><label>Beginning mileage</label><input id="beginMileage" type="number"><label>Start time</label><input id="startTime" type="time"><button class="primary" style="margin-top:12px" onclick="startDay()">Start Day</button></div><div id="activeBox" class="hidden"><div class="notice">Everything below can be edited before saving.</div><div class="row"><div><label>Beginning mileage</label><input id="editBeginMileage" type="number"></div><div><label>Start time</label><input id="editStartTime" type="time"></div></div><hr><h3>Timed Activities</h3><label>Activity</label><select id="timedType"><option>Live Load</option><option>Live Unload</option><option>Wait Time</option><option>Meeting</option><option>Survey</option><option>Training</option></select><div class="row"><div><label>Start</label><input id="activityStart" type="time"></div><div><label>Stop</label><input id="activityStop" type="time"></div></div><div class="row"><div><label>Rate per hour</label><input id="timedRate" type="number" step="0.01"></div><div><label>Notes</label><input id="timedNote"></div></div><button class="secondary" style="margin-top:10px" onclick="addTimed()">Add Timed Activity</button><div id="timedList"></div><hr><h3>Flat Activities</h3><label>Activity</label><select id="flatType"><option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option><option>Layover</option><option>Chain</option><option>Regional Pay</option></select><div class="row"><div><label>How many</label><input id="flatQty" type="number" min="1" value="1"></div><div><label>Rate each</label><input id="flatRate" type="number" step="0.01"></div></div><label>Notes</label><input id="flatNote"><button class="secondary" style="margin-top:10px" onclick="addFlat()">Add Flat Activity</button><div id="flatList"></div><hr><div class="row"><div><label>Ending mileage</label><input id="endMileage" type="number"></div><div><label>End time</label><input id="endTime" type="time"></div></div><label>PTO</label><select id="ptoType"><option value="none">None</option><option>Vacation</option><option>Sick</option><option>Safety</option></select><label>PTO hours</label><input id="ptoHours" type="number" step="0.25" value="0"><label>Day notes</label><textarea id="notes"></textarea><div class="card"><div class="kv"><span>Mileage pay</span><b id="pMileage">$0.00</b></div><div class="kv"><span>Timed activities</span><b id="pTimed">$0.00</b></div><div class="kv"><span>Flat activities</span><b id="pFlat">$0.00</b></div><div class="kv"><span>PTO</span><b id="pPto">$0.00</b></div><div class="kv"><span>Total</span><b id="pTotal">$0.00</b></div></div><button class="green" onclick="saveDay()">End Day & Save</button><button class="danger" style="margin-top:8px" onclick="cancelDay()">Cancel Day</button></div></div></section>
-<section id="history"><div class="card"><h3>History</h3><div id="historyList" class="muted">No entries yet.</div></div></section>
-<section id="setup"><div class="card"><h3>Driver & Region</h3><label>Driver name</label><input id="driverName"><label>Region</label><input id="regionName"><label>Effective date</label><input id="effectiveDate" type="date"></div><div class="card"><h3>Rates</h3><div class="row"><div><label>Regular mileage</label><input id="mileageRate" type="number" step="0.001"></div><div><label>Weekend mileage</label><input id="weekendRate" type="number" step="0.001"></div></div><div class="row"><div><label>Live Load/hr</label><input id="liveLoadRate" type="number" step="0.01"></div><div><label>Live Unload/hr</label><input id="liveUnloadRate" type="number" step="0.01"></div></div><label>Wait Time/hr</label><input id="waitRate" type="number" step="0.01"><div class="row"><div><label>Hook</label><input id="hookRate" type="number" step="0.01"></div><div><label>Stop</label><input id="stopRate" type="number" step="0.01"></div></div><div class="row"><div><label>Arrive</label><input id="arriveRate" type="number" step="0.01"></div><div><label>Arrive Drop</label><input id="arriveDropRate" type="number" step="0.01"></div></div><div class="row"><div><label>Layover</label><input id="layoverRate" type="number" step="0.01"></div><div><label>Chain</label><input id="chainRate" type="number" step="0.01"></div></div><label>Regional Pay</label><input id="regionalRate" type="number" step="0.01"><label>Manual ADP</label><input id="manualAdp" type="number" step="0.01"></div><button class="primary" onclick="saveSetup()">Save Setup</button></section>
-<section id="data"><div class="card"><h3>Backup & Restore</h3><button class="primary" onclick="exportBackup()">Export Backup</button><label>Import backup</label><input id="importFile" type="file" accept=".json"><button class="secondary" style="margin-top:10px" onclick="importBackup()">Import Backup</button></div></section></div>
-<div class="nav"><button class="active" data-page="home" onclick="show('home')">Home</button><button data-page="day" onclick="show('day')">Day</button><button data-page="history" onclick="show('history')">History</button><button data-page="setup" onclick="show('setup')">Setup</button><button data-page="data" onclick="show('data')">Data</button></div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Spark Transportation</title>
+<style>
+:root{--bg:#07111f;--card:#102033;--line:#294056;--text:#fff;--muted:#a9b8c7;--gold:#ffb000;--green:#2ec4b6}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(#07111f,#0c1b2b);color:var(--text)}
+.app{max-width:580px;margin:auto;min-height:100vh;padding:12px 14px 95px}.brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}.logo{width:58px;height:58px;border-radius:14px}.muted{color:var(--muted)}.small{font-size:12px}
+.card{background:#102033;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}h1{font-size:20px;margin:0}h3{margin:0 0 12px}
+label{display:block;font-size:13px;color:var(--muted);margin:11px 0 6px}input,select,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:#081522;color:#fff;font-size:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{width:100%;padding:13px;border:0;border-radius:13px;font-weight:800;font-size:15px}.primary{background:var(--gold);color:#2b1700}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
+.hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,580px);display:grid;grid-template-columns:repeat(4,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
+.nav button{background:transparent;color:var(--muted);font-size:11px}.nav button.active{background:#3b290c;color:#ffd166}
+section{display:none}section.active{display:block}.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small">v0.5 • Unified Activities</div></div></div>
+
+<section id="home" class="active">
+<div class="card"><h3>Current Day</h3><div id="homeStatus" class="muted">No active day.</div><button class="primary" style="margin-top:12px" onclick="show('day')">Open Day</button></div>
+<div class="card"><div class="kv"><span>Total completed days</span><b id="dayCount">0</b></div><div class="kv"><span>Total pay</span><b id="totalPay">$0.00</b></div></div>
+</section>
+
+<section id="day">
+<div class="card">
+<h3>Start / Edit Day</h3>
+<div id="startBox">
+<label>Beginning mileage</label><input id="beginMileage" type="number">
+<label>Start time</label><input id="startTime" type="time">
+<button class="primary" style="margin-top:12px" onclick="startDay()">Start Day</button>
+</div>
+
+<div id="activeBox" class="hidden">
+<div class="row"><div><label>Beginning mileage</label><input id="editBeginMileage" type="number"></div><div><label>Start time</label><input id="editStartTime" type="time"></div></div>
+
+<hr>
+<h3>Add Activity</h3>
+<label>Activity</label>
+<select id="activityType" onchange="updateActivityFields()">
+<option value="">Select activity</option>
+<option>Live Load</option><option>Live Unload</option><option>Wait Time</option>
+<option>Meeting</option><option>Survey</option><option>Training</option>
+<option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option>
+<option>Layover</option><option>Chain</option><option>Regional Pay</option>
+</select>
+
+<div id="timedFields" class="hidden">
+<div class="row"><div><label>Start time</label><input id="activityStart" type="time"></div><div><label>Stop time</label><input id="activityStop" type="time"></div></div>
+<label>Hourly rate</label><input id="activityHourlyRate" type="number" step="0.01">
+</div>
+
+<div id="flatFields" class="hidden">
+<div class="row"><div><label>Quantity</label><input id="activityQty" type="number" min="1" value="1"></div><div><label>Rate each</label><input id="activityFlatRate" type="number" step="0.01"></div></div>
+</div>
+
+<div id="commonFields" class="hidden">
+<label>Store / Vendor / Notes</label><input id="activityNote" placeholder="Optional">
+<button class="secondary" style="margin-top:12px" onclick="addActivity()">Add Activity</button>
+</div>
+
+<div id="activityList"></div>
+
+<hr>
+<div class="row"><div><label>Ending mileage</label><input id="endMileage" type="number"></div><div><label>End time</label><input id="endTime" type="time"></div></div>
+<label>PTO</label><select id="ptoType"><option value="none">None</option><option>Vacation</option><option>Sick</option><option>Safety</option></select>
+<label>PTO hours</label><input id="ptoHours" type="number" step="0.25" value="0">
+<button class="green" style="margin-top:12px" onclick="saveDay()">Save Day</button>
+<button class="danger" style="margin-top:8px" onclick="cancelDay()">Cancel Day</button>
+</div>
+</div>
+</section>
+
+<section id="history"><div class="card"><h3>History</h3><div id="historyList" class="muted">No entries.</div></div></section>
+
+<section id="setup">
+<div class="card"><h3>Driver Rates</h3>
+<label>Driver name</label><input id="driverName">
+<label>Region</label><input id="regionName">
+<label>Regular mileage rate</label><input id="mileageRate" type="number" step="0.001">
+<label>Weekend mileage rate</label><input id="weekendRate" type="number" step="0.001">
+<label>Live Load / hr</label><input id="liveLoadRate" type="number" step="0.01">
+<label>Live Unload / hr</label><input id="liveUnloadRate" type="number" step="0.01">
+<label>Wait Time / hr</label><input id="waitRate" type="number" step="0.01">
+<label>Manual ADP</label><input id="manualAdp" type="number" step="0.01">
+<label>Hook</label><input id="hookRate" type="number" step="0.01">
+<label>Stop</label><input id="stopRate" type="number" step="0.01">
+<label>Arrive</label><input id="arriveRate" type="number" step="0.01">
+<label>Arrive Drop</label><input id="arriveDropRate" type="number" step="0.01">
+<label>Layover</label><input id="layoverRate" type="number" step="0.01">
+<label>Chain</label><input id="chainRate" type="number" step="0.01">
+<label>Regional Pay</label><input id="regionalRate" type="number" step="0.01">
+<button class="primary" style="margin-top:12px" onclick="saveSetup()">Save Setup</button>
+</div>
+</section>
+</div>
+
+<div class="nav">
+<button class="active" data-page="home" onclick="show('home')">Home</button>
+<button data-page="day" onclick="show('day')">Day</button>
+<button data-page="history" onclick="show('history')">History</button>
+<button data-page="setup" onclick="show('setup')">Setup</button>
+</div>
+
 <script>
-const KEY='sparkTransportationV04';const D={driverName:'',regionName:'',effectiveDate:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6,manualAdp:0};let s={setup:{...D},active:null,entries:[],timed:[],flat:[],editing:null};const $=x=>document.getElementById(x),n=x=>Number(x||0),m=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n(x));function persist(){localStorage.setItem(KEY,JSON.stringify(s));render()}function load(){let x=localStorage.getItem(KEY);if(x)try{s=JSON.parse(x)}catch(e){}s.setup={...D,...s.setup};Object.keys(s.setup).forEach(k=>{if($(k))$(k).value=s.setup[k]});render()}function show(id){document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render()}function hrs(a,b){if(!a||!b)return 0;let A=a.split(':').map(Number),B=b.split(':').map(Number),q=(B[0]*60+B[1])-(A[0]*60+A[1]);if(q<0)q+=1440;return Math.round(q/60*100)/100}function adp(){return n(s.setup.manualAdp)}function weekend(d){let x=new Date(d+'T12:00:00').getDay();return x===0||x===6}function timedDefault(t){if(t==='Live Load')return n(s.setup.liveLoadRate);if(t==='Live Unload')return n(s.setup.liveUnloadRate);if(t==='Wait Time')return n(s.setup.waitRate);return adp()/10}function flatDefault(t){return {'Hook':s.setup.hookRate,'Stop':s.setup.stopRate,'Arrive':s.setup.arriveRate,'Arrive Drop':s.setup.arriveDropRate,'Layover':s.setup.layoverRate,'Chain':s.setup.chainRate,'Regional Pay':s.setup.regionalRate}[t]||0}function startDay(){if(!beginMileage.value||!startTime.value)return alert('Enter beginning mileage and start time.');s.active={date:new Date().toISOString().slice(0,10),begin:n(beginMileage.value),start:startTime.value};s.timed=[];s.flat=[];s.editing=null;persist()}function addTimed(){if(!activityStart.value||!activityStop.value)return alert('Enter activity start and stop times.');let type=timedType.value,h=hrs(activityStart.value,activityStop.value),rate=n(timedRate.value)||timedDefault(type);s.timed.push({type,start:activityStart.value,stop:activityStop.value,hours:h,rate,note:timedNote.value,pay:h*rate});activityStart.value=activityStop.value=timedRate.value=timedNote.value='';persist()}function editTimed(i){let x=s.timed[i];timedType.value=x.type;activityStart.value=x.start;activityStop.value=x.stop;timedRate.value=x.rate;timedNote.value=x.note||'';s.timed.splice(i,1);persist()}function addFlat(){let type=flatType.value,qty=Math.max(1,n(flatQty.value)),rate=n(flatRate.value)||flatDefault(type);s.flat.push({type,qty,rate,note:flatNote.value,pay:qty*rate});flatQty.value=1;flatRate.value=flatNote.value='';persist()}function editFlat(i){let x=s.flat[i];flatType.value=x.type;flatQty.value=x.qty;flatRate.value=x.rate;flatNote.value=x.note||'';s.flat.splice(i,1);persist()}function saveDay(){let b=n(editBeginMileage.value),st=editStartTime.value,e=n(endMileage.value),et=endTime.value;if(!b||!st||!e||!et)return alert('Enter beginning mileage, start time, ending mileage and end time.');if(e<b)return alert('Ending mileage cannot be lower.');let miles=e-b,rate=weekend(s.active.date)?n(s.setup.weekendRate):n(s.setup.mileageRate),mp=miles*rate,tp=s.timed.reduce((a,x)=>a+x.pay,0),fp=s.flat.reduce((a,x)=>a+x.pay,0),ph=n(ptoHours.value),pp=ptoType.value==='none'?0:ph*(adp()/10),entry={date:s.active.date,begin:b,start:st,end:e,stop:et,miles,hours:hrs(st,et),mileagePay:mp,timed:[...s.timed],timedPay:tp,flat:[...s.flat],flatPay:fp,ptoType:ptoType.value,ptoHours:ph,ptoPay:pp,total:mp+tp+fp+pp,region:s.setup.regionName,notes:notes.value};if(s.editing===null)s.entries.push(entry);else s.entries[s.editing]=entry;s.active=null;s.timed=[];s.flat=[];s.editing=null;persist();show('home')}function editDay(i){let e=s.entries[i];s.active={date:e.date,begin:e.begin,start:e.start};s.timed=[...(e.timed||[])];s.flat=[...(e.flat||[])];s.editing=i;show('day');setTimeout(()=>{editBeginMileage.value=e.begin;editStartTime.value=e.start;endMileage.value=e.end;endTime.value=e.stop;ptoType.value=e.ptoType;ptoHours.value=e.ptoHours;notes.value=e.notes||''},0)}function cancelDay(){if(confirm('Cancel without saving?')){s.active=null;s.timed=[];s.flat=[];s.editing=null;persist()}}function saveSetup(){Object.keys(D).forEach(k=>s.setup[k]=['driverName','regionName','effectiveDate'].includes(k)?$(k).value:n($(k).value));persist();alert('Setup saved');show('home')}function exportBackup(){let a=document.createElement('a'),b=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});a.href=URL.createObjectURL(b);a.download='spark-backup.json';a.click()}function importBackup(){let f=importFile.files[0];if(!f)return alert('Choose a file.');let r=new FileReader();r.onload=()=>{try{s=JSON.parse(r.result);persist();location.reload()}catch(e){alert('Invalid backup.')}};r.readAsText(f)}function render(){let total=s.entries.reduce((a,e)=>a+e.total,0),mi=s.entries.reduce((a,e)=>a+e.miles,0),ho=s.entries.reduce((a,e)=>a+e.hours,0);totalPay.textContent=m(total);dayCount.textContent=s.entries.length+' completed days';milesTotal.textContent=Math.round(mi);hoursTotal.textContent=ho.toFixed(2);adpDisplay.textContent=m(adp());regionDisplay.textContent=s.setup.regionName||'Not set';driverLine.textContent=(s.setup.driverName?s.setup.driverName+' • ':'')+(s.setup.regionName||'Driver Pay & Activity Tracker')+' • v0.4';todayText.textContent=s.active?'Day in progress.':'No active day.';startBox.classList.toggle('hidden',!!s.active);activeBox.classList.toggle('hidden',!s.active);if(s.active){if(!editBeginMileage.value)editBeginMileage.value=s.active.begin;if(!editStartTime.value)editStartTime.value=s.active.start}timedList.innerHTML=s.timed.length?s.timed.map((x,i)=>`<div class="entry"><b>${x.type}</b><div class="muted small">${x.start}–${x.stop} • ${x.hours.toFixed(2)} hrs • ${m(x.rate)}/hr</div><span class="pill">${m(x.pay)}</span><div class="actions"><button class="secondary" onclick="editTimed(${i})">Edit</button><button class="danger" onclick="s.timed.splice(${i},1);persist()">Remove</button></div></div>`).join(''):'<div class="muted small">No timed activities.</div>';flatList.innerHTML=s.flat.length?s.flat.map((x,i)=>`<div class="entry"><b>${x.type} × ${x.qty}</b><div class="muted small">${m(x.rate)} each</div><span class="pill">${m(x.pay)}</span><div class="actions"><button class="secondary" onclick="editFlat(${i})">Edit</button><button class="danger" onclick="s.flat.splice(${i},1);persist()">Remove</button></div></div>`).join(''):'<div class="muted small">No flat activities.</div>';historyList.innerHTML=s.entries.length?[...s.entries].map((e,i)=>`<div class="entry"><b>${e.date} • ${e.region||'No region'}</b><div class="muted small">${e.begin} → ${e.end} • ${e.miles} miles • ${e.start}–${e.stop}</div><div class="kv"><span>Timed activities (${(e.timed||[]).length})</span><b>${m(e.timedPay)}</b></div><div class="kv"><span>Flat activities (${(e.flat||[]).reduce((a,x)=>a+x.qty,0)})</span><b>${m(e.flatPay)}</b></div><div class="kv"><span>Total</span><b>${m(e.total)}</b></div><div class="actions"><button class="secondary" onclick="editDay(${i})">Edit Day</button><button class="danger" onclick="s.entries.splice(${i},1);persist()">Delete</button></div></div>`).reverse().join(''):'No entries yet.';preview()}function preview(){if(!s.active)return;let b=n(editBeginMileage.value),e=n(endMileage.value),mi=Math.max(0,e-b),rate=weekend(s.active.date)?n(s.setup.weekendRate):n(s.setup.mileageRate),mp=mi*rate,tp=s.timed.reduce((a,x)=>a+x.pay,0),fp=s.flat.reduce((a,x)=>a+x.pay,0),pp=ptoType.value==='none'?0:n(ptoHours.value)*(adp()/10);pMileage.textContent=m(mp);pTimed.textContent=m(tp);pFlat.textContent=m(fp);pPto.textContent=m(pp);pTotal.textContent=m(mp+tp+fp+pp)}document.addEventListener('input',e=>{if(['editBeginMileage','endMileage','ptoType','ptoHours'].includes(e.target.id))preview()});timedType.addEventListener('change',()=>timedRate.value=timedDefault(timedType.value));flatType.addEventListener('change',()=>flatRate.value=flatDefault(flatType.value));if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));load();
-</script></body></html>
+const KEY='sparkTransportationV05';
+const defaults={driverName:'',regionName:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6};
+let state={setup:{...defaults},active:null,activities:[],entries:[]};
+const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
+
+function show(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render()}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});render()}
+function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
+function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t)}
+function defaultRate(t){
+ if(t==='Live Load')return num(state.setup.liveLoadRate)
+ if(t==='Live Unload')return num(state.setup.liveUnloadRate)
+ if(t==='Wait Time')return num(state.setup.waitRate)
+ if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10
+ return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0
+}
+function updateActivityFields(){
+ const t=activityType.value
+ timedFields.classList.toggle('hidden',!isTimed(t))
+ flatFields.classList.toggle('hidden',!t||isTimed(t))
+ commonFields.classList.toggle('hidden',!t)
+ if(!t)return
+ if(isTimed(t))activityHourlyRate.value=defaultRate(t)
+ else activityFlatRate.value=defaultRate(t)
+}
+function startDay(){
+ if(!beginMileage.value||!startTime.value){alert('Enter beginning mileage and start time.');return}
+ state.active={date:new Date().toISOString().slice(0,10),beginMileage:num(beginMileage.value),startTime:startTime.value}
+ state.activities=[];save()
+}
+function addActivity(){
+ const t=activityType.value;if(!t){alert('Select an activity.');return}
+ if(isTimed(t)){
+  if(!activityStart.value||!activityStop.value){alert('Enter activity start and stop times.');return}
+  const h=decimalHours(activityStart.value,activityStop.value),r=num(activityHourlyRate.value)
+  state.activities.push({type:t,kind:'timed',start:activityStart.value,stop:activityStop.value,hours:h,rate:r,note:activityNote.value,pay:h*r})
+ }else{
+  const q=Math.max(1,num(activityQty.value)),r=num(activityFlatRate.value)
+  state.activities.push({type:t,kind:'flat',qty:q,rate:r,note:activityNote.value,pay:q*r})
+ }
+ activityType.value='';activityStart.value=activityStop.value=activityHourlyRate.value=activityFlatRate.value=activityNote.value='';activityQty.value=1;updateActivityFields();save()
+}
+function editActivity(i){
+ const a=state.activities[i];activityType.value=a.type;updateActivityFields();activityNote.value=a.note||''
+ if(a.kind==='timed'){activityStart.value=a.start;activityStop.value=a.stop;activityHourlyRate.value=a.rate}
+ else{activityQty.value=a.qty;activityFlatRate.value=a.rate}
+ state.activities.splice(i,1);save()
+}
+function removeActivity(i){state.activities.splice(i,1);save()}
+function saveDay(){
+ const bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value
+ if(!bm||!em||!st||!et){alert('Enter beginning and ending mileage and start and end times.');return}
+ if(em<bm){alert('Ending mileage cannot be lower.');return}
+ const miles=em-bm,rate=(new Date(state.active.date+'T12:00:00').getDay()%6===0)?num(state.setup.weekendRate):num(state.setup.mileageRate)
+ const mileagePay=miles*rate,activityPay=state.activities.reduce((s,a)=>s+a.pay,0),ptoPay=ptoType.value==='none'?0:num(ptoHours.value)*(num(state.setup.manualAdp)/10)
+ state.entries.push({date:state.active.date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay,activities:[...state.activities],activityPay,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay,total:mileagePay+activityPay+ptoPay})
+ state.active=null;state.activities=[];save();show('home')
+}
+function cancelDay(){state.active=null;state.activities=[];save()}
+function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','regionName'].includes(k)?$(k).value:num($(k).value));save();show('home')}
+function render(){
+ startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
+ if(state.active){if(!editBeginMileage.value)editBeginMileage.value=state.active.beginMileage;if(!editStartTime.value)editStartTime.value=state.active.startTime}
+ homeStatus.textContent=state.active?`Day in progress: ${state.active.startTime}, mileage ${state.active.beginMileage}`:'No active day.'
+ dayCount.textContent=state.entries.length;totalPay.textContent=money(state.entries.reduce((s,e)=>s+e.total,0))
+ activityList.innerHTML=state.activities.length?state.activities.map((a,i)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<div><b>${money(a.pay)}</b></div><div class="actions"><button class="secondary" onclick="editActivity(${i})">Edit</button><button class="danger" onclick="removeActivity(${i})">Remove</button></div></div>`).join(''):'<div class="muted small">No activities added.</div>'
+ historyList.innerHTML=state.entries.length?[...state.entries].reverse().map(e=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Activities (${e.activities.length})</span><b>${money(e.activityPay)}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div></div>`).join(''):'No entries.'
+}
+load()
+</script>
+</body>
+</html>

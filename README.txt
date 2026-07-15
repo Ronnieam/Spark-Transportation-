@@ -1,11 +1,13 @@
-Spark Transportation v0.4 fixes:
-- Activities restored
-- Ending mileage field included
-- Edit beginning and ending mileage
-- Edit start and stop times
-- Enter activity quantities
-- Edit and remove activities
-- Edit completed saved days in History
-- Live pay preview before saving
+Spark Transportation v0.5
 
-Upload all files to the same GitHub repository, replacing the old files. Commit, wait for GitHub Pages, open the site in Safari once, refresh, then reopen the Home Screen app.
+Main change:
+All activities are now in one Add Activity section.
+
+Workflow:
+1. Select an activity.
+2. Timed activities show start time, stop time, and hourly rate.
+3. Flat-rate activities show quantity and rate each.
+4. Notes are available for every activity.
+5. Every added activity can be edited or removed.
+
+Update the same GitHub Pages repository by replacing index.html, manifest.json, sw.js, icon-192.png, and icon-512.png.
