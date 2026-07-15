@@ -79,7 +79,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 11</div>
+<div class="version">v1.0 Beta 12</div>
 </header>
 
 <section id="home" class="active">
@@ -132,7 +132,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <option>Live Load</option><option>Live Unload</option><option>Wait Time</option>
 <option>Meeting</option><option>Survey</option><option>Training</option>
 <option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option>
-<option>Layover</option><option>Chain</option><option>Driver IDal Pay</option>
+<option>Layover</option><option>Chain</option><option>Regional Pay</option>
 </select>
 
 <div id="timedFields" class="hidden">
@@ -212,7 +212,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <label>Arrive Drop</label><input id="arriveDropRate" type="number" step="0.01">
 <label>Layover</label><input id="layoverRate" type="number" step="0.01">
 <label>Chain</label><input id="chainRate" type="number" step="0.01">
-<label>Driver IDal Pay</label><input id="regionalRate" type="number" step="0.01">
+<label>Regional Pay</label><input id="regionalRate" type="number" step="0.01">
 <button class="primary" onclick="saveSetup()">Save Setup</button>
 </div>
 </section>
@@ -310,7 +310,7 @@ if(s){try{state=JSON.parse(s)}catch(e){}}
 else{mergeLegacyState(findLegacyData())}state.setup={...defaults,...state.setup};if(!state.setup.driverId&&state.setup.regionName)state.setup.driverId=state.setup.regionName;state.locations=state.locations||[];state.savedLocations=state.savedLocations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
 function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t)}
-function defaultRate(t){if(t==='Live Load')return num(state.setup.liveLoadRate);if(t==='Live Unload')return num(state.setup.liveUnloadRate);if(t==='Wait Time')return num(state.setup.waitRate);if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Driver IDal Pay':state.setup.regionalRate}[t]||0}
+function defaultRate(t){if(t==='Live Load')return num(state.setup.liveLoadRate);if(t==='Live Unload')return num(state.setup.liveUnloadRate);if(t==='Wait Time')return num(state.setup.waitRate);if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0}
 function updateActivityFields(){const t=activityType.value;timedFields.classList.toggle('hidden',!isTimed(t));flatFields.classList.toggle('hidden',!t||isTimed(t));commonFields.classList.toggle('hidden',!t);if(!t)return;if(isTimed(t))activityHourlyRate.value=defaultRate(t);else activityFlatRate.value=defaultRate(t)}
 function startDay(){if(!dayDate.value||!beginMileage.value||!startTime.value){alert('Enter date, beginning mileage and start time.');return}state.active={date:dayDate.value,beginMileage:num(beginMileage.value),startTime:startTime.value};state.locations=[];state.activeLocationIndex=null;save()}
 function startLocationFromData(data){state.locations.push({type:data.type,number:data.number,name:data.name||'',activities:[]});state.activeLocationIndex=state.locations.length-1;save()}
