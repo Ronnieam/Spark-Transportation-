@@ -25,7 +25,12 @@ button{width:100%;padding:13px;border:0;border-radius:13px;font-size:15px;font-w
 .hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
 .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#3b290c;color:#ffd166;font-size:12px}
-section{display:none}section.active{display:block}
+section{display:none;opacity:0;transform:translateX(0);transition:transform .28s ease,opacity .28s ease}
+section.active{display:block;opacity:1}
+section.slide-in-right{display:block;animation:slideInRight .28s ease}
+section.slide-in-left{display:block;animation:slideInLeft .28s ease}
+@keyframes slideInRight{from{opacity:.3;transform:translateX(45px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInLeft{from{opacity:.3;transform:translateX(-45px)}to{opacity:1;transform:translateX(0)}}
 .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,620px);display:grid;grid-template-columns:repeat(5,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
 .nav button{background:transparent;color:var(--muted);font-size:11px;padding:9px 2px}.nav button.active{background:#3b290c;color:#ffd166}
 hr{border:0;border-top:1px solid var(--line);margin:16px 0}
@@ -35,7 +40,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 3</div>
+<div class="version">v1.0 Beta 4</div>
 </header>
 
 <section id="home" class="active">
@@ -180,7 +185,20 @@ const defaults={driverName:'',regionName:'',mileageRate:.679,weekendRate:.749,li
 let state={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
 const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
 
-function show(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render()}
+const pageOrder=['home','day','locations','history','setup']
+let currentPage='home'
+function show(id,direction=null){
+ const oldIndex=pageOrder.indexOf(currentPage)
+ const newIndex=pageOrder.indexOf(id)
+ document.querySelectorAll('section').forEach(s=>s.classList.remove('active','slide-in-left','slide-in-right'))
+ const target=$(id)
+ target.classList.add('active')
+ if(direction==='left'||(direction===null&&newIndex<oldIndex))target.classList.add('slide-in-left')
+ if(direction==='right'||(direction===null&&newIndex>oldIndex))target.classList.add('slide-in-right')
+ currentPage=id
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id))
+ render()
+}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
 function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};state.locations=state.locations||[];state.savedLocations=state.savedLocations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
@@ -334,6 +352,25 @@ ${l.address||l.city?`<button class="primary" onclick='mapLocation(${JSON.stringi
  historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,rev)=>{const i=state.entries.length-1-rev;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${e.locations.length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger" style="margin-top:8px" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${e.locations.map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${l.activities.map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`}).join(''):'No entries.'
 }
 document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render()})
+let touchStartX=null,touchStartY=null,touchEndX=null,touchEndY=null
+document.addEventListener('touchstart',e=>{
+ const t=e.changedTouches[0]
+ touchStartX=t.screenX
+ touchStartY=t.screenY
+},{passive:true})
+document.addEventListener('touchend',e=>{
+ if(touchStartX===null)return
+ const t=e.changedTouches[0]
+ touchEndX=t.screenX
+ touchEndY=t.screenY
+ const dx=touchEndX-touchStartX
+ const dy=touchEndY-touchStartY
+ touchStartX=touchStartY=null
+ if(Math.abs(dx)<60||Math.abs(dx)<=Math.abs(dy))return
+ const index=pageOrder.indexOf(currentPage)
+ if(dx<0&&index<pageOrder.length-1)show(pageOrder[index+1],'right')
+ else if(dx>0&&index>0)show(pageOrder[index-1],'left')
+},{passive:true})
 load()
 </script>
 </body>
