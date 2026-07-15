@@ -79,7 +79,13 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
 .current-location-main{display:flex;gap:12px;align-items:center}.location-icon{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;background:#ffc247;color:#2b1700;font-size:24px;flex:0 0 auto}.location-copy{min-width:0;flex:1}.location-copy b{font-size:18px}.location-copy div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .location-actions{grid-template-columns:repeat(2,1fr)}.location-details{margin-top:12px;padding-top:5px;border-top:1px solid var(--line)}
 .pay-card .kv{padding:10px 0}.pay-card .total-row{font-size:20px;color:#ffd166}.pay-card .total-row b{font-size:24px}
-.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.quick-btn{min-height:78px;background:#10243a;border:1px solid #35506a;color:#fff;padding:8px 5px}.quick-btn .quick-icon{display:block;font-size:24px;margin-bottom:5px}.quick-btn.more{background:#2b3440;color:#fff}
+.quick-grid{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain}
+.quick-grid::-webkit-scrollbar{display:none}
+.quick-btn{flex:0 0 92px;min-height:82px;background:#10243a;border:1px solid #35506a;color:#fff;padding:8px 5px;scroll-snap-align:start;user-select:none;-webkit-user-select:none}
+.quick-btn .quick-icon{display:block;font-size:24px;margin-bottom:5px}
+.quick-grid.reordering{touch-action:none;overflow-x:hidden}
+.quick-btn.drag-source{opacity:.25}
+.quick-drag-ghost{position:fixed;z-index:99999;pointer-events:none;opacity:.96;transform:scale(1.06);box-shadow:0 12px 28px rgba(0,0,0,.35)}
 .primary-dashboard{min-height:59px;font-size:18px;box-shadow:0 9px 20px rgba(255,176,0,.15)}
 .dashboard-note{text-align:center;color:var(--muted);font-size:12px;margin:-4px 0 10px}
 
@@ -89,31 +95,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
   .card,.day-group{padding:13px}
   .logo{width:60px;height:60px}
   .nav button{font-size:9px}
-  .today-title{font-size:27px}.dashboard-hero .big{font-size:40px}.quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-
-
-/* v1.2.2 touch reorder fix */
-.quick-activity-row {
-  touch-action: pan-x;
-  -webkit-overflow-scrolling: touch;
-}
-.quick-activity-row.reorder-mode {
-  touch-action: none;
-  overflow-x: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.quick-activity-item.dragging {
-  opacity: .28;
-}
-.quick-activity-drag-ghost {
-  position: fixed;
-  z-index: 99999;
-  pointer-events: none;
-  transform: scale(1.06);
-  opacity: .96;
-  filter: drop-shadow(0 10px 14px rgba(0,0,0,.28));
+  .today-title{font-size:27px}.dashboard-hero .big{font-size:40px}
 }
 
 </style>
@@ -129,7 +111,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.0</div>
+  <div class="version">v1.2.3</div>
 </header>
 
 <section id="home" class="active">
@@ -191,14 +173,22 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
 
   <div class="card">
     <h2>Quick Add Activity</h2>
-    <div class="quick-grid">
-      <button class="quick-btn" onclick="quickAddActivity('Live Load')"><span class="quick-icon">📦</span>Live Load</button>
-      <button class="quick-btn" onclick="quickAddActivity('Live Unload')"><span class="quick-icon">📤</span>Live Unload</button>
-      <button class="quick-btn" onclick="quickAddActivity('Wait Time')"><span class="quick-icon">⏱️</span>Wait Time</button>
-      <button class="quick-btn" onclick="quickAddActivity('Hook')"><span class="quick-icon">🔗</span>Hook</button>
-      <button class="quick-btn" onclick="quickAddActivity('Stop')"><span class="quick-icon">🛑</span>Stop</button>
-      <button class="quick-btn more" onclick="showPage('day')"><span class="quick-icon">•••</span>More</button>
+    <div class="quick-grid" id="quickActivityRow" aria-label="Quick activities">
+      <button class="quick-btn" data-activity="Live Load"><span class="quick-icon">📦</span>Live Load</button>
+      <button class="quick-btn" data-activity="Live Unload"><span class="quick-icon">📤</span>Live Unload</button>
+      <button class="quick-btn" data-activity="Wait Time"><span class="quick-icon">⏱️</span>Wait Time</button>
+      <button class="quick-btn" data-activity="Hook"><span class="quick-icon">🔗</span>Hook</button>
+      <button class="quick-btn" data-activity="Stop"><span class="quick-icon">🛑</span>Stop</button>
+      <button class="quick-btn" data-activity="Arrive"><span class="quick-icon">📍</span>Arrive</button>
+      <button class="quick-btn" data-activity="Arrive Drop"><span class="quick-icon">📥</span>Arrive Drop</button>
+      <button class="quick-btn" data-activity="Layover"><span class="quick-icon">🌙</span>Layover</button>
+      <button class="quick-btn" data-activity="Chain"><span class="quick-icon">⛓️</span>Chain</button>
+      <button class="quick-btn" data-activity="Regional Pay"><span class="quick-icon">🗺️</span>Regional Pay</button>
+      <button class="quick-btn" data-activity="Meeting"><span class="quick-icon">👥</span>Meeting</button>
+      <button class="quick-btn" data-activity="Survey"><span class="quick-icon">📝</span>Survey</button>
+      <button class="quick-btn" data-activity="Training"><span class="quick-icon">🎓</span>Training</button>
     </div>
+    <div class="muted small top-gap-sm">Swipe left or right. Press and hold an activity, then drag it to reorder.</div>
   </div>
 
   <button class="primary primary-dashboard" id="dashboardPrimaryButton" onclick="dashboardPrimaryAction()">Start Day</button>
@@ -424,7 +414,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.1.0</b></div>
+    <div class="kv"><span>App version</span><b>1.2.3</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -489,7 +479,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.0',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.3',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -769,195 +759,100 @@ render();
 </script>
 
 <script>
-(() => {
-  const STORAGE_KEY = 'sparkTransportationData';
-  const LONG_PRESS_MS = 450;
-  let pressTimer = null;
-  let activeItem = null;
-  let ghost = null;
-  let row = null;
-  let pointerId = null;
-  let offsetX = 0;
-  let offsetY = 0;
-  let dragging = false;
-  let startX = 0;
-  let startY = 0;
+(function(){
+  const row=document.getElementById('quickActivityRow');
+  if(!row)return;
+  const LONG_PRESS=450;
+  let timer=null,active=null,ghost=null,pointerId=null,dragging=false,suppressClick=false;
+  let startX=0,startY=0,offsetX=0,offsetY=0;
 
-  function findRow() {
-    return document.querySelector(
-      '.quick-activity-row, #quickActivityRow, [data-quick-activity-row], .quick-add-row, .activity-scroll'
-    );
+  const items=()=>Array.from(row.querySelectorAll('.quick-btn[data-activity]'));
+
+  function saveOrder(){
+    try{
+      const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+      data.quickActivityOrder=items().map(b=>b.dataset.activity);
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+    }catch(e){console.warn(e);}
   }
-
-  function items() {
-    if (!row) return [];
-    return [...row.children].filter(el =>
-      el.matches('.quick-activity-item, [data-activity], .quick-activity, .activity-chip, button')
-    );
+  function restoreOrder(){
+    try{
+      const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+      const order=Array.isArray(data.quickActivityOrder)?data.quickActivityOrder:[];
+      order.forEach(name=>{
+        const item=items().find(b=>b.dataset.activity===name);
+        if(item)row.appendChild(item);
+      });
+    }catch(e){console.warn(e);}
   }
-
-  function activityName(el) {
-    return el.dataset.activity || el.dataset.name ||
-      el.querySelector('[data-label]')?.textContent?.trim() ||
-      el.textContent.trim().replace(/\s+/g, ' ');
+  function clearPress(){if(timer){clearTimeout(timer);timer=null;}}
+  function begin(button,e){
+    dragging=true;suppressClick=true;active=button;
+    row.classList.add('reordering');active.classList.add('drag-source');
+    const r=active.getBoundingClientRect();
+    offsetX=e.clientX-r.left;offsetY=e.clientY-r.top;
+    ghost=active.cloneNode(true);
+    ghost.classList.add('quick-drag-ghost');
+    ghost.style.width=r.width+'px';ghost.style.height=r.height+'px';
+    ghost.style.left=(e.clientX-offsetX)+'px';ghost.style.top=(e.clientY-offsetY)+'px';
+    document.body.appendChild(ghost);
+    try{active.setPointerCapture(pointerId);}catch(_){}
+    if(navigator.vibrate)navigator.vibrate(20);
   }
-
-  function saveOrder() {
-    try {
-      const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      data.quickActivityOrder = items().map(activityName);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (err) {
-      console.warn('Unable to save quick activity order', err);
-    }
-  }
-
-  function cancelPress() {
-    clearTimeout(pressTimer);
-    pressTimer = null;
-  }
-
-  function makeGhost(el, x, y) {
-    const rect = el.getBoundingClientRect();
-    const clone = el.cloneNode(true);
-    clone.classList.add('quick-activity-drag-ghost');
-    clone.style.width = rect.width + 'px';
-    clone.style.height = rect.height + 'px';
-    clone.style.left = (x - offsetX) + 'px';
-    clone.style.top = (y - offsetY) + 'px';
-    document.body.appendChild(clone);
-    return clone;
-  }
-
-  function beginDrag(el, e) {
-    dragging = true;
-    activeItem = el;
-    row.classList.add('reorder-mode');
-    activeItem.classList.add('dragging');
-
-    const rect = activeItem.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-    ghost = makeGhost(activeItem, e.clientX, e.clientY);
-
-    if (navigator.vibrate) navigator.vibrate(20);
-    try { activeItem.setPointerCapture(pointerId); } catch (_) {}
-  }
-
-  function moveGhost(x, y) {
-    if (!ghost) return;
-    ghost.style.left = (x - offsetX) + 'px';
-    ghost.style.top = (y - offsetY) + 'px';
-  }
-
-  function reorderAt(x) {
-    const siblings = items().filter(el => el !== activeItem);
-    let inserted = false;
-
-    for (const sibling of siblings) {
-      const rect = sibling.getBoundingClientRect();
-      const midpoint = rect.left + rect.width / 2;
-      if (x < midpoint) {
-        if (activeItem.nextSibling !== sibling) {
-          row.insertBefore(activeItem, sibling);
-        }
-        inserted = true;
-        break;
+  function move(e){
+    ghost.style.left=(e.clientX-offsetX)+'px';
+    ghost.style.top=(e.clientY-offsetY)+'px';
+    const others=items().filter(b=>b!==active);
+    let placed=false;
+    for(const other of others){
+      const r=other.getBoundingClientRect();
+      if(e.clientX<r.left+r.width/2){
+        if(active.nextSibling!==other)row.insertBefore(active,other);
+        placed=true;break;
       }
     }
-    if (!inserted) row.appendChild(activeItem);
-
-    // Auto-scroll when dragging near either edge.
-    const rr = row.getBoundingClientRect();
-    const edge = 44;
-    if (x < rr.left + edge) row.scrollLeft -= 16;
-    if (x > rr.right - edge) row.scrollLeft += 16;
+    if(!placed)row.appendChild(active);
+    const rr=row.getBoundingClientRect();
+    if(e.clientX<rr.left+42)row.scrollLeft-=18;
+    else if(e.clientX>rr.right-42)row.scrollLeft+=18;
+  }
+  function end(){
+    clearPress();
+    if(ghost)ghost.remove();
+    ghost=null;
+    if(active)active.classList.remove('drag-source');
+    row.classList.remove('reordering');
+    if(dragging)saveOrder();
+    dragging=false;active=null;pointerId=null;
+    setTimeout(()=>suppressClick=false,250);
   }
 
-  function finishDrag() {
-    cancelPress();
-    if (ghost) ghost.remove();
-    ghost = null;
+  row.addEventListener('pointerdown',e=>{
+    const button=e.target.closest('.quick-btn[data-activity]');
+    if(!button)return;
+    pointerId=e.pointerId;active=button;startX=e.clientX;startY=e.clientY;
+    clearPress();timer=setTimeout(()=>begin(button,e),LONG_PRESS);
+  },{passive:true});
 
-    if (activeItem) {
-      activeItem.classList.remove('dragging');
-      try { activeItem.releasePointerCapture(pointerId); } catch (_) {}
+  row.addEventListener('pointermove',e=>{
+    if(e.pointerId!==pointerId)return;
+    if(!dragging){
+      if(Math.hypot(e.clientX-startX,e.clientY-startY)>8)clearPress();
+      return;
     }
-    if (row) row.classList.remove('reorder-mode');
+    e.preventDefault();move(e);
+  },{passive:false});
 
-    if (dragging) saveOrder();
+  row.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)end();});
+  row.addEventListener('pointercancel',e=>{if(e.pointerId===pointerId)end();});
+  row.addEventListener('click',e=>{
+    const button=e.target.closest('.quick-btn[data-activity]');
+    if(!button)return;
+    if(suppressClick){e.preventDefault();e.stopImmediatePropagation();return;}
+    quickAddActivity(button.dataset.activity);
+  });
 
-    dragging = false;
-    activeItem = null;
-    pointerId = null;
-  }
-
-  function bind() {
-    row = findRow();
-    if (!row || row.dataset.dragFixBound === 'true') return;
-    row.dataset.dragFixBound = 'true';
-    row.classList.add('quick-activity-row');
-
-    row.addEventListener('pointerdown', e => {
-      const el = e.target.closest(
-        '.quick-activity-item, [data-activity], .quick-activity, .activity-chip, button'
-      );
-      if (!el || !row.contains(el)) return;
-
-      pointerId = e.pointerId;
-      activeItem = el;
-      startX = e.clientX;
-      startY = e.clientY;
-
-      cancelPress();
-      pressTimer = setTimeout(() => beginDrag(el, e), LONG_PRESS_MS);
-    }, { passive: true });
-
-    row.addEventListener('pointermove', e => {
-      if (e.pointerId !== pointerId) return;
-
-      if (!dragging) {
-        const moved = Math.hypot(e.clientX - startX, e.clientY - startY);
-        // Normal swiping should cancel the long-press.
-        if (moved > 9) cancelPress();
-        return;
-      }
-
-      e.preventDefault();
-      moveGhost(e.clientX, e.clientY);
-      reorderAt(e.clientX);
-    }, { passive: false });
-
-    row.addEventListener('pointerup', e => {
-      if (e.pointerId === pointerId) finishDrag();
-    });
-
-    row.addEventListener('pointercancel', e => {
-      if (e.pointerId === pointerId) finishDrag();
-    });
-
-    row.addEventListener('lostpointercapture', () => {
-      if (dragging) finishDrag();
-    });
-
-    // Prevent accidental activity launch immediately after dragging.
-    row.addEventListener('click', e => {
-      if (dragging) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
-    }, true);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind);
-  } else {
-    bind();
-  }
-
-  // Rebind if the dashboard is re-rendered.
-  const observer = new MutationObserver(() => bind());
-  observer.observe(document.documentElement, { childList: true, subtree: true });
+  restoreOrder();
 })();
 </script>
 
