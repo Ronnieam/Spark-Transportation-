@@ -1,12 +1,10 @@
-Spark Transportation v1.2.9 — Hold Completed Day Totals
+Spark Transportation v1.2.10 — Persistent Activity Order
 
-After ending a day:
-- Today's Estimated Pay continues showing the completed day's total.
-- Pay Summary continues showing mileage pay, activity pay, PTO pay, and total.
-- Miles, locations, and activity counts continue showing the completed day.
-- Dashboard status changes to Day Complete.
+Fixed:
+- Quick Add activity order is now part of the main permanent app state.
+- Normal app saves no longer erase the customized icon arrangement.
+- Future updates preserve the existing order stored in sparkTransportationData.
+- Newly added activities are appended without rearranging the driver's saved icons.
+- Backup and restore now include the customized activity order.
 
-Those values remain visible until Start New Day is used.
-Starting a new day switches the dashboard to the new active day's totals.
-
-Existing data remains stored under sparkTransportationData.
+After uploading, arrange the icons one final time. That order will remain through future updates.

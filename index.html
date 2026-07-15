@@ -138,7 +138,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.9</div>
+  <div class="version">v1.2.10</div>
 </header>
 
 <section id="home" class="active">
@@ -447,7 +447,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.9</b></div>
+    <div class="kv"><span>App version</span><b>1.2.10</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -512,7 +512,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.9',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.10',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -542,12 +542,30 @@ const defaults={
  hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,
  layoverRate:42,chainRate:60,regionalRate:6
 };
-const baseState={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
+const DEFAULT_QUICK_ACTIVITY_ORDER=[
+ 'Live Load','Live Unload','Wait Time','Breakdown','Hook','Stop','Arrive',
+ 'Arrive Drop','Layover','Chain','Regional Pay','Meeting','Survey','Training'
+];
+const baseState={
+ setup:{...defaults},
+ active:null,
+ locations:[],
+ activeLocationIndex:null,
+ entries:[],
+ savedLocations:[],
+ editingEntryIndex:null,
+ quickActivityOrder:[...DEFAULT_QUICK_ACTIVITY_ORDER]
+};
 let state=loadPersistentState(baseState);
 state.setup={...defaults,...(state.setup||{})};
 state.entries=Array.isArray(state.entries)?state.entries:[];
 state.savedLocations=Array.isArray(state.savedLocations)?state.savedLocations:[];
 state.locations=Array.isArray(state.locations)?state.locations:[];
+state.quickActivityOrder=Array.isArray(state.quickActivityOrder)?state.quickActivityOrder:[];
+state.quickActivityOrder=[
+ ...state.quickActivityOrder.filter(name=>DEFAULT_QUICK_ACTIVITY_ORDER.includes(name)),
+ ...DEFAULT_QUICK_ACTIVITY_ORDER.filter(name=>!state.quickActivityOrder.includes(name))
+];
 
 const $=id=>document.getElementById(id);
 const num=v=>Number(v||0);
@@ -849,9 +867,8 @@ render();
 
   function saveOrder(){
     try{
-      const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-      data.quickActivityOrder=items().map(button=>button.dataset.activity);
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+      state.quickActivityOrder=items().map(button=>button.dataset.activity);
+      savePersistentState(state);
     }catch(error){
       console.warn('Could not save quick activity order',error);
     }
@@ -859,8 +876,7 @@ render();
 
   function restoreOrder(){
     try{
-      const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-      const order=Array.isArray(data.quickActivityOrder)?data.quickActivityOrder:[];
+      const order=Array.isArray(state.quickActivityOrder)?state.quickActivityOrder:DEFAULT_QUICK_ACTIVITY_ORDER;
       order.forEach(name=>{
         const button=items().find(item=>item.dataset.activity===name);
         if(button)grid.appendChild(button);
