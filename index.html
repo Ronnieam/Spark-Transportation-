@@ -35,7 +35,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 2</div>
+<div class="version">v1.0 Beta 3</div>
 </header>
 
 <section id="home" class="active">
@@ -56,7 +56,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 
 <section id="day">
 <div class="card">
-<h3>Start / Edit Day</h3>
+<h3 id="dayHeading">Start / Edit Day</h3>
 <div id="startBox">
 <label>Date</label><input id="dayDate" type="date">
 <label>Beginning mileage</label><input id="beginMileage" type="number">
@@ -118,7 +118,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="kv"><span>PTO pay</span><b id="previewPto">$0.00</b></div>
 <div class="kv"><span>Running total</span><b id="previewTotal">$0.00</b></div>
 </div>
-<button class="green" onclick="saveDay()">End Day & Save</button>
+<button id="saveDayButton" class="green" onclick="saveDay()">End Day & Save</button>
 <button class="danger" style="margin-top:8px" onclick="cancelDay()">Cancel Day</button>
 </div>
 </div>
@@ -177,7 +177,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <script>
 const KEY='sparkTransportationV1Beta';
 const defaults={driverName:'',regionName:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6};
-let state={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[]};
+let state={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
 const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
 
 function show(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render()}
@@ -199,8 +199,11 @@ function activityTotal(){return state.locations.reduce((s,l)=>s+l.activities.red
 function mileagePreview(){if(!state.active)return 0;const bm=num(editBeginMileage.value||state.active.beginMileage),em=num(endMileage.value);if(!em||em<bm)return 0;const d=new Date((editDayDate.value||state.active.date)+'T12:00:00'),r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate);return (em-bm)*r}
 function ptoPreview(){return ptoType.value==='none'?0:num(ptoHours.value)*(num(state.setup.manualAdp)/10)}
 function running(){return activityTotal()+mileagePreview()+ptoPreview()}
-function saveDay(){const date=editDayDate.value,bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value;if(!date||!bm||!em||!st||!et){alert('Complete the day fields.');return}if(em<bm){alert('Ending mileage cannot be lower.');return}const d=new Date(date+'T12:00:00'),r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate),miles=em-bm,mp=miles*r,ap=activityTotal(),pp=ptoPreview();state.entries.push({date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay:mp,locations:JSON.parse(JSON.stringify(state.locations)),activityPay:ap,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay:pp,total:mp+ap+pp});state.active=null;state.locations=[];state.activeLocationIndex=null;save();show('home')}
-function cancelDay(){if(confirm('Cancel this day?')){state.active=null;state.locations=[];state.activeLocationIndex=null;save()}}
+function saveDay(){const date=editDayDate.value,bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value;if(!date||!bm||!em||!st||!et){alert('Complete the day fields.');return}if(em<bm){alert('Ending mileage cannot be lower.');return}const d=new Date(date+'T12:00:00'),r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate),miles=em-bm,mp=miles*r,ap=activityTotal(),pp=ptoPreview();const entry={date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay:mp,locations:JSON.parse(JSON.stringify(state.locations)),activityPay:ap,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay:pp,total:mp+ap+pp}
+if(state.editingEntryIndex===null||state.editingEntryIndex===undefined){state.entries.push(entry)}
+else{state.entries[state.editingEntryIndex]=entry}
+state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save();show('history')}
+function cancelDay(){if(confirm('Cancel this day?')){state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save()}}
 function saveLocation(){
  if(!savedNumber.value.trim()){alert('Enter a location number.');return}
  const location={
@@ -260,6 +263,30 @@ function clearSavedLocationForm(){
 }
 function deleteSavedLocation(i){state.savedLocations.splice(i,1);save()}
 function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','regionName'].includes(k)?$(k).value:num($(k).value));save();show('home')}
+function editHistoryDay(i){
+ const e=state.entries[i]
+ state.editingEntryIndex=i
+ state.active={date:e.date,beginMileage:e.beginMileage,startTime:e.startTime}
+ state.locations=JSON.parse(JSON.stringify(e.locations||[]))
+ state.activeLocationIndex=state.locations.length?0:null
+ show('day')
+ setTimeout(()=>{
+   editDayDate.value=e.date
+   editBeginMileage.value=e.beginMileage
+   editStartTime.value=e.startTime
+   endMileage.value=e.endMileage
+   endTime.value=e.endTime
+   ptoType.value=e.ptoType||'none'
+   ptoHours.value=e.ptoHours||0
+   render()
+ },0)
+}
+function deleteHistoryDay(i){
+ if(confirm('Delete this saved day from History?')){
+   state.entries.splice(i,1)
+   save()
+ }
+}
 function toggleHistory(i){const e=$('history'+i);if(e)e.classList.toggle('hidden')}
 function cleanPhone(phone){return String(phone||'').replace(/[^0-9+]/g,'')}
 function callLocation(phone,ext){
@@ -275,6 +302,8 @@ function mapLocation(l){
 function render(){
  driverLine.textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.regionName||'Driver Pay & Activity Tracker')
  startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
+ dayHeading.textContent=state.editingEntryIndex===null||state.editingEntryIndex===undefined?'Start / Edit Day':'Edit Saved Day'
+ saveDayButton.textContent=state.editingEntryIndex===null||state.editingEntryIndex===undefined?'End Day & Save':'Save History Changes'
  if(state.active){if(!editDayDate.value)editDayDate.value=state.active.date;if(!editBeginMileage.value)editBeginMileage.value=state.active.beginMileage;if(!editStartTime.value)editStartTime.value=state.active.startTime}
  homeStatus.textContent=state.active?`Day in progress: ${state.active.date} • ${state.active.startTime} • mileage ${state.active.beginMileage}`:'No active day.'
  runningTotal.textContent=money(state.active?running():0);runningDetail.textContent=state.active?`${state.locations.length} locations • ${state.locations.reduce((s,l)=>s+l.activities.length,0)} activities`:'No active day'
@@ -302,7 +331,7 @@ ${l.address||l.city?`<button class="primary" onclick='mapLocation(${JSON.stringi
 </div>
 <div class="actions"><button class="secondary" onclick="editSavedLocation(${i})">Edit</button><button class="danger" onclick="deleteSavedLocation(${i})">Delete</button></div>
 </div>`).join(''):'No saved locations.'
- historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,rev)=>{const i=state.entries.length-1-rev;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${e.locations.length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><button class="secondary" onclick="toggleHistory(${i})">View Details</button><div id="history${i}" class="hidden">${e.locations.map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${l.activities.map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`}).join(''):'No entries.'
+ historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,rev)=>{const i=state.entries.length-1-rev;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${e.locations.length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger" style="margin-top:8px" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${e.locations.map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${l.activities.map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`}).join(''):'No entries.'
 }
 document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render()})
 load()
