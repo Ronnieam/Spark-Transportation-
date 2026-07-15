@@ -1,11 +1,15 @@
-Spark Transportation v1.2.4 — Quick Add Tap Delay
+Spark Transportation v1.2.5 — Explicit Reorder Mode
 
-Fixed:
-- Quick activities no longer open immediately when touched.
-- An activity opens only after a short, deliberate tap.
-- Holding for about half a second enters reorder mode.
-- Moving your finger cancels activity opening and allows scrolling/reordering.
-- Browser-generated click events are blocked to prevent accidental double-opening.
-- Custom order remains saved in sparkTransportationData.
+This version removes the unreliable long-press behavior.
 
+Normal mode:
+- Swipe left/right without opening an activity.
+- An activity opens only after a clean, stationary tap.
+
+Reorder mode:
+1. Tap Reorder.
+2. Drag any activity immediately.
+3. Tap Done when finished.
+
+The custom order remains saved in sparkTransportationData.
 Upload all individual files to the root of the existing GitHub repository.

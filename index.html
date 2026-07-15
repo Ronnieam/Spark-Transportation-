@@ -98,6 +98,13 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
   .today-title{font-size:27px}.dashboard-hero .big{font-size:40px}
 }
 
+
+.quick-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.small-btn{min-height:38px;padding:7px 14px;width:auto}
+.quick-grid.reorder-mode{overflow-x:auto;touch-action:none;border:2px dashed #e0b74a;border-radius:14px;padding:8px}
+.quick-grid.reorder-mode .quick-btn{cursor:grab}
+.quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
+
 </style>
 <title>Spark Transportation</title>
 </head>
@@ -111,7 +118,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.4</div>
+  <div class="version">v1.2.5</div>
 </header>
 
 <section id="home" class="active">
@@ -173,6 +180,10 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
 
   <div class="card">
     <h2>Quick Add Activity</h2>
+    <div class="quick-toolbar">
+      <span id="quickModeText" class="muted small">Swipe to browse activities</span>
+      <button type="button" id="quickReorderToggle" class="secondary small-btn">Reorder</button>
+    </div>
     <div class="quick-grid" id="quickActivityRow" aria-label="Quick activities">
       <button class="quick-btn" data-activity="Live Load"><span class="quick-icon">📦</span>Live Load</button>
       <button class="quick-btn" data-activity="Live Unload"><span class="quick-icon">📤</span>Live Unload</button>
@@ -188,7 +199,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
       <button class="quick-btn" data-activity="Survey"><span class="quick-icon">📝</span>Survey</button>
       <button class="quick-btn" data-activity="Training"><span class="quick-icon">🎓</span>Training</button>
     </div>
-    <div class="muted small top-gap-sm">Swipe left or right. Press and hold an activity, then drag it to reorder.</div>
+    <div class="muted small top-gap-sm">Swipe left or right to browse. Tap Reorder to move activities.</div>
   </div>
 
   <button class="primary primary-dashboard" id="dashboardPrimaryButton" onclick="dashboardPrimaryAction()">Start Day</button>
@@ -414,7 +425,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.4</b></div>
+    <div class="kv"><span>App version</span><b>1.2.5</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -479,7 +490,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.4',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.5',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -761,17 +772,23 @@ render();
 <script>
 (function(){
   const row=document.getElementById('quickActivityRow');
-  if(!row)return;
+  const toggle=document.getElementById('quickReorderToggle');
+  const modeText=document.getElementById('quickModeText');
+  if(!row||!toggle)return;
 
-  const LONG_PRESS=500;
-  const MAX_TAP_TIME=260;
-  const MAX_TAP_MOVE=7;
-  const OPEN_DELAY=170;
+  let reorderMode=false;
+  let active=null;
+  let ghost=null;
+  let pointerId=null;
+  let startX=0;
+  let startY=0;
+  let downTime=0;
+  let moved=false;
+  let offsetX=0;
+  let offsetY=0;
 
-  let timer=null,active=null,ghost=null,pointerId=null,dragging=false;
-  let startX=0,startY=0,offsetX=0,offsetY=0,downTime=0;
-  let moved=false,openTimer=null;
-
+  const TAP_MOVE_LIMIT=9;
+  const TAP_TIME_LIMIT=500;
   const items=()=>Array.from(row.querySelectorAll('.quick-btn[data-activity]'));
 
   function saveOrder(){
@@ -793,38 +810,38 @@ render();
     }catch(e){console.warn(e);}
   }
 
-  function clearPress(){
-    if(timer){clearTimeout(timer);timer=null;}
+  function setMode(enabled){
+    reorderMode=enabled;
+    row.classList.toggle('reorder-mode',enabled);
+    toggle.textContent=enabled?'Done':'Reorder';
+    modeText.textContent=enabled
+      ?'Drag icons into your preferred order'
+      :'Swipe to browse activities';
+    if(enabled&&navigator.vibrate)navigator.vibrate(20);
+    finishDrag();
   }
 
-  function clearOpen(){
-    if(openTimer){clearTimeout(openTimer);openTimer=null;}
-  }
-
-  function begin(button,e){
-    dragging=true;
+  function beginDrag(button,e){
     active=button;
-    row.classList.add('reordering');
+    pointerId=e.pointerId;
+    const rect=active.getBoundingClientRect();
+    offsetX=e.clientX-rect.left;
+    offsetY=e.clientY-rect.top;
+
     active.classList.add('drag-source');
-
-    const r=active.getBoundingClientRect();
-    offsetX=e.clientX-r.left;
-    offsetY=e.clientY-r.top;
-
     ghost=active.cloneNode(true);
     ghost.classList.add('quick-drag-ghost');
-    ghost.style.width=r.width+'px';
-    ghost.style.height=r.height+'px';
+    ghost.style.width=rect.width+'px';
+    ghost.style.height=rect.height+'px';
     ghost.style.left=(e.clientX-offsetX)+'px';
     ghost.style.top=(e.clientY-offsetY)+'px';
     document.body.appendChild(ghost);
 
     try{active.setPointerCapture(pointerId);}catch(_){}
-    if(navigator.vibrate)navigator.vibrate(20);
   }
 
-  function move(e){
-    if(!ghost||!active)return;
+  function moveDrag(e){
+    if(!active||!ghost)return;
 
     ghost.style.left=(e.clientX-offsetX)+'px';
     ghost.style.top=(e.clientY-offsetY)+'px';
@@ -833,108 +850,102 @@ render();
     let placed=false;
 
     for(const other of others){
-      const r=other.getBoundingClientRect();
-      if(e.clientX<r.left+r.width/2){
+      const rect=other.getBoundingClientRect();
+      if(e.clientX<rect.left+rect.width/2){
         if(active.nextSibling!==other)row.insertBefore(active,other);
         placed=true;
         break;
       }
     }
-
     if(!placed)row.appendChild(active);
 
     const rr=row.getBoundingClientRect();
-    if(e.clientX<rr.left+42)row.scrollLeft-=18;
-    else if(e.clientX>rr.right-42)row.scrollLeft+=18;
+    if(e.clientX<rr.left+48)row.scrollLeft-=20;
+    else if(e.clientX>rr.right-48)row.scrollLeft+=20;
   }
 
   function finishDrag(){
-    clearPress();
-
     if(ghost)ghost.remove();
     ghost=null;
-
     if(active)active.classList.remove('drag-source');
-    row.classList.remove('reordering');
-
-    if(dragging)saveOrder();
-
-    dragging=false;
+    if(active&&pointerId!==null){
+      try{active.releasePointerCapture(pointerId);}catch(_){}
+    }
     active=null;
     pointerId=null;
   }
+
+  toggle.addEventListener('click',()=>{
+    if(reorderMode)saveOrder();
+    setMode(!reorderMode);
+  });
 
   row.addEventListener('pointerdown',e=>{
     const button=e.target.closest('.quick-btn[data-activity]');
     if(!button)return;
 
-    clearOpen();
-    pointerId=e.pointerId;
-    active=button;
     startX=e.clientX;
     startY=e.clientY;
     downTime=Date.now();
     moved=false;
 
-    clearPress();
-    timer=setTimeout(()=>begin(button,e),LONG_PRESS);
-  },{passive:true});
+    if(reorderMode){
+      e.preventDefault();
+      beginDrag(button,e);
+    }else{
+      active=button;
+      pointerId=e.pointerId;
+    }
+  },{passive:false});
 
   row.addEventListener('pointermove',e=>{
     if(e.pointerId!==pointerId)return;
 
     const distance=Math.hypot(e.clientX-startX,e.clientY-startY);
-    if(distance>MAX_TAP_MOVE)moved=true;
+    if(distance>TAP_MOVE_LIMIT)moved=true;
 
-    if(!dragging){
-      if(moved)clearPress();
-      return;
+    if(reorderMode&&active){
+      e.preventDefault();
+      moveDrag(e);
     }
-
-    e.preventDefault();
-    move(e);
   },{passive:false});
 
   row.addEventListener('pointerup',e=>{
     if(e.pointerId!==pointerId)return;
 
-    const button=e.target.closest('.quick-btn[data-activity]')||active;
-    const elapsed=Date.now()-downTime;
-
-    if(dragging){
+    if(reorderMode){
+      saveOrder();
       finishDrag();
       return;
     }
 
-    clearPress();
-    pointerId=null;
+    const button=active;
+    const elapsed=Date.now()-downTime;
     active=null;
+    pointerId=null;
 
-    // Open only after a deliberate, quick, mostly stationary tap.
-    if(button&&!moved&&elapsed<=MAX_TAP_TIME){
-      clearOpen();
-      openTimer=setTimeout(()=>{
-        quickAddActivity(button.dataset.activity);
-        openTimer=null;
-      },OPEN_DELAY);
+    // Only a stationary, deliberate tap opens an activity.
+    if(button&&!moved&&elapsed<=TAP_TIME_LIMIT){
+      quickAddActivity(button.dataset.activity);
     }
   });
 
   row.addEventListener('pointercancel',()=>{
-    clearOpen();
     finishDrag();
+    active=null;
+    pointerId=null;
   });
 
-  // Block the browser-generated click so pointer handling is the only opener.
+  // Prevent browser-generated click events from opening activities.
   row.addEventListener('click',e=>{
-    const button=e.target.closest('.quick-btn[data-activity]');
-    if(button){
+    if(e.target.closest('.quick-btn[data-activity]')){
       e.preventDefault();
       e.stopImmediatePropagation();
     }
   },true);
 
   restoreOrder();
+  setMode(false);
 })();
 </script>
 
