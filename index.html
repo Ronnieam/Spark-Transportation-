@@ -126,7 +126,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.3.0 visual refresh */
+/* v1.3.1 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -224,6 +224,34 @@ padding:8px
   .nav button{font-size:11px!important;min-width:52px!important}
 }
 
+
+/* v1.3.1 biweekly reports */
+.report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
+.report-metric span{display:block;color:#aebdca;font-size:13px;margin-bottom:6px}
+.report-metric b{font-size:22px}
+.report-metric.total{background:#17365a;border-color:#c99718}
+.report-metric.total b{color:#f4bd28}
+.report-metrics.compact{grid-template-columns:repeat(3,minmax(0,1fr))}
+.report-metrics.compact .report-metric{padding:10px 5px}
+.report-metrics.compact .report-metric b{font-size:18px}
+.pay-breakdown{margin-top:12px}
+.week-report-grid{display:grid;grid-template-columns:1fr;gap:14px}
+.week-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.week-heading h2{margin:0 0 4px}
+.week-pay{color:#f4bd28;font-size:24px;white-space:nowrap}
+.activity-report-list{display:grid;gap:8px}
+.activity-report-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#10243a;border:1px solid #35506a;border-radius:13px;padding:10px 12px}
+.activity-report-row div{display:flex;flex-direction:column;gap:3px}
+.activity-report-row span{color:#aebdca;font-size:12px}
+@media(min-width:760px){.week-report-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:390px){
+ .report-actions{grid-template-columns:1fr}
+ .report-metric b{font-size:19px}
+ .week-pay{font-size:21px}
+}
+
 </style>
 <title>Spark Transportation</title>
 </head>
@@ -237,7 +265,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.3.0</div>
+  <div class="version">v1.3.1</div>
 </header>
 
 <section id="home" class="active">
@@ -506,11 +534,83 @@ padding:8px
 
 <section id="reports">
   <div class="card">
-    <h2>Reports</h2>
-    <div class="kv"><span>Total days</span><b id="reportDays">0</b></div>
-    <div class="kv"><span>Total miles</span><b id="reportMiles">0</b></div>
-    <div class="kv"><span>Total activities</span><b id="reportActivities">0</b></div>
-    <div class="kv"><span>Total estimated pay</span><b id="reportPay">$0.00</b></div>
+    <h2>Biweekly Pay Period</h2>
+    <div class="row">
+      <div>
+        <label>First day of payroll</label>
+        <input id="payPeriodStart" type="date">
+      </div>
+      <div>
+        <label>Last day of payroll</label>
+        <input id="payPeriodEnd" type="date">
+      </div>
+    </div>
+    <div class="report-actions">
+      <button type="button" class="secondary" onclick="setFourteenDayPeriod()">Set 14 Days</button>
+      <button type="button" class="primary" onclick="savePayPeriodDates()">Save Pay Period</button>
+    </div>
+    <div id="payPeriodMessage" class="muted small top-gap-sm"></div>
+  </div>
+
+  <div class="card">
+    <h2>Pay Period Total</h2>
+    <div class="report-metrics">
+      <div class="report-metric"><span>Days worked</span><b id="reportDays">0</b></div>
+      <div class="report-metric"><span>Miles</span><b id="reportMiles">0</b></div>
+      <div class="report-metric"><span>Activities</span><b id="reportActivities">0</b></div>
+      <div class="report-metric total"><span>Estimated pay</span><b id="reportPay">$0.00</b></div>
+    </div>
+    <div class="pay-breakdown">
+      <div class="kv"><span>Mileage pay</span><b id="periodMileagePay">$0.00</b></div>
+      <div class="kv"><span>Activity pay</span><b id="periodActivityPay">$0.00</b></div>
+      <div class="kv"><span>PTO pay</span><b id="periodPtoPay">$0.00</b></div>
+    </div>
+  </div>
+
+  <div class="week-report-grid">
+    <div class="card week-report">
+      <div class="week-heading">
+        <div>
+          <h2>Week 1</h2>
+          <div id="week1Dates" class="muted small">—</div>
+        </div>
+        <b id="week1Pay" class="week-pay">$0.00</b>
+      </div>
+      <div class="report-metrics compact">
+        <div class="report-metric"><span>Days</span><b id="week1Days">0</b></div>
+        <div class="report-metric"><span>Miles</span><b id="week1Miles">0</b></div>
+        <div class="report-metric"><span>Activities</span><b id="week1Activities">0</b></div>
+      </div>
+      <div class="pay-breakdown">
+        <div class="kv"><span>Mileage pay</span><b id="week1MileagePay">$0.00</b></div>
+        <div class="kv"><span>Activity pay</span><b id="week1ActivityPay">$0.00</b></div>
+        <div class="kv"><span>PTO pay</span><b id="week1PtoPay">$0.00</b></div>
+      </div>
+      <h3>Activity breakdown</h3>
+      <div id="week1ActivityBreakdown" class="activity-report-list"></div>
+    </div>
+
+    <div class="card week-report">
+      <div class="week-heading">
+        <div>
+          <h2>Week 2</h2>
+          <div id="week2Dates" class="muted small">—</div>
+        </div>
+        <b id="week2Pay" class="week-pay">$0.00</b>
+      </div>
+      <div class="report-metrics compact">
+        <div class="report-metric"><span>Days</span><b id="week2Days">0</b></div>
+        <div class="report-metric"><span>Miles</span><b id="week2Miles">0</b></div>
+        <div class="report-metric"><span>Activities</span><b id="week2Activities">0</b></div>
+      </div>
+      <div class="pay-breakdown">
+        <div class="kv"><span>Mileage pay</span><b id="week2MileagePay">$0.00</b></div>
+        <div class="kv"><span>Activity pay</span><b id="week2ActivityPay">$0.00</b></div>
+        <div class="kv"><span>PTO pay</span><b id="week2PtoPay">$0.00</b></div>
+      </div>
+      <h3>Activity breakdown</h3>
+      <div id="week2ActivityBreakdown" class="activity-report-list"></div>
+    </div>
   </div>
 </section>
 
@@ -545,7 +645,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.3.0</b></div>
+    <div class="kv"><span>App version</span><b>1.3.1</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -610,7 +710,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.3.0',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.3.1',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -652,7 +752,9 @@ const baseState={
  entries:[],
  savedLocations:[],
  editingEntryIndex:null,
- quickActivityOrder:[...DEFAULT_QUICK_ACTIVITY_ORDER]
+ quickActivityOrder:[...DEFAULT_QUICK_ACTIVITY_ORDER],
+ payPeriodStart:'',
+ payPeriodEnd:''
 };
 let state=loadPersistentState(baseState);
 state.setup={...defaults,...(state.setup||{})};
@@ -849,6 +951,149 @@ function renderHistory(){
  $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
 }
 
+
+function dateFromISO(value){
+ if(!value)return null;
+ const d=new Date(value+'T12:00:00');
+ return Number.isNaN(d.getTime())?null:d;
+}
+function isoFromDate(date){
+ const y=date.getFullYear();
+ const m=String(date.getMonth()+1).padStart(2,'0');
+ const d=String(date.getDate()).padStart(2,'0');
+ return `${y}-${m}-${d}`;
+}
+function addCalendarDays(value,days){
+ const d=dateFromISO(value);
+ if(!d)return '';
+ d.setDate(d.getDate()+days);
+ return isoFromDate(d);
+}
+function displayReportDate(value){
+ const d=dateFromISO(value);
+ return d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+}
+function activityCountForEntry(entry){
+ return (entry.locations||[]).reduce((sum,location)=>sum+(location.activities||[]).length,0);
+}
+function entriesBetween(start,end){
+ if(!start||!end)return [];
+ return state.entries.filter(entry=>entry.date>=start&&entry.date<=end);
+}
+function summarizeEntries(entries){
+ const summary={
+  days:entries.length,miles:0,activities:0,mileagePay:0,activityPay:0,ptoPay:0,total:0,
+  activityTypes:{}
+ };
+ entries.forEach(entry=>{
+  summary.miles+=num(entry.miles);
+  summary.mileagePay+=num(entry.mileagePay);
+  summary.activityPay+=num(entry.activityPay);
+  summary.ptoPay+=num(entry.ptoPay);
+  summary.total+=num(entry.total);
+  (entry.locations||[]).forEach(location=>{
+   (location.activities||[]).forEach(activity=>{
+    summary.activities++;
+    const type=activity.type||'Other';
+    if(!summary.activityTypes[type])summary.activityTypes[type]={count:0,pay:0,hours:0,paidHours:0};
+    summary.activityTypes[type].count++;
+    summary.activityTypes[type].pay+=num(activity.pay);
+    summary.activityTypes[type].hours+=num(activity.hours);
+    summary.activityTypes[type].paidHours+=num(activity.paidHours!==undefined?activity.paidHours:activity.hours);
+   });
+  });
+ });
+ return summary;
+}
+function renderActivityBreakdown(elementId,summary){
+ const box=$(elementId);
+ if(!box)return;
+ const rows=Object.entries(summary.activityTypes).sort((a,b)=>b[1].pay-a[1].pay||a[0].localeCompare(b[0]));
+ box.innerHTML=rows.length?rows.map(([type,data])=>`
+  <div class="activity-report-row">
+   <div><b>${type}</b><span>${data.count} ${data.count===1?'activity':'activities'}${data.hours?` • ${data.hours.toFixed(2)} hrs`:''}</span></div>
+   <b>${money(data.pay)}</b>
+  </div>`).join(''):'<div class="muted small">No activities recorded for this week.</div>';
+}
+function fillWeekReport(prefix,start,end,summary){
+ $(prefix+'Dates').textContent=`${displayReportDate(start)} – ${displayReportDate(end)}`;
+ $(prefix+'Days').textContent=summary.days;
+ $(prefix+'Miles').textContent=Math.round(summary.miles);
+ $(prefix+'Activities').textContent=summary.activities;
+ $(prefix+'MileagePay').textContent=money(summary.mileagePay);
+ $(prefix+'ActivityPay').textContent=money(summary.activityPay);
+ $(prefix+'PtoPay').textContent=money(summary.ptoPay);
+ $(prefix+'Pay').textContent=money(summary.total);
+ renderActivityBreakdown(prefix+'ActivityBreakdown',summary);
+}
+function setFourteenDayPeriod(){
+ const start=$('payPeriodStart').value||state.payPeriodStart||new Date().toISOString().slice(0,10);
+ $('payPeriodStart').value=start;
+ $('payPeriodEnd').value=addCalendarDays(start,13);
+ renderPayPeriodReport();
+}
+function savePayPeriodDates(){
+ const start=$('payPeriodStart').value;
+ const end=$('payPeriodEnd').value;
+ if(!start||!end){alert('Choose the first and last day of the payroll period.');return;}
+ if(end<start){alert('The last day cannot be before the first day.');return;}
+ state.payPeriodStart=start;
+ state.payPeriodEnd=end;
+ savePersistentState(state);
+ renderPayPeriodReport();
+}
+function renderPayPeriodReport(){
+ const startInput=$('payPeriodStart');
+ const endInput=$('payPeriodEnd');
+ if(!startInput||!endInput)return;
+
+ if(!startInput.value)startInput.value=state.payPeriodStart||'';
+ if(!endInput.value)endInput.value=state.payPeriodEnd||'';
+
+ const start=startInput.value;
+ const end=endInput.value;
+ const message=$('payPeriodMessage');
+
+ if(!start||!end){
+  message.textContent='Choose the first and last day of your payroll period.';
+  const empty=summarizeEntries([]);
+  $('reportDays').textContent=0;$('reportMiles').textContent=0;$('reportActivities').textContent=0;$('reportPay').textContent=money(0);
+  $('periodMileagePay').textContent=money(0);$('periodActivityPay').textContent=money(0);$('periodPtoPay').textContent=money(0);
+  fillWeekReport('week1','','',empty);fillWeekReport('week2','','',empty);
+  return;
+ }
+ if(end<start){
+  message.textContent='The payroll end date must be after the start date.';
+  return;
+ }
+
+ const expectedEnd=addCalendarDays(start,13);
+ const actualDays=Math.round((dateFromISO(end)-dateFromISO(start))/86400000)+1;
+ message.textContent=actualDays===14
+  ?'14-day payroll period selected.'
+  :`${actualDays}-day period selected. A two-week payroll period is normally 14 days.`;
+
+ const week1Start=start;
+ const week1End=[addCalendarDays(start,6),end].sort()[0];
+ const week2Start=addCalendarDays(start,7);
+ const week2End=end;
+
+ const period=summarizeEntries(entriesBetween(start,end));
+ const week1=summarizeEntries(entriesBetween(week1Start,week1End));
+ const week2=week2Start<=week2End?summarizeEntries(entriesBetween(week2Start,week2End)):summarizeEntries([]);
+
+ $('reportDays').textContent=period.days;
+ $('reportMiles').textContent=Math.round(period.miles);
+ $('reportActivities').textContent=period.activities;
+ $('reportPay').textContent=money(period.total);
+ $('periodMileagePay').textContent=money(period.mileagePay);
+ $('periodActivityPay').textContent=money(period.activityPay);
+ $('periodPtoPay').textContent=money(period.ptoPay);
+
+ fillWeekReport('week1',week1Start,week1End,week1);
+ fillWeekReport('week2',week2Start,week2End,week2);
+}
+
 function render(){
  $('driverLine').textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.driverId||'Driver Pay & Activity Tracker');
  $('startBox').classList.toggle('hidden',!!state.active);$('activeBox').classList.toggle('hidden',!state.active);
@@ -930,17 +1175,16 @@ function render(){
 
  renderSavedLocations();renderHistory();
 
- const reportActivities=state.entries.reduce((s,e)=>s+(e.locations||[]).reduce((x,l)=>x+(l.activities||[]).length,0),0);
- $('reportDays').textContent=state.entries.length;
- $('reportMiles').textContent=Math.round(state.entries.reduce((s,e)=>s+num(e.miles),0));
- $('reportActivities').textContent=reportActivities;
- $('reportPay').textContent=money(state.entries.reduce((s,e)=>s+num(e.total),0));
+ renderPayPeriodReport();
  $('migrationStatus').textContent=localStorage.getItem(MIGRATION_FLAG)||'None';
 }
 
 Object.keys(defaults).forEach(k=>{if($(k))$(k).value=state.setup[k]});
 $('dayDate').value=new Date().toISOString().slice(0,10);
-document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render();});
+document.addEventListener('input',e=>{
+ if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render();
+ if(['payPeriodStart','payPeriodEnd'].includes(e.target.id))renderPayPeriodReport();
+});
 
 let touchStartX=null,touchStartY=null;
 document.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchStartX=t.screenX;touchStartY=t.screenY;},{passive:true});

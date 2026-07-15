@@ -1,21 +1,13 @@
-Spark Transportation v1.3.0 — Visual Refresh
+Spark Transportation v1.3.1 — Biweekly Pay Period Reports
 
-Activities:
-- Renamed Quick Add Activity to Activities
-- Kept the full three-column grid
-- Removed extra helper text
-- Added compact Reorder and Reset controls
-- Added jiggle animation in Reorder mode
-- Improved icon size, spacing, card shape, and tap feedback
-- Preserves custom activity order in sparkTransportationData
+Added:
+- Select the first and last day of each payroll period
+- One-tap Set 14 Days button
+- Saved pay-period dates
+- Full pay-period totals for days, miles, activities, and estimated pay
+- Mileage, activity, and PTO pay breakdown
+- Separate Week 1 and Week 2 totals
+- Activity count and money earned for each individual week
+- Per-activity-type count and pay breakdown for each week
 
-Navigation:
-- Added icons to Home, Day, Locations, History, Reports, Setup, and Data
-- Improved active-tab spacing and touch targets
-
-Dashboard:
-- Refined card rounding and spacing
-- Increased emphasis on major totals
-- Preserved all existing pay rules, history, locations, and data
-
-Upload all individual files to the root of the existing GitHub repository.
+The report uses completed days saved in History and preserves all existing app data.
