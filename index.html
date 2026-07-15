@@ -45,6 +45,10 @@ button{display:block;width:100%;max-width:100%;min-height:48px;padding:13px;bord
 .hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
 .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#3b290c;color:#ffd166;font-size:12px}
+.collapse-header{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.collapse-header h3{margin:0}
+.collapse-toggle{width:auto;min-height:40px;padding:8px 12px;border-radius:999px;background:#17304a;color:#fff}
+.collapse-content{margin-top:14px}
 section{display:none;opacity:0;transform:translateX(0);transition:transform .28s ease,opacity .28s ease}
 section.active{display:block;opacity:1}
 section.slide-in-right{display:block;animation:slideInRight .28s ease}
@@ -75,7 +79,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 9</div>
+<div class="version">v1.0 Beta 10</div>
 </header>
 
 <section id="home" class="active">
@@ -167,7 +171,12 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 </section>
 
 <section id="locations">
-<div class="card"><h3>Add Saved Location</h3>
+<div class="card">
+<div class="collapse-header" onclick="toggleSavedLocationForm()">
+<h3>Add Saved Location</h3>
+<button id="savedLocationToggleButton" class="collapse-toggle" type="button">Show</button>
+</div>
+<div id="savedLocationForm" class="collapse-content hidden">
 <div class="row"><div><label>Type</label><select id="savedType"><option>Store</option><option>Vendor</option><option>DC</option></select></div><div><label>Number</label><input id="savedNumber"></div></div>
 <label>Name</label><input id="savedName">
 <label>Address</label><input id="savedAddress">
@@ -180,6 +189,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <input id="editingSavedLocationIndex" type="hidden" value="">
 <button id="saveLocationButton" class="primary" onclick="saveLocation()">Save Location</button>
 <button id="cancelLocationEditButton" class="secondary hidden" style="margin-top:8px" onclick="cancelLocationEdit()">Cancel Edit</button>
+</div>
 </div>
 <div class="card"><h3>Saved Locations</h3><div id="savedLocationList" class="muted">No saved locations.</div></div>
 </section>
@@ -259,6 +269,16 @@ if(state.editingEntryIndex===null||state.editingEntryIndex===undefined){state.en
 else{state.entries[state.editingEntryIndex]=entry}
 state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save();show('history')}
 function cancelDay(){if(confirm('Cancel this day?')){state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save()}}
+function toggleSavedLocationForm(forceState=null){
+ const form=$('savedLocationForm')
+ const button=$('savedLocationToggleButton')
+ let shouldOpen
+ if(forceState===true)shouldOpen=true
+ else if(forceState===false)shouldOpen=false
+ else shouldOpen=form.classList.contains('hidden')
+ form.classList.toggle('hidden',!shouldOpen)
+ button.textContent=shouldOpen?'Hide':'Show'
+}
 function saveLocation(){
  if(!savedNumber.value.trim()){alert('Enter a location number.');return}
  const location={
@@ -285,6 +305,7 @@ function saveLocation(){
    state.savedLocations[Number(idx)]=location
  }
  clearSavedLocationForm()
+ toggleSavedLocationForm(false)
  save()
 }
 function editSavedLocation(i){
@@ -306,6 +327,7 @@ function editSavedLocation(i){
  saveLocationButton.textContent='Update Location'
  cancelLocationEditButton.classList.remove('hidden')
  show('locations')
+ toggleSavedLocationForm(true)
  window.scrollTo({top:0,behavior:'smooth'})
 }
 function cancelLocationEdit(){clearSavedLocationForm()}
