@@ -1,19 +1,13 @@
-Spark Transportation v1.3.3 — New Official Logo
+Spark Transportation v1.3.4 — Home Header Redesign
 
-This update uses the newly supplied Spark Transportation logo everywhere:
-- App header
-- Home dashboard branding
-- Splash/loading branding
-- Browser/PWA branding
-- 192×192 app icon
-- 512×512 app icon
-
-Brand colors:
-- Deep navy background
-- Gold accent
-- White text
-- Tagline: Know Your Day. Know Your Pay.
+Changes:
+- Replaced the crowded header with one centered, full-width official logo.
+- Removed duplicate Spark Transportation title and tracker text.
+- Removed the version badge from the Home header.
+- App version remains available on the Data/Setup screen.
+- Removed the duplicate tagline below the greeting.
+- Added a smaller profile/settings button beside Today's Run.
+- Improved header spacing and bottom-navigation alignment.
+- Preserved all data, pay rules, reports, saved locations, and custom activity order.
 
 Upload all individual files to the root of the existing GitHub repository.
-After GitHub Pages updates, refresh Safari. If the Home Screen icon does not change,
-remove only the shortcut and add it again from Safari.
