@@ -1,15 +1,19 @@
-Spark Transportation v1.3.2 — Currency Pay Rates
+Spark Transportation v1.3.3 — New Official Logo
 
-Driver & Pay Rates updates:
-- Mileage Rate remains a plain numeric field.
-- Weekend Mileage Rate remains a plain numeric field.
-- All other monetary pay-rate fields display a dollar sign.
-- Monetary fields display two decimal places after leaving the field or saving.
-- Wait Time and Breakdown share the same hourly-rate field.
-- Currency formatting does not change the internal pay calculations.
+This update uses the newly supplied Spark Transportation logo everywhere:
+- App header
+- Home dashboard branding
+- Splash/loading branding
+- Browser/PWA branding
+- 192×192 app icon
+- 512×512 app icon
 
-Formatted fields:
-Live Load, Live Unload, Wait Time & Breakdown, Manual ADP, Hook, Stop,
-Arrive, Arrive Drop, Layover, Chain, and Regional Pay.
+Brand colors:
+- Deep navy background
+- Gold accent
+- White text
+- Tagline: Know Your Day. Know Your Pay.
 
-Existing data remains under sparkTransportationData.
+Upload all individual files to the root of the existing GitHub repository.
+After GitHub Pages updates, refresh Safari. If the Home Screen icon does not change,
+remove only the shortcut and add it again from Safari.
