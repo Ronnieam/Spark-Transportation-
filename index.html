@@ -125,6 +125,105 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn{cursor:grab;outline:1px solid rgba(224,183,74,.35)}
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
+
+/* v1.3.0 visual refresh */
+.activity-section-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.activity-section-header h2{margin:0}
+.quick-toolbar{margin:0}
+.activity-actions{display:flex;gap:8px;align-items:center}
+.ghost{
+  background:transparent!important;
+  color:#c7d3df!important;
+  border:1px solid #35506a!important;
+}
+.small-btn{
+  min-height:38px!important;
+  padding:7px 13px!important;
+  width:auto!important;
+  border-radius:12px!important;
+}
+.quick-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+  padding:0!important;
+}
+.quick-btn{
+  min-height:102px!important;
+  border-radius:18px!important;
+  padding:12px 6px 10px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  font-weight:800!important;
+  line-height:1.05!important;
+  transition:transform .12s ease, border-color .12s ease, background .12s ease!important;
+}
+.quick-btn:active{transform:scale(.96)}
+.quick-btn .quick-icon{
+  font-size:30px!important;
+  margin:0!important;
+  line-height:1!important;
+}
+.quick-grid.reorder-mode{
+  border:2px solid #e0b74a!important;
+  box-shadow:0 0 0 3px rgba(224,183,74,.12);
+}
+.quick-grid.reorder-mode .quick-btn{
+  animation:activityJiggle .22s infinite alternate ease-in-out;
+}
+.quick-grid.reorder-mode .quick-btn:nth-child(even){
+  animation-direction:alternate-reverse;
+}
+@keyframes activityJiggle{
+  from{transform:rotate(-1.1deg)}
+  to{transform:rotate(1.1deg)}
+}
+.quick-btn.drag-source{opacity:.2!important;animation:none!important}
+.quick-drag-ghost{
+  border-radius:18px!important;
+  transform:scale(1.05)!important;
+}
+.card{border-radius:22px!important}
+.dashboard-total,.hero-total,.pay-total{
+  font-size:clamp(2rem,8vw,3.25rem)!important;
+}
+.nav{
+  gap:2px!important;
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom))!important;
+}
+.nav button{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  min-width:58px!important;
+  padding:8px 6px!important;
+  font-size:12px!important;
+  border-radius:15px!important;
+}
+.nav button::before{font-size:20px;line-height:1}
+.nav button[data-page="home"]::before{content:"🏠"}
+.nav button[data-page="day"]::before{content:"📅"}
+.nav button[data-page="locations"]::before{content:"📍"}
+.nav button[data-page="history"]::before{content:"🕒"}
+.nav button[data-page="reports"]::before{content:"📊"}
+.nav button[data-page="setup"]::before{content:"⚙️"}
+.nav button[data-page="data"]::before{content:"💾"}
+@media(max-width:390px){
+  .quick-btn{min-height:94px!important;font-size:14px!important}
+  .quick-btn .quick-icon{font-size:27px!important}
+  .nav button{font-size:11px!important;min-width:52px!important}
+}
+
 </style>
 <title>Spark Transportation</title>
 </head>
@@ -138,7 +237,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.11</div>
+  <div class="version">v1.3.0</div>
 </header>
 
 <section id="home" class="active">
@@ -199,28 +298,27 @@ padding:8px
   </div>
 
   <div class="card">
-    <h2>Quick Add Activity</h2>
-    <div class="quick-toolbar">
-      <span id="quickModeText" class="muted small">All activities are shown below</span>
-      <button type="button" id="quickReorderToggle" class="secondary small-btn">Reorder</button>
-    </div>
+    <div class="activity-section-header"><h2>Activities</h2><div class="quick-toolbar">
+      
+      <div class="activity-actions"><button type="button" id="quickResetOrder" class="ghost small-btn">Reset</button><button type="button" id="quickReorderToggle" class="secondary small-btn">Reorder</button></div>
+    </div></div>
     <div class="quick-grid" id="quickActivityRow" aria-label="Quick activities">
-      <button class="quick-btn" data-activity="Live Load"><span class="quick-icon">📦</span>Live Load</button>
-      <button class="quick-btn" data-activity="Live Unload"><span class="quick-icon">📤</span>Live Unload</button>
+      <button class="quick-btn" data-activity="Live Load"><span class="quick-icon">🚚</span>Live Load</button>
+      <button class="quick-btn" data-activity="Live Unload"><span class="quick-icon">📥</span>Live Unload</button>
       <button class="quick-btn" data-activity="Wait Time"><span class="quick-icon">⏱️</span>Wait Time</button>
-      <button class="quick-btn" data-activity="Breakdown"><span class="quick-icon">🛠️</span>Breakdown</button>
-      <button class="quick-btn" data-activity="Hook"><span class="quick-icon">🔗</span>Hook</button>
+      <button class="quick-btn" data-activity="Breakdown"><span class="quick-icon">🔧</span>Breakdown</button>
+      <button class="quick-btn" data-activity="Hook"><span class="quick-icon">🪝</span>Hook</button>
       <button class="quick-btn" data-activity="Stop"><span class="quick-icon">🛑</span>Stop</button>
       <button class="quick-btn" data-activity="Arrive"><span class="quick-icon">📍</span>Arrive</button>
-      <button class="quick-btn" data-activity="Arrive Drop"><span class="quick-icon">📥</span>Arrive Drop</button>
-      <button class="quick-btn" data-activity="Layover"><span class="quick-icon">🌙</span>Layover</button>
+      <button class="quick-btn" data-activity="Arrive Drop"><span class="quick-icon">⬇️</span>Arrive Drop</button>
+      <button class="quick-btn" data-activity="Layover"><span class="quick-icon">🛏️</span>Layover</button>
       <button class="quick-btn" data-activity="Chain"><span class="quick-icon">⛓️</span>Chain</button>
       <button class="quick-btn" data-activity="Regional Pay"><span class="quick-icon">🗺️</span>Regional Pay</button>
       <button class="quick-btn" data-activity="Meeting"><span class="quick-icon">👥</span>Meeting</button>
-      <button class="quick-btn" data-activity="Survey"><span class="quick-icon">📝</span>Survey</button>
+      <button class="quick-btn" data-activity="Survey"><span class="quick-icon">📋</span>Survey</button>
       <button class="quick-btn" data-activity="Training"><span class="quick-icon">🎓</span>Training</button>
     </div>
-    <div class="muted small top-gap-sm">Tap an activity to open it. Tap Reorder to rearrange the grid.</div>
+    
   </div>
 
   <button class="primary primary-dashboard" id="dashboardPrimaryButton" onclick="dashboardPrimaryAction()">Start Day</button>
@@ -447,7 +545,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.11</b></div>
+    <div class="kv"><span>App version</span><b>1.3.0</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -512,7 +610,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.11',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.3.0',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -862,7 +960,7 @@ render();
 (function(){
   const grid=document.getElementById('quickActivityRow');
   const toggle=document.getElementById('quickReorderToggle');
-  const modeText=document.getElementById('quickModeText');
+  const reset=document.getElementById('quickResetOrder');
   if(!grid||!toggle)return;
 
   let reorderMode=false;
@@ -905,9 +1003,7 @@ render();
     reorderMode=enabled;
     grid.classList.toggle('reorder-mode',enabled);
     toggle.textContent=enabled?'Done':'Reorder';
-    modeText.textContent=enabled
-      ?'Drag an activity to any grid position'
-      :'All activities are shown below';
+
     finishDrag();
     if(enabled&&navigator.vibrate)navigator.vibrate(20);
   }
@@ -976,6 +1072,19 @@ render();
     if(reorderMode)saveOrder();
     setMode(!reorderMode);
   });
+
+  if(reset){
+    reset.addEventListener('click',()=>{
+      if(!confirm('Reset activities to the default order?'))return;
+      state.quickActivityOrder=[...DEFAULT_QUICK_ACTIVITY_ORDER];
+      DEFAULT_QUICK_ACTIVITY_ORDER.forEach(name=>{
+        const button=items().find(item=>item.dataset.activity===name);
+        if(button)grid.appendChild(button);
+      });
+      savePersistentState(state);
+      setMode(false);
+    });
+  }
 
   grid.addEventListener('pointerdown',event=>{
     const button=event.target.closest('.quick-btn[data-activity]');
