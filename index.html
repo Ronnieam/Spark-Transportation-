@@ -138,7 +138,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.10</div>
+  <div class="version">v1.2.11</div>
 </header>
 
 <section id="home" class="active">
@@ -447,7 +447,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.2.10</b></div>
+    <div class="kv"><span>App version</span><b>1.2.11</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -512,7 +512,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.2.10',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.2.11',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -570,6 +570,16 @@ state.quickActivityOrder=[
 const $=id=>document.getElementById(id);
 const num=v=>Number(v||0);
 const money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
+function formatPhone(value){
+ const digits=String(value||'').replace(/\D/g,'').slice(0,10);
+ if(digits.length<=3)return digits;
+ if(digits.length<=6)return digits.slice(0,3)+'-'+digits.slice(3);
+ return digits.slice(0,3)+'-'+digits.slice(3,6)+'-'+digits.slice(6);
+}
+function phoneDigits(value){
+ return String(value||'').replace(/\D/g,'').slice(0,10);
+}
+
 const pageOrder=['home','day','locations','history','reports','setup','data'];
 let currentPage='home';
 
@@ -703,7 +713,7 @@ function clearSavedLocationForm(){
 }
 function saveLocation(){
  if(!$('savedNumber').value.trim()){alert('Enter a location number.');return;}
- const l={id:Date.now().toString(),type:$('savedType').value,number:$('savedNumber').value.trim(),name:$('savedName').value.trim(),address:$('savedAddress').value.trim(),city:$('savedCity').value.trim(),state:$('savedState').value.trim(),phone:$('savedPhone').value.trim(),extension:$('savedExtension').value.trim(),contact:$('savedContact').value.trim(),hours:$('savedHours').value.trim(),gateCode:$('savedGateCode').value.trim(),appointment:$('savedAppointment').value.trim(),notes:$('savedNotes').value.trim()};
+ const l={id:Date.now().toString(),type:$('savedType').value,number:$('savedNumber').value.trim(),name:$('savedName').value.trim(),address:$('savedAddress').value.trim(),city:$('savedCity').value.trim(),state:$('savedState').value.trim(),phone:formatPhone($('savedPhone').value),extension:$('savedExtension').value.trim(),contact:$('savedContact').value.trim(),hours:$('savedHours').value.trim(),gateCode:$('savedGateCode').value.trim(),appointment:$('savedAppointment').value.trim(),notes:$('savedNotes').value.trim()};
  const idx=$('editingSavedLocationIndex').value;
  if(idx==='')state.savedLocations.push(l);else{l.id=state.savedLocations[Number(idx)].id;state.savedLocations[Number(idx)]=l;}
  clearSavedLocationForm();toggleSavedLocationForm(false);save();
@@ -839,6 +849,11 @@ document.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchStar
 document.addEventListener('touchend',e=>{if(touchStartX===null)return;const t=e.changedTouches[0],dx=t.screenX-touchStartX,dy=t.screenY-touchStartY;touchStartX=touchStartY=null;if(Math.abs(dx)<60||Math.abs(dx)<=Math.abs(dy))return;const i=pageOrder.indexOf(currentPage);if(dx<0&&i<pageOrder.length-1)showPage(pageOrder[i+1]);else if(dx>0&&i>0)showPage(pageOrder[i-1]);},{passive:true});
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+$('savedPhone').addEventListener('input',e=>{
+ const cursor=e.target.selectionStart;
+ const before=e.target.value;
+ e.target.value=formatPhone(before);
+});
 render();
 
 </script>

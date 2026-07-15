@@ -1,10 +1,10 @@
-Spark Transportation v1.2.10 — Persistent Activity Order
+Spark Transportation v1.2.11 — Phone Number Formatting
 
-Fixed:
-- Quick Add activity order is now part of the main permanent app state.
-- Normal app saves no longer erase the customized icon arrangement.
-- Future updates preserve the existing order stored in sparkTransportationData.
-- Newly added activities are appended without rearranging the driver's saved icons.
-- Backup and restore now include the customized activity order.
+Saved Locations phone numbers now:
+- Format automatically as 602-818-4551
+- Accept only the first 10 digits
+- Show a numeric phone keypad on mobile
+- Keep tap-to-call working by stripping hyphens when dialing
+- Format existing saved phone numbers when editing them
 
-After uploading, arrange the icons one final time. That order will remain through future updates.
+Upload all individual files to the root of the existing GitHub repository.
