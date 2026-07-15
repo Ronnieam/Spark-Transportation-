@@ -7,20 +7,85 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="css/app.css">
+<style>
+:root{
+  --bg:#07111f;--card:#102033;--card2:#13263a;--line:#294056;
+  --text:#fff;--muted:#a9b8c7;--gold:#ffb000;--green:#2ec4b6;--danger:#52232a
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:linear-gradient(#07111f,#0c1b2b);color:var(--text)
+}
+.app{max-width:640px;margin:auto;min-height:100vh;padding:12px 14px 104px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:68px;height:68px;border-radius:14px;object-fit:contain;background:#fff;flex:0 0 auto}
+.brand-copy{min-width:0}h1{font-size:20px;line-height:1.05;margin:0}h2{font-size:18px;margin:0 0 12px}h3{font-size:16px;margin:0 0 10px}
+.version{font-size:11px;color:#ffd166;border:1px solid #6b4d10;padding:7px 10px;border-radius:999px;white-space:nowrap}
+.muted{color:var(--muted)}.small{font-size:12px}
+section{display:none;opacity:0}section.active{display:block;opacity:1}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;overflow:hidden}
+.hero{background:linear-gradient(135deg,#8e570a,#d98200);border:none}.big{font-size:36px;font-weight:800;margin:4px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.metric{background:#091522;border:1px solid var(--line);border-radius:14px;padding:13px;text-align:center}
+.metric span{color:var(--muted);font-size:13px}.metric b{display:block;font-size:20px;margin-top:4px}
+label{display:block;font-size:13px;color:var(--muted);margin:11px 0 6px}
+input,select,textarea{
+  display:block;width:100%;max-width:100%;min-width:0;height:56px;
+  padding:0 14px;border-radius:12px;border:1px solid var(--line);
+  background:#081522;color:#fff;font-size:16px;line-height:56px;
+  text-align:center;text-align-last:center;-webkit-appearance:none;appearance:none
+}
+textarea{height:auto;min-height:88px;padding:14px;line-height:1.4}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  margin:0;width:100%;height:56px;line-height:56px
+}
+input::placeholder,textarea::placeholder{text-align:center}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;align-items:start}
+.row>div{min-width:0}
+button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padding:13px;font-size:15px;font-weight:800}
+.primary{background:var(--gold);color:#2b1700}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:var(--danger);color:#ffdce1}
+.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
+.hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}
+.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}
+.day-group{background:#0b1927;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}
+.inset{margin-top:14px;background:#0b1927}.section-gap{margin-top:16px}.top-gap{margin-top:14px}.top-gap-sm{margin-top:9px}
+.collapse-header{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}.collapse-header h2{margin:0}
+.collapse-toggle{width:auto;min-height:40px;padding:8px 12px;border-radius:999px;background:#17304a;color:#fff}.collapse-content{margin-top:14px}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#3b290c;color:#ffd166;font-size:12px}
+.nav{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,640px);
+  display:grid;grid-template-columns:repeat(7,1fr);background:#08131f;
+  border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:30
+}
+.nav button{background:transparent;color:var(--muted);font-size:10px;padding:8px 1px;min-height:44px}
+.nav button.active{background:#3b290c;color:#ffd166}
+@media(max-width:430px){
+  .row,.actions{grid-template-columns:1fr}
+  .app{padding-left:10px;padding-right:10px}
+  .card,.day-group{padding:13px}
+  .logo{width:60px;height:60px}
+  .nav button{font-size:9px}
+}
+
+</style>
 <title>Spark Transportation</title>
 </head>
 <body>
 <div class="app">
 <header>
   <div class="brand">
-    <img src="assets/logo.png" class="logo" alt="Spark Transportation">
+    <img src="logo.png" class="logo" alt="Spark Transportation">
     <div class="brand-copy">
       <h1>Spark Transportation</h1>
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.1.0</div>
+  <div class="version">v1.1.1</div>
 </header>
 
 <section id="home" class="active">
@@ -283,7 +348,289 @@
 <button data-page="data" onclick="showPage('data')">Data</button>
 </nav>
 
-<script src="js/storage.js"></script>
-<script src="js/app.js"></script>
+<script>
+const STORAGE_KEY='sparkTransportationData';
+const MIGRATION_FLAG='sparkTransportationMigratedFrom';
+const LEGACY_KEYS=[
+ 'sparkTransportationPWA1','sparkTransportationV03','sparkTransportationV04',
+ 'sparkTransportationV05','sparkTransportationV07','sparkTransportationV1Beta',
+ 'sparkTransportationV1Beta1','sparkTransportationV1Beta2','sparkTransportationV1Beta3',
+ 'sparkTransportationV1Beta4','sparkTransportationV1Beta5','sparkTransportationV1Beta6',
+ 'sparkTransportationV1Beta7','sparkTransportationV1Beta8','sparkTransportationV1Beta9',
+ 'sparkTransportationV1Beta10'
+];
+
+function findLegacyData(){
+  const keys=[...LEGACY_KEYS];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k!==STORAGE_KEY&&k.toLowerCase().includes('sparktransportation'))keys.push(k);
+  }
+  for(const key of [...new Set(keys)]){
+    const raw=localStorage.getItem(key);
+    if(!raw)continue;
+    try{
+      const data=JSON.parse(raw);
+      if(data&&typeof data==='object')return {key,data};
+    }catch(e){}
+  }
+  return null;
+}
+
+function loadPersistentState(defaultState){
+  const current=localStorage.getItem(STORAGE_KEY);
+  if(current){
+    try{return {...defaultState,...JSON.parse(current)};}catch(e){}
+  }
+  const legacy=findLegacyData();
+  if(legacy){
+    const merged={...defaultState,...legacy.data};
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(merged));
+    localStorage.setItem(MIGRATION_FLAG,legacy.key);
+    return merged;
+  }
+  return defaultState;
+}
+
+function savePersistentState(state){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+}
+
+function exportState(state){
+  const payload={app:'Spark Transportation',version:'1.1.0',exportedAt:new Date().toISOString(),data:state};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='spark-transportation-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function importState(file,onSuccess,onError){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(reader.result);
+      const restored=parsed.data||parsed;
+      if(!restored||typeof restored!=='object'||!Array.isArray(restored.entries))throw new Error('Invalid');
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(restored));
+      onSuccess(restored);
+    }catch(e){onError(e);}
+  };
+  reader.readAsText(file);
+}
+
+
+const defaults={
+ driverName:'',driverId:'',mileageRate:.679,weekendRate:.749,
+ liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,
+ hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,
+ layoverRate:42,chainRate:60,regionalRate:6
+};
+const baseState={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
+let state=loadPersistentState(baseState);
+state.setup={...defaults,...(state.setup||{})};
+state.entries=Array.isArray(state.entries)?state.entries:[];
+state.savedLocations=Array.isArray(state.savedLocations)?state.savedLocations:[];
+state.locations=Array.isArray(state.locations)?state.locations:[];
+
+const $=id=>document.getElementById(id);
+const num=v=>Number(v||0);
+const money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
+const pageOrder=['home','day','locations','history','reports','setup','data'];
+let currentPage='home';
+
+function save(){savePersistentState(state);render();}
+function showPage(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');currentPage=id;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render();}
+function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100;}
+function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t);}
+function defaultRate(t){
+ if(t==='Live Load')return num(state.setup.liveLoadRate);
+ if(t==='Live Unload')return num(state.setup.liveUnloadRate);
+ if(t==='Wait Time')return num(state.setup.waitRate);
+ if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;
+ return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0;
+}
+function updateActivityFields(){
+ const t=$('activityType').value;
+ $('timedFields').classList.toggle('hidden',!isTimed(t));
+ $('flatFields').classList.toggle('hidden',!t||isTimed(t));
+ $('commonFields').classList.toggle('hidden',!t);
+ if(!t)return;
+ if(isTimed(t))$('activityHourlyRate').value=defaultRate(t);
+ else $('activityFlatRate').value=defaultRate(t);
+}
+function startDay(){
+ if(!$('dayDate').value||!$('beginMileage').value||!$('startTime').value){alert('Enter date, beginning mileage and start time.');return;}
+ state.active={date:$('dayDate').value,beginMileage:num($('beginMileage').value),startTime:$('startTime').value};
+ state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save();
+}
+function startLocationFromData(data){
+ state.locations.push({type:data.type,number:data.number,name:data.name||'',activities:[]});
+ state.activeLocationIndex=state.locations.length-1;save();
+}
+function startLocation(){
+ if(!$('locationNumber').value.trim()){alert('Enter a Store, Vendor or DC number.');return;}
+ startLocationFromData({type:$('locationType').value,number:$('locationNumber').value.trim(),name:$('locationName').value.trim()});
+ $('locationNumber').value='';$('locationName').value='';
+}
+function useSavedLocation(){
+ const loc=state.savedLocations.find(x=>x.id===$('savedLocationSelect').value);
+ if(!loc){alert('Choose a saved location.');return;}
+ startLocationFromData(loc);
+}
+function addActivity(){
+ if(state.activeLocationIndex===null){alert('Choose a location first.');return;}
+ const t=$('activityType').value;if(!t){alert('Select an activity.');return;}
+ let a;
+ if(isTimed(t)){
+  if(!$('activityStart').value||!$('activityStop').value){alert('Enter start and stop times.');return;}
+  const h=decimalHours($('activityStart').value,$('activityStop').value),r=num($('activityHourlyRate').value);
+  a={type:t,kind:'timed',start:$('activityStart').value,stop:$('activityStop').value,hours:h,rate:r,note:$('activityNote').value,pay:h*r};
+ }else{
+  const q=Math.max(1,num($('activityQty').value)),r=num($('activityFlatRate').value);
+  a={type:t,kind:'flat',qty:q,rate:r,note:$('activityNote').value,pay:q*r};
+ }
+ state.locations[state.activeLocationIndex].activities.push(a);
+ ['activityStart','activityStop','activityHourlyRate','activityFlatRate','activityNote'].forEach(id=>$(id).value='');
+ $('activityType').value='';$('activityQty').value=1;updateActivityFields();save();
+}
+function selectLocation(i){state.activeLocationIndex=i;save();}
+function removeActivity(li,ai){state.locations[li].activities.splice(ai,1);save();}
+function removeLocation(i){if(confirm('Remove this location and all activities?')){state.locations.splice(i,1);state.activeLocationIndex=null;save();}}
+function activityTotal(){return state.locations.reduce((s,l)=>s+(l.activities||[]).reduce((x,a)=>x+num(a.pay),0),0);}
+function mileagePreview(){
+ if(!state.active)return 0;
+ const bm=num($('editBeginMileage').value||state.active.beginMileage),em=num($('endMileage').value);
+ if(!em||em<bm)return 0;
+ const d=new Date(($('editDayDate').value||state.active.date)+'T12:00:00');
+ const r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate);
+ return (em-bm)*r;
+}
+function ptoPreview(){return $('ptoType').value==='none'?0:num($('ptoHours').value)*(num(state.setup.manualAdp)/10);}
+function running(){return activityTotal()+mileagePreview()+ptoPreview();}
+function saveDay(){
+ const date=$('editDayDate').value,bm=num($('editBeginMileage').value),em=num($('endMileage').value),st=$('editStartTime').value,et=$('endTime').value;
+ if(!date||!bm||!em||!st||!et){alert('Complete the day fields.');return;}
+ if(em<bm){alert('Ending mileage cannot be lower.');return;}
+ const d=new Date(date+'T12:00:00'),r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate);
+ const miles=em-bm,mp=miles*r,ap=activityTotal(),pp=ptoPreview();
+ const entry={date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay:mp,locations:JSON.parse(JSON.stringify(state.locations)),activityPay:ap,ptoType:$('ptoType').value,ptoHours:num($('ptoHours').value),ptoPay:pp,total:mp+ap+pp};
+ if(state.editingEntryIndex===null)state.entries.push(entry);else state.entries[state.editingEntryIndex]=entry;
+ state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save();showPage('history');
+}
+function cancelDay(){if(confirm('Cancel this day?')){state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save();}}
+function editHistoryDay(i){
+ const e=state.entries[i];state.editingEntryIndex=i;state.active={date:e.date,beginMileage:e.beginMileage,startTime:e.startTime};
+ state.locations=JSON.parse(JSON.stringify(e.locations||[]));state.activeLocationIndex=state.locations.length?0:null;showPage('day');
+ setTimeout(()=>{$('editDayDate').value=e.date;$('editBeginMileage').value=e.beginMileage;$('editStartTime').value=e.startTime;$('endMileage').value=e.endMileage;$('endTime').value=e.endTime;$('ptoType').value=e.ptoType||'none';$('ptoHours').value=e.ptoHours||0;render();},0);
+}
+function deleteHistoryDay(i){if(confirm('Delete this saved day?')){state.entries.splice(i,1);save();}}
+function toggleHistory(i){const el=$('history'+i);if(el)el.classList.toggle('hidden');}
+
+function toggleSavedLocationForm(forceState=null){
+ const form=$('savedLocationForm'),button=$('savedLocationToggleButton');
+ const open=forceState===true?true:forceState===false?false:form.classList.contains('hidden');
+ form.classList.toggle('hidden',!open);button.textContent=open?'Hide':'Show';
+}
+function clearSavedLocationForm(){
+ ['savedNumber','savedName','savedAddress','savedCity','savedState','savedPhone','savedExtension','savedContact','savedHours','savedGateCode','savedAppointment','savedNotes'].forEach(id=>$(id).value='');
+ $('savedType').value='Store';$('editingSavedLocationIndex').value='';$('saveLocationButton').textContent='Save Location';$('cancelLocationEditButton').classList.add('hidden');
+}
+function saveLocation(){
+ if(!$('savedNumber').value.trim()){alert('Enter a location number.');return;}
+ const l={id:Date.now().toString(),type:$('savedType').value,number:$('savedNumber').value.trim(),name:$('savedName').value.trim(),address:$('savedAddress').value.trim(),city:$('savedCity').value.trim(),state:$('savedState').value.trim(),phone:$('savedPhone').value.trim(),extension:$('savedExtension').value.trim(),contact:$('savedContact').value.trim(),hours:$('savedHours').value.trim(),gateCode:$('savedGateCode').value.trim(),appointment:$('savedAppointment').value.trim(),notes:$('savedNotes').value.trim()};
+ const idx=$('editingSavedLocationIndex').value;
+ if(idx==='')state.savedLocations.push(l);else{l.id=state.savedLocations[Number(idx)].id;state.savedLocations[Number(idx)]=l;}
+ clearSavedLocationForm();toggleSavedLocationForm(false);save();
+}
+function editSavedLocation(i){
+ const l=state.savedLocations[i];
+ [['savedType','type'],['savedNumber','number'],['savedName','name'],['savedAddress','address'],['savedCity','city'],['savedState','state'],['savedPhone','phone'],['savedExtension','extension'],['savedContact','contact'],['savedHours','hours'],['savedGateCode','gateCode'],['savedAppointment','appointment'],['savedNotes','notes']].forEach(([id,key])=>$(id).value=l[key]||'');
+ $('editingSavedLocationIndex').value=i;$('saveLocationButton').textContent='Update Location';$('cancelLocationEditButton').classList.remove('hidden');toggleSavedLocationForm(true);window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelLocationEdit(){clearSavedLocationForm();}
+function deleteSavedLocation(i){if(confirm('Delete this saved location?')){state.savedLocations.splice(i,1);save();}}
+function cleanPhone(p){return String(p||'').replace(/[^0-9+]/g,'');}
+function callLocation(phone,ext){const p=cleanPhone(phone);if(!p){alert('No phone number saved.');return;}window.location.href='tel:'+p+(ext?','+String(ext).replace(/[^0-9]/g,''):'');}
+function mapLocation(l){const q=[l.address,l.city,l.state].filter(Boolean).join(', ');if(!q){alert('No address saved.');return;}window.location.href='https://maps.apple.com/?q='+encodeURIComponent(q);}
+
+function saveSetup(){
+ Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','driverId'].includes(k)?$(k).value:num($(k).value));
+ save();showPage('home');
+}
+function exportBackup(){exportState(state);}
+function importBackup(){
+ const file=$('importFile').files[0];if(!file){alert('Choose a backup file first.');return;}
+ importState(file,restored=>{state=restored;alert('Backup restored.');location.reload();},()=>alert('Invalid backup file.'));
+}
+
+function renderSavedLocations(){
+ const q=($('locationSearch').value||'').toLowerCase();
+ const rows=state.savedLocations.map((l,i)=>({l,i})).filter(({l})=>[l.type,l.number,l.name,l.city,l.state,l.phone].join(' ').toLowerCase().includes(q));
+ $('savedLocationList').innerHTML=rows.length?rows.map(({l,i})=>`<div class="entry"><b>${l.type} #${l.number}</b><div>${l.name||''}</div><div class="muted small">${[l.address,l.city,l.state].filter(Boolean).join(', ')}</div>${l.phone?`<div class="kv"><span>Phone</span><b>${l.phone}${l.extension?' ext. '+l.extension:''}</b></div>`:''}${l.contact?`<div class="kv"><span>Contact</span><b>${l.contact}</b></div>`:''}${l.hours?`<div class="kv"><span>Receiving hours</span><b>${l.hours}</b></div>`:''}${l.gateCode?`<div class="kv"><span>Gate code</span><b>${l.gateCode}</b></div>`:''}${l.appointment?`<div class="kv"><span>Appointment</span><b>${l.appointment}</b></div>`:''}${l.notes?`<div class="small top-gap-sm">${l.notes}</div>`:''}<div class="actions">${l.phone?`<button class="green" onclick="callLocation('${l.phone.replace(/'/g,"\\'")}','${(l.extension||'').replace(/'/g,"\\'")}')">Call</button>`:'<button class="secondary" disabled>No Phone</button>'}<button class="primary" onclick='mapLocation(${JSON.stringify(l)})'>Directions</button></div><div class="actions"><button class="secondary" onclick="editSavedLocation(${i})">Edit</button><button class="danger" onclick="deleteSavedLocation(${i})">Delete</button></div></div>`).join(''):'No saved locations.';
+}
+
+function renderHistory(){
+ const q=($('historySearch').value||'').toLowerCase();
+ const rows=state.entries.map((e,i)=>({e,i})).filter(({e})=>[e.date,...(e.locations||[]).flatMap(l=>[l.type,l.number,l.name])].join(' ').toLowerCase().includes(q));
+ $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
+}
+
+function render(){
+ $('driverLine').textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.driverId||'Driver Pay & Activity Tracker');
+ $('startBox').classList.toggle('hidden',!!state.active);$('activeBox').classList.toggle('hidden',!state.active);
+ $('dayHeading').textContent=state.editingEntryIndex===null?'Start / Edit Day':'Edit Saved Day';
+ $('saveDayButton').textContent=state.editingEntryIndex===null?'End Day & Save':'Save History Changes';
+
+ if(state.active){
+  if(!$('editDayDate').value)$('editDayDate').value=state.active.date;
+  if(!$('editBeginMileage').value)$('editBeginMileage').value=state.active.beginMileage;
+  if(!$('editStartTime').value)$('editStartTime').value=state.active.startTime;
+ }
+
+ $('homeStatus').textContent=state.active?`Day in progress: ${state.active.date} • ${state.active.startTime} • mileage ${state.active.beginMileage}`:'No active day.';
+ $('runningTotal').textContent=money(state.active?running():0);
+ $('runningDetail').textContent=state.active?`${state.locations.length} locations • ${state.locations.reduce((s,l)=>s+(l.activities||[]).length,0)} activities`:'No active day';
+ $('milesToday').textContent=state.active&&$('endMileage').value?Math.max(0,num($('endMileage').value)-num($('editBeginMileage').value||state.active.beginMileage)):0;
+ $('locationsToday').textContent=state.locations.length;
+ $('activitiesToday').textContent=state.locations.reduce((s,l)=>s+(l.activities||[]).length,0);
+ $('adpToday').textContent=money(state.setup.manualAdp);
+ $('dayCount').textContent=state.entries.length;
+ $('totalPay').textContent=money(state.entries.reduce((s,e)=>s+num(e.total),0));
+
+ $('savedLocationSelect').innerHTML='<option value="">Choose saved location</option>'+state.savedLocations.map(l=>`<option value="${l.id}">${l.type} #${l.number} ${l.name||''}</option>`).join('');
+ $('activeLocationBox').classList.toggle('hidden',state.activeLocationIndex===null);
+ if(state.activeLocationIndex!==null&&state.locations[state.activeLocationIndex]){
+  const l=state.locations[state.activeLocationIndex];$('activeLocationTitle').textContent=`${l.type} #${l.number}`;$('activeLocationSubtitle').textContent=l.name||'Activities added here belong to this location.';
+ }
+
+ $('locationGroups').innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}<div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${(l.activities||[]).length}</b></div><div class="kv"><span>Location total</span><b>${money((l.activities||[]).reduce((s,a)=>s+num(a.pay),0))}</b></div>${(l.activities||[]).map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<b>${money(a.pay)}</b><button class="danger top-gap-sm" onclick="removeActivity(${li},${ai})">Remove</button></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added.</div>';
+
+ const mp=mileagePreview(),ap=activityTotal(),pp=ptoPreview();
+ $('previewMileage').textContent=money(mp);$('previewActivity').textContent=money(ap);$('previewPto').textContent=money(pp);$('previewTotal').textContent=money(mp+ap+pp);
+
+ renderSavedLocations();renderHistory();
+
+ const reportActivities=state.entries.reduce((s,e)=>s+(e.locations||[]).reduce((x,l)=>x+(l.activities||[]).length,0),0);
+ $('reportDays').textContent=state.entries.length;
+ $('reportMiles').textContent=Math.round(state.entries.reduce((s,e)=>s+num(e.miles),0));
+ $('reportActivities').textContent=reportActivities;
+ $('reportPay').textContent=money(state.entries.reduce((s,e)=>s+num(e.total),0));
+ $('migrationStatus').textContent=localStorage.getItem(MIGRATION_FLAG)||'None';
+}
+
+Object.keys(defaults).forEach(k=>{if($(k))$(k).value=state.setup[k]});
+$('dayDate').value=new Date().toISOString().slice(0,10);
+document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render();});
+
+let touchStartX=null,touchStartY=null;
+document.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchStartX=t.screenX;touchStartY=t.screenY;},{passive:true});
+document.addEventListener('touchend',e=>{if(touchStartX===null)return;const t=e.changedTouches[0],dx=t.screenX-touchStartX,dy=t.screenY-touchStartY;touchStartX=touchStartY=null;if(Math.abs(dx)<60||Math.abs(dx)<=Math.abs(dy))return;const i=pageOrder.indexOf(currentPage);if(dx<0&&i<pageOrder.length-1)showPage(pageOrder[i+1]);else if(dx>0&&i>0)showPage(pageOrder[i-1]);},{passive:true});
+
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+render();
+
+</script>
 </body>
 </html>
