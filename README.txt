@@ -1,17 +1,13 @@
-Spark Transportation v1.0 Beta 11 — Permanent Data Fix
+Spark Transportation v1.0 Beta 12
 
-Why data disappeared:
-Earlier versions used different localStorage keys for each release. The new version looked in a new location and could not see older records.
+Label correction:
 
-This update:
-- Uses one permanent key: sparkTransportationData
-- Searches for older Spark Transportation storage keys
-- Automatically migrates the first valid older dataset it finds
-- Keeps the permanent key unchanged in future updates
-- Adds Export Backup and Import Backup
-- Displays which older storage key was migrated
+On the Driver & Pay Rates page, the bottom field label has been changed from:
 
-Important:
-Upload this update to the SAME GitHub Pages URL.
-Open the website in Safari first after deployment.
-Do not clear Safari website data before opening the new version.
+    Driver IDal Pay
+
+to:
+
+    Regional Pay
+
+No calculations or stored values are changed—this is a display label fix only.
