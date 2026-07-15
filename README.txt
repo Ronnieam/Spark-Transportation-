@@ -1,17 +1,21 @@
-Spark Transportation v0.7
+Spark Transportation v1.0 Beta
 
-New:
-- Activities are grouped under a Store, Vendor, or DC number.
-- Selecting a new Store, Vendor, or DC starts a new empty activity group.
-- Drivers can return to an earlier location and add more activities.
-- Each location shows its activity count and location pay total.
-- History shows locations and all activities under each location.
-- The Home screen shows a live running total for the active day.
-- The running total includes activities, PTO, and mileage once ending mileage is entered.
+Included:
+- Redesigned dashboard
+- Today's running total
+- Current-day miles, locations, activities, and ADP
+- Start or resume day
+- Saved Store, Vendor, and DC locations
+- Search/select saved locations from daily workflow
+- Activities grouped under each location
+- Detailed history by day, location, and activity
+- Editable regional rates
 
-Update your existing GitHub Pages repository by replacing:
+Update your current GitHub Pages repository by replacing:
 index.html
 manifest.json
 sw.js
 icon-192.png
 icon-512.png
+
+After committing, wait for GitHub Pages to deploy, open the website in Safari, refresh once, then reopen the Home Screen app.
