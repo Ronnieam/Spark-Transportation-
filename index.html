@@ -126,7 +126,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.3.5 visual refresh */
+/* v1.3.6 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -225,7 +225,7 @@ padding:8px
 }
 
 
-/* v1.3.5 biweekly reports */
+/* v1.3.6 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -253,7 +253,7 @@ padding:8px
 }
 
 
-/* v1.3.5 currency-formatted pay rates */
+/* v1.3.6 currency-formatted pay rates */
 .currency-input{
   display:flex;
   align-items:center;
@@ -283,7 +283,7 @@ padding:8px
 }
 
 
-/* v1.3.5 official branding */
+/* v1.3.6 official branding */
 .brand img,
 .logo img,
 .app-logo,
@@ -304,7 +304,7 @@ header{
 }
 
 
-/* v1.3.5 Home header redesign */
+/* v1.3.6 Home header redesign */
 .hero-header{
   display:block!important;
   padding:12px 16px 14px!important;
@@ -364,7 +364,7 @@ header{
 }
 
 
-/* v1.3.5 currency-value visibility fix */
+/* v1.3.6 currency-value visibility fix */
 .currency-input{
   min-height:56px!important;
 }
@@ -385,6 +385,23 @@ header{
   opacity:1!important;
   -webkit-text-fill-color:#ffffff!important;
 }
+
+
+/* v1.3.6 payroll archive */
+.pay-period-archive{display:grid;gap:10px;margin-top:12px}
+.pay-period-item{border:1px solid #35506a;border-radius:16px;overflow:hidden;background:#0b1927}
+.pay-period-date-button{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:12px!important;text-align:left!important;background:#10243a!important;color:#fff!important;
+ border-radius:0!important;padding:14px!important
+}
+.pay-period-date-button span:first-child{display:flex;flex-direction:column;gap:4px}
+.pay-period-date-button small{color:#aebdca;font-weight:500}
+.pay-period-item-total{color:#f4bd28;white-space:nowrap;font-weight:800}
+.archived-period-detail{padding:14px}
+.archived-period-total{margin-bottom:16px}
+.archived-week{border-top:1px solid #35506a;padding-top:15px;margin-top:15px}
+.archived-week h3{margin:0 0 4px}
 
 </style>
 <title>Spark Transportation</title>
@@ -660,7 +677,7 @@ header{
 
 <section id="reports">
   <div class="card">
-    <h2>Biweekly Pay Period</h2>
+    <div class="section-title-row"><h2>Current Pay Period</h2><span class="pill">14 days</span></div>
     <div class="row">
       <div>
         <label>First day of payroll</label>
@@ -738,6 +755,15 @@ header{
       <div id="week2ActivityBreakdown" class="activity-report-list"></div>
     </div>
   </div>
+
+  <div class="card">
+    <div class="section-title-row">
+      <h2>Previous Pay Periods</h2>
+      <span id="payPeriodArchiveCount" class="pill">0 saved</span>
+    </div>
+    <p class="muted small">Tap a payroll date range to open its full Week 1 and Week 2 breakdown.</p>
+    <div id="payPeriodArchiveList" class="pay-period-archive"></div>
+  </div>
 </section>
 
 <section id="setup">
@@ -760,6 +786,19 @@ header{
     <label>Regional Pay</label><div class="currency-input"><span>$</span><input id="regionalRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
     <button class="primary" onclick="saveSetup()">Save Setup</button>
   </div>
+
+  <div class="card">
+    <h2>About Spark Transportation</h2>
+    <div class="kv"><span>App</span><b>Spark Transportation</b></div>
+    <div class="kv"><span>Version</span><b>v1.3.6</b></div>
+    <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
+    <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
+    <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
+    <div class="kv"><span>Saved locations</span><b id="aboutLocations">0</b></div>
+    <div class="kv"><span>Saved pay periods</span><b id="aboutPayPeriods">0</b></div>
+    <div class="kv"><span>Current payroll</span><b id="aboutCurrentPayroll">Not set</b></div>
+    <div class="top-gap-sm muted small">Know Your Day. Know Your Pay.</div>
+  </div>
 </section>
 
 <section id="data">
@@ -771,7 +810,7 @@ header{
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.3.5</b></div>
+    <div class="kv"><span>App version</span><b>1.3.6</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -836,7 +875,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.3.5',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.3.6',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -880,7 +919,9 @@ const baseState={
  editingEntryIndex:null,
  quickActivityOrder:[...DEFAULT_QUICK_ACTIVITY_ORDER],
  payPeriodStart:'',
- payPeriodEnd:''
+ payPeriodEnd:'',
+ payPeriods:[],
+ selectedPayPeriodId:null
 };
 let state=loadPersistentState(baseState);
 state.setup={...defaults,...(state.setup||{})};
@@ -892,6 +933,9 @@ state.quickActivityOrder=[
  ...state.quickActivityOrder.filter(name=>DEFAULT_QUICK_ACTIVITY_ORDER.includes(name)),
  ...DEFAULT_QUICK_ACTIVITY_ORDER.filter(name=>!state.quickActivityOrder.includes(name))
 ];
+state.payPeriods=Array.isArray(state.payPeriods)?state.payPeriods:[];
+state.selectedPayPeriodId=state.selectedPayPeriodId||null;
+
 
 const $=id=>document.getElementById(id);
 const num=v=>Number(v||0);
@@ -1105,10 +1149,27 @@ function saveSetup(){
  displayCurrencyFields();
  save();showPage('home');
 }
-function exportBackup(){exportState(state);}
+function exportBackup(){
+ ensureCurrentPayPeriod();
+ if(state.payPeriodStart&&state.payPeriodEnd)upsertPayPeriod(state.payPeriodStart,state.payPeriodEnd,'current');
+ savePersistentState(state);
+ exportState(state);
+}
 function importBackup(){
  const file=$('importFile').files[0];if(!file){alert('Choose a backup file first.');return;}
- importState(file,restored=>{state=restored;alert('Backup restored.');location.reload();},()=>alert('Invalid backup file.'));
+ importState(file,restored=>{
+  restored.payPeriods=Array.isArray(restored.payPeriods)?restored.payPeriods:[];
+  if(restored.payPeriodStart&&restored.payPeriodEnd){
+   const id=payPeriodId(restored.payPeriodStart,restored.payPeriodEnd);
+   if(!restored.payPeriods.some(period=>period.id===id)){
+    restored.payPeriods.push({id,start:restored.payPeriodStart,end:restored.payPeriodEnd,status:'current',createdAt:new Date().toISOString()});
+   }
+  }
+  state=restored;
+  savePersistentState(state);
+  alert('Backup restored, including payroll history.');
+  location.reload();
+ },()=>alert('Invalid backup file.'));
 }
 
 function renderSavedLocations(){
@@ -1204,17 +1265,142 @@ function setFourteenDayPeriod(){
  $('payPeriodEnd').value=addCalendarDays(start,13);
  renderPayPeriodReport();
 }
+function payPeriodId(start,end){return `${start}_${end}`;}
+function upsertPayPeriod(start,end,status='current'){
+ if(!start||!end)return null;
+ const id=payPeriodId(start,end);
+ let period=state.payPeriods.find(item=>item.id===id);
+ if(!period){
+  period={id,start,end,status,createdAt:new Date().toISOString()};
+  state.payPeriods.push(period);
+ }else{
+  period.start=start;
+  period.end=end;
+  period.status=status;
+ }
+ return period;
+}
+function archiveCurrentPayPeriod(){
+ if(!state.payPeriodStart||!state.payPeriodEnd)return null;
+ const period=upsertPayPeriod(state.payPeriodStart,state.payPeriodEnd,'complete');
+ if(period)period.completedAt=period.completedAt||new Date().toISOString();
+ return period;
+}
+function ensureCurrentPayPeriod(){
+ if(!state.payPeriodStart||!state.payPeriodEnd)return;
+ const today=new Date().toISOString().slice(0,10);
+ if(today<=state.payPeriodEnd){
+  upsertPayPeriod(state.payPeriodStart,state.payPeriodEnd,'current');
+  return;
+ }
+ archiveCurrentPayPeriod();
+ let nextStart=addCalendarDays(state.payPeriodEnd,1);
+ let nextEnd=addCalendarDays(nextStart,13);
+ while(today>nextEnd){
+  upsertPayPeriod(nextStart,nextEnd,'complete');
+  nextStart=addCalendarDays(nextEnd,1);
+  nextEnd=addCalendarDays(nextStart,13);
+ }
+ state.payPeriodStart=nextStart;
+ state.payPeriodEnd=nextEnd;
+ upsertPayPeriod(nextStart,nextEnd,'current');
+ state.selectedPayPeriodId=null;
+ savePersistentState(state);
+}
 function savePayPeriodDates(){
  const start=$('payPeriodStart').value;
  const end=$('payPeriodEnd').value;
  if(!start||!end){alert('Choose the first and last day of the payroll period.');return;}
  if(end<start){alert('The last day cannot be before the first day.');return;}
+ const days=Math.round((dateFromISO(end)-dateFromISO(start))/86400000)+1;
+ if(days!==14&&!confirm(`This payroll period is ${days} days instead of 14. Save it anyway?`))return;
+
+ if(state.payPeriodStart&&state.payPeriodEnd&&
+    (state.payPeriodStart!==start||state.payPeriodEnd!==end)){
+  archiveCurrentPayPeriod();
+ }
  state.payPeriodStart=start;
  state.payPeriodEnd=end;
+ upsertPayPeriod(start,end,'current');
+ state.selectedPayPeriodId=null;
  savePersistentState(state);
  renderPayPeriodReport();
+ renderPayPeriodArchive();
 }
+
+function periodSummary(period){
+ return summarizeEntries(entriesBetween(period.start,period.end));
+}
+function renderPayPeriodArchive(){
+ const box=$('payPeriodArchiveList');
+ if(!box)return;
+ const currentId=state.payPeriodStart&&state.payPeriodEnd?payPeriodId(state.payPeriodStart,state.payPeriodEnd):null;
+ const periods=[...state.payPeriods]
+  .filter(period=>period&&period.start&&period.end&&period.id!==currentId)
+  .sort((a,b)=>b.start.localeCompare(a.start));
+ $('payPeriodArchiveCount').textContent=`${periods.length} saved`;
+ box.innerHTML=periods.length?periods.map(period=>{
+  const summary=periodSummary(period);
+  const open=state.selectedPayPeriodId===period.id;
+  return `<div class="pay-period-item">
+   <button type="button" class="pay-period-date-button" onclick="toggleArchivedPayPeriod('${period.id}')">
+    <span><b>${displayReportDate(period.start)} – ${displayReportDate(period.end)}</b>
+    <small>${summary.days} days • ${summary.activities} activities</small></span>
+    <span class="pay-period-item-total">${money(summary.total)} ${open?'▲':'▼'}</span>
+   </button>
+   <div class="archived-period-detail ${open?'':'hidden'}" id="archived_${period.id}">
+    ${archivedPeriodDetailHtml(period,summary)}
+   </div>
+  </div>`;
+ }).join(''):'<div class="muted small">Completed payroll periods will appear here automatically.</div>';
+}
+function toggleArchivedPayPeriod(id){
+ state.selectedPayPeriodId=state.selectedPayPeriodId===id?null:id;
+ savePersistentState(state);
+ renderPayPeriodArchive();
+}
+function archivedActivityRows(summary){
+ const rows=Object.entries(summary.activityTypes).sort((a,b)=>b[1].pay-a[1].pay||a[0].localeCompare(b[0]));
+ return rows.length?rows.map(([type,data])=>`
+  <div class="activity-report-row">
+   <div><b>${type}</b><span>${data.count} ${data.count===1?'activity':'activities'}${data.hours?` • ${data.hours.toFixed(2)} hrs`:''}</span></div>
+   <b>${money(data.pay)}</b>
+  </div>`).join(''):'<div class="muted small">No activities recorded.</div>';
+}
+function archivedWeekHtml(title,start,end){
+ const summary=summarizeEntries(entriesBetween(start,end));
+ return `<div class="archived-week">
+  <div class="week-heading"><div><h3>${title}</h3><div class="muted small">${displayReportDate(start)} – ${displayReportDate(end)}</div></div><b class="week-pay">${money(summary.total)}</b></div>
+  <div class="report-metrics compact">
+   <div class="report-metric"><span>Days</span><b>${summary.days}</b></div>
+   <div class="report-metric"><span>Miles</span><b>${Math.round(summary.miles)}</b></div>
+   <div class="report-metric"><span>Activities</span><b>${summary.activities}</b></div>
+  </div>
+  <div class="pay-breakdown">
+   <div class="kv"><span>Mileage pay</span><b>${money(summary.mileagePay)}</b></div>
+   <div class="kv"><span>Activity pay</span><b>${money(summary.activityPay)}</b></div>
+   <div class="kv"><span>PTO pay</span><b>${money(summary.ptoPay)}</b></div>
+  </div>
+  <div class="activity-report-list top-gap-sm">${archivedActivityRows(summary)}</div>
+ </div>`;
+}
+function archivedPeriodDetailHtml(period,summary){
+ const week1End=[addCalendarDays(period.start,6),period.end].sort()[0];
+ const week2Start=addCalendarDays(period.start,7);
+ return `<div class="archived-period-total">
+   <div class="kv"><span>Total miles</span><b>${Math.round(summary.miles)}</b></div>
+   <div class="kv"><span>Total activities</span><b>${summary.activities}</b></div>
+   <div class="kv"><span>Mileage pay</span><b>${money(summary.mileagePay)}</b></div>
+   <div class="kv"><span>Activity pay</span><b>${money(summary.activityPay)}</b></div>
+   <div class="kv"><span>PTO pay</span><b>${money(summary.ptoPay)}</b></div>
+   <div class="kv total-row"><span>Pay-period total</span><b>${money(summary.total)}</b></div>
+  </div>
+  ${archivedWeekHtml('Week 1',period.start,week1End)}
+  ${week2Start<=period.end?archivedWeekHtml('Week 2',week2Start,period.end):''}`;
+}
+
 function renderPayPeriodReport(){
+ ensureCurrentPayPeriod();
  const startInput=$('payPeriodStart');
  const endInput=$('payPeriodEnd');
  if(!startInput||!endInput)return;
@@ -1348,6 +1534,14 @@ function render(){
  renderSavedLocations();renderHistory();
 
  renderPayPeriodReport();
+ renderPayPeriodArchive();
+ if($('aboutDataStatus'))$('aboutDataStatus').textContent='Ready';
+ if($('aboutWorkdays'))$('aboutWorkdays').textContent=state.entries.length;
+ if($('aboutLocations'))$('aboutLocations').textContent=state.savedLocations.length;
+ if($('aboutPayPeriods'))$('aboutPayPeriods').textContent=state.payPeriods.length;
+ if($('aboutCurrentPayroll'))$('aboutCurrentPayroll').textContent=state.payPeriodStart&&state.payPeriodEnd
+  ?`${displayReportDate(state.payPeriodStart)} – ${displayReportDate(state.payPeriodEnd)}`
+  :'Not set';
  $('migrationStatus').textContent=localStorage.getItem(MIGRATION_FLAG)||'None';
 }
 
