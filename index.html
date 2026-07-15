@@ -10,23 +10,29 @@
 <style>
 :root{--bg:#07111f;--card:#102033;--line:#294056;--text:#fff;--muted:#a9b8c7;--gold:#ffb000;--green:#2ec4b6}
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(#07111f,#0c1b2b);color:var(--text)}
-.app{max-width:580px;margin:auto;min-height:100vh;padding:12px 14px 95px}.brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}.logo{width:58px;height:58px;border-radius:14px}.muted{color:var(--muted)}.small{font-size:12px}
-.card{background:#102033;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}h1{font-size:20px;margin:0}h3{margin:0 0 12px}
+.app{max-width:600px;margin:auto;min-height:100vh;padding:12px 14px 96px}.brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}.logo{width:58px;height:58px;border-radius:14px}.muted{color:var(--muted)}.small{font-size:12px}
+.card{background:#102033;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}.hero{background:linear-gradient(135deg,#8e570a,#d98200);border:none}
+h1{font-size:20px;margin:0}h3{margin:0 0 12px}.big{font-size:34px;font-weight:800;margin:4px 0}
 label{display:block;font-size:13px;color:var(--muted);margin:11px 0 6px}input,select,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:#081522;color:#fff;font-size:16px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{width:100%;padding:13px;border:0;border-radius:13px;font-weight:800;font-size:15px}.primary{background:var(--gold);color:#2b1700}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
-.hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.details{margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}.activity-detail{padding:9px 0;border-bottom:1px solid var(--line)}.activity-detail:last-child{border-bottom:0}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,580px);display:grid;grid-template-columns:repeat(4,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
+.hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,600px);display:grid;grid-template-columns:repeat(4,1fr);background:#08131f;border-top:1px solid var(--line);padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
 .nav button{background:transparent;color:var(--muted);font-size:11px}.nav button.active{background:#3b290c;color:#ffd166}
-section{display:none}section.active{display:block}.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+section{display:none}section.active{display:block}.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#3b290c;color:#ffd166;font-size:12px}
 </style>
 </head>
 <body>
 <div class="app">
-<div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small">v0.6 • Date & Detailed History</div></div></div>
+<div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small">v0.7 • Locations & Running Total</div></div></div>
 
 <section id="home" class="active">
+<div class="card hero">
+<div>Current day running total</div>
+<div class="big" id="runningTotal">$0.00</div>
+<div id="runningDetail">No active day</div>
+</div>
 <div class="card"><h3>Current Day</h3><div id="homeStatus" class="muted">No active day.</div><button class="primary" style="margin-top:12px" onclick="show('day')">Open Day</button></div>
-<div class="card"><div class="kv"><span>Total completed days</span><b id="dayCount">0</b></div><div class="kv"><span>Total pay</span><b id="totalPay">$0.00</b></div></div>
+<div class="card"><div class="kv"><span>Completed days</span><b id="dayCount">0</b></div><div class="kv"><span>All saved pay</span><b id="totalPay">$0.00</b></div></div>
 </section>
 
 <section id="day">
@@ -44,7 +50,21 @@ section{display:none}section.active{display:block}.kv{display:flex;justify-conte
 <div class="row"><div><label>Beginning mileage</label><input id="editBeginMileage" type="number"></div><div><label>Start time</label><input id="editStartTime" type="time"></div></div>
 
 <hr>
-<h3>Add Activity</h3>
+<h3>Select Location</h3>
+<div class="row">
+<div><label>Location type</label><select id="locationType"><option>Store</option><option>Vendor</option><option>DC</option></select></div>
+<div><label>Number</label><input id="locationNumber" placeholder="Example: 1234"></div>
+</div>
+<label>Name or notes</label><input id="locationName" placeholder="Optional">
+<button class="primary" style="margin-top:12px" onclick="startLocation()">Start New Location</button>
+
+<div id="activeLocationBox" class="hidden">
+<div class="location-card">
+<div><b id="activeLocationTitle"></b></div>
+<div class="muted small" id="activeLocationSubtitle"></div>
+</div>
+
+<h3 style="margin-top:16px">Add Activity</h3>
 <label>Activity</label>
 <select id="activityType" onchange="updateActivityFields()">
 <option value="">Select activity</option>
@@ -64,17 +84,26 @@ section{display:none}section.active{display:block}.kv{display:flex;justify-conte
 </div>
 
 <div id="commonFields" class="hidden">
-<label>Store / Vendor / Notes</label><input id="activityNote" placeholder="Optional">
+<label>Activity notes</label><input id="activityNote" placeholder="Optional">
 <button class="secondary" style="margin-top:12px" onclick="addActivity()">Add Activity</button>
 </div>
+</div>
 
-<div id="activityList"></div>
+<div id="locationGroups"></div>
 
 <hr>
 <div class="row"><div><label>Ending mileage</label><input id="endMileage" type="number"></div><div><label>End time</label><input id="endTime" type="time"></div></div>
 <label>PTO</label><select id="ptoType"><option value="none">None</option><option>Vacation</option><option>Sick</option><option>Safety</option></select>
 <label>PTO hours</label><input id="ptoHours" type="number" step="0.25" value="0">
-<button class="green" style="margin-top:12px" onclick="saveDay()">Save Day</button>
+
+<div class="card" style="margin-top:14px">
+<div class="kv"><span>Mileage pay</span><b id="previewMileage">$0.00</b></div>
+<div class="kv"><span>Activity pay</span><b id="previewActivity">$0.00</b></div>
+<div class="kv"><span>PTO pay</span><b id="previewPto">$0.00</b></div>
+<div class="kv"><span>Running total</span><b id="previewTotal">$0.00</b></div>
+</div>
+
+<button class="green" onclick="saveDay()">Save Day</button>
 <button class="danger" style="margin-top:8px" onclick="cancelDay()">Cancel Day</button>
 </div>
 </div>
@@ -112,14 +141,14 @@ section{display:none}section.active{display:block}.kv{display:flex;justify-conte
 </div>
 
 <script>
-const KEY='sparkTransportationV05';
+const KEY='sparkTransportationV07';
 const defaults={driverName:'',regionName:'',mileageRate:.679,weekendRate:.749,liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,layoverRate:42,chainRate:60,regionalRate:6};
-let state={setup:{...defaults},active:null,activities:[],entries:[]};
+let state={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[]};
 const $=id=>document.getElementById(id),num=v=>Number(v||0),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num(v));
 
 function show(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));render()}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
-function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
+function load(){const s=localStorage.getItem(KEY);if(s)try{state=JSON.parse(s)}catch(e){};state.setup={...defaults,...state.setup};state.locations=state.locations||[];Object.keys(state.setup).forEach(k=>{if($(k))$(k).value=state.setup[k]});dayDate.value=new Date().toISOString().slice(0,10);render()}
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100}
 function isTimed(t){return ['Live Load','Live Unload','Wait Time','Meeting','Survey','Training'].includes(t)}
 function defaultRate(t){
@@ -139,49 +168,96 @@ function updateActivityFields(){
  else activityFlatRate.value=defaultRate(t)
 }
 function startDay(){
- if(!dayDate.value||!beginMileage.value||!startTime.value){alert('Enter the date, beginning mileage and start time.');return}
+ if(!dayDate.value||!beginMileage.value||!startTime.value){alert('Enter date, beginning mileage and start time.');return}
  state.active={date:dayDate.value,beginMileage:num(beginMileage.value),startTime:startTime.value}
- state.activities=[];save()
+ state.locations=[];state.activeLocationIndex=null;save()
+}
+function startLocation(){
+ if(!locationNumber.value.trim()){alert('Enter a Store, Vendor or DC number.');return}
+ state.locations.push({type:locationType.value,number:locationNumber.value.trim(),name:locationName.value.trim(),activities:[]})
+ state.activeLocationIndex=state.locations.length-1
+ locationNumber.value='';locationName.value='';save()
 }
 function addActivity(){
+ if(state.activeLocationIndex===null){alert('Select a Store, Vendor or DC first.');return}
  const t=activityType.value;if(!t){alert('Select an activity.');return}
+ let activity
  if(isTimed(t)){
   if(!activityStart.value||!activityStop.value){alert('Enter activity start and stop times.');return}
   const h=decimalHours(activityStart.value,activityStop.value),r=num(activityHourlyRate.value)
-  state.activities.push({type:t,kind:'timed',start:activityStart.value,stop:activityStop.value,hours:h,rate:r,note:activityNote.value,pay:h*r})
+  activity={type:t,kind:'timed',start:activityStart.value,stop:activityStop.value,hours:h,rate:r,note:activityNote.value,pay:h*r}
  }else{
   const q=Math.max(1,num(activityQty.value)),r=num(activityFlatRate.value)
-  state.activities.push({type:t,kind:'flat',qty:q,rate:r,note:activityNote.value,pay:q*r})
+  activity={type:t,kind:'flat',qty:q,rate:r,note:activityNote.value,pay:q*r}
  }
+ state.locations[state.activeLocationIndex].activities.push(activity)
  activityType.value='';activityStart.value=activityStop.value=activityHourlyRate.value=activityFlatRate.value=activityNote.value='';activityQty.value=1;updateActivityFields();save()
 }
-function editActivity(i){
- const a=state.activities[i];activityType.value=a.type;updateActivityFields();activityNote.value=a.note||''
+function editActivity(li,ai){
+ const a=state.locations[li].activities[ai]
+ state.activeLocationIndex=li
+ activityType.value=a.type;updateActivityFields();activityNote.value=a.note||''
  if(a.kind==='timed'){activityStart.value=a.start;activityStop.value=a.stop;activityHourlyRate.value=a.rate}
  else{activityQty.value=a.qty;activityFlatRate.value=a.rate}
- state.activities.splice(i,1);save()
+ state.locations[li].activities.splice(ai,1);save()
 }
-function removeActivity(i){state.activities.splice(i,1);save()}
+function removeActivity(li,ai){state.locations[li].activities.splice(ai,1);save()}
+function selectLocation(i){state.activeLocationIndex=i;save()}
+function removeLocation(i){if(confirm('Remove this location and all of its activities?')){state.locations.splice(i,1);state.activeLocationIndex=null;save()}}
+
+function activityTotal(){return state.locations.reduce((sum,l)=>sum+l.activities.reduce((s,a)=>s+a.pay,0),0)}
+function mileagePreview(){
+ if(!state.active)return 0
+ const bm=num(editBeginMileage.value||state.active.beginMileage),em=num(endMileage.value)
+ if(!em||em<bm)return 0
+ const d=new Date((editDayDate.value||state.active.date)+'T12:00:00')
+ const rate=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate)
+ return (em-bm)*rate
+}
+function ptoPreview(){return ptoType.value==='none'?0:num(ptoHours.value)*(num(state.setup.manualAdp)/10)}
+function currentRunningTotal(){return activityTotal()+mileagePreview()+ptoPreview()}
+
 function saveDay(){
  const date=editDayDate.value,bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value
  if(!date||!bm||!em||!st||!et){alert('Enter date, beginning and ending mileage, and start and end times.');return}
  if(em<bm){alert('Ending mileage cannot be lower.');return}
- const miles=em-bm,rate=(new Date(state.active.date+'T12:00:00').getDay()%6===0)?num(state.setup.weekendRate):num(state.setup.mileageRate)
- const mileagePay=miles*rate,activityPay=state.activities.reduce((s,a)=>s+a.pay,0),ptoPay=ptoType.value==='none'?0:num(ptoHours.value)*(num(state.setup.manualAdp)/10)
- state.entries.push({date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay,activities:[...state.activities],activityPay,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay,total:mileagePay+activityPay+ptoPay})
- state.active=null;state.activities=[];save();show('home')
+ const d=new Date(date+'T12:00:00'),rate=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate)
+ const miles=em-bm,mileagePay=miles*rate,activityPay=activityTotal(),ptoPay=ptoPreview()
+ state.entries.push({date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay,locations:JSON.parse(JSON.stringify(state.locations)),activityPay,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay,total:mileagePay+activityPay+ptoPay})
+ state.active=null;state.locations=[];state.activeLocationIndex=null;save();show('home')
 }
-function cancelDay(){state.active=null;state.activities=[];save()}
+function cancelDay(){if(confirm('Cancel this day?')){state.active=null;state.locations=[];state.activeLocationIndex=null;save()}}
 function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','regionName'].includes(k)?$(k).value:num($(k).value));save();show('home')}
-function toggleHistoryDetails(i){const el=$('historyDetails'+i);if(el)el.classList.toggle('hidden')}
+function toggleHistory(i){const e=$('history'+i);if(e)e.classList.toggle('hidden')}
+
 function render(){
  startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
- if(state.active){if(!editDayDate.value)editDayDate.value=state.active.date;if(!editBeginMileage.value)editBeginMileage.value=state.active.beginMileage;if(!editStartTime.value)editStartTime.value=state.active.startTime}
- homeStatus.textContent=state.active?`Day in progress: ${state.active.startTime}, mileage ${state.active.beginMileage}`:'No active day.'
- dayCount.textContent=state.entries.length;totalPay.textContent=money(state.entries.reduce((s,e)=>s+e.total,0))
- activityList.innerHTML=state.activities.length?state.activities.map((a,i)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<div><b>${money(a.pay)}</b></div><div class="actions"><button class="secondary" onclick="editActivity(${i})">Edit</button><button class="danger" onclick="removeActivity(${i})">Remove</button></div></div>`).join(''):'<div class="muted small">No activities added.</div>'
- historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,revIndex)=>{const i=state.entries.length-1-revIndex;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Activities (${e.activities.length})</span><b>${money(e.activityPay)}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><button class="secondary" style="margin-top:9px" onclick="toggleHistoryDetails(${i})">View Activities</button><div id="historyDetails${i}" class="details hidden">${e.activities.length?e.activities.map(a=>`<div class="activity-detail"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} decimal hours • ${money(a.rate)}/hr`:`Quantity ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div class="small">${a.note}</div>`:''}<div><b>${money(a.pay)}</b></div></div>`).join(''):'<div class="muted small">No activities recorded.</div>'}</div></div>`}).join(''):'No entries.'
+ if(state.active){
+  if(!editDayDate.value)editDayDate.value=state.active.date
+  if(!editBeginMileage.value)editBeginMileage.value=state.active.beginMileage
+  if(!editStartTime.value)editStartTime.value=state.active.startTime
+ }
+ homeStatus.textContent=state.active?`Day in progress: ${state.active.date} • ${state.active.startTime} • mileage ${state.active.beginMileage}`:'No active day.'
+ dayCount.textContent=state.entries.length
+ totalPay.textContent=money(state.entries.reduce((s,e)=>s+e.total,0))
+ runningTotal.textContent=money(state.active?currentRunningTotal():0)
+ runningDetail.textContent=state.active?`${state.locations.length} location${state.locations.length===1?'':'s'} • ${state.locations.reduce((s,l)=>s+l.activities.length,0)} activities`:'No active day'
+
+ activeLocationBox.classList.toggle('hidden',state.activeLocationIndex===null)
+ if(state.activeLocationIndex!==null&&state.locations[state.activeLocationIndex]){
+  const l=state.locations[state.activeLocationIndex]
+  activeLocationTitle.textContent=`${l.type} #${l.number}`
+  activeLocationSubtitle.textContent=l.name||'Activities added below belong to this location.'
+ }
+
+ locationGroups.innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><div><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}</div><div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${l.activities.length}</b></div><div class="kv"><span>Location total</span><b>${money(l.activities.reduce((s,a)=>s+a.pay,0))}</b></div>${l.activities.map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div class="small">${a.note}</div>`:''}<div><b>${money(a.pay)}</b></div><div class="actions"><button class="secondary" onclick="editActivity(${li},${ai})">Edit</button><button class="danger" onclick="removeActivity(${li},${ai})">Remove</button></div></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added yet.</div>'
+
+ const mp=mileagePreview(),ap=activityTotal(),pp=ptoPreview()
+ previewMileage.textContent=money(mp);previewActivity.textContent=money(ap);previewPto.textContent=money(pp);previewTotal.textContent=money(mp+ap+pp)
+
+ historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,rev)=>{const i=state.entries.length-1-rev;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${e.locations.length}</b></div><div class="kv"><span>Activities</span><b>${e.locations.reduce((s,l)=>s+l.activities.length,0)}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><button class="secondary" style="margin-top:9px" onclick="toggleHistory(${i})">View Locations & Activities</button><div id="history${i}" class="hidden">${e.locations.map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${l.activities.map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} decimal hours • ${money(a.rate)}/hr`:`Quantity ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div class="small">${a.note}</div>`:''}<div><b>${money(a.pay)}</b></div></div>`).join('')}</div>`).join('')}</div></div>`}).join(''):'No entries.'
 }
+document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render()})
 load()
 </script>
 </body>
