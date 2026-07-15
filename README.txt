@@ -1,11 +1,12 @@
-Spark Transportation v1.0 Beta 7
+Spark Transportation v1.0 Beta 8
 
-Visual fixes:
-- Date, Beginning Mileage, and Start Time are now the same height.
-- iPhone date and time controls use consistent sizing and alignment.
-- Version badge stays on one line.
-- Header spacing is tighter.
-- Start Day button has a more polished rounded shape.
+Typography update:
+- Text is centered in all input fields.
+- Date and time values are centered on iPhone.
+- Dropdown selections are centered.
+- Placeholder text is centered.
+- Text areas are centered.
+- Applies across Home, Day, Locations, History, and Setup pages.
 
 Replace the existing GitHub Pages files with:
 index.html

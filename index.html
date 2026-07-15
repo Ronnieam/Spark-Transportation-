@@ -23,16 +23,20 @@ input,select,textarea{
 display:block;width:100%;max-width:100%;min-width:0;height:56px;
 padding:0 14px;border-radius:12px;border:1px solid var(--line);
 background:#081522;color:#fff;font-size:16px;line-height:1.2;box-sizing:border-box;
--webkit-appearance:none;appearance:none
+-webkit-appearance:none;appearance:none;
+text-align:center;
+text-align-last:center
 }
-textarea{height:auto;min-height:88px;padding:14px}
+textarea{height:auto;min-height:88px;padding:14px;text-align:center}
 input[type="date"],input[type="time"],input[type="number"],input[type="text"],input[type="tel"]{
 height:56px;min-height:56px;max-height:56px
 }
 input[type="date"]::-webkit-date-and-time-value,
 input[type="time"]::-webkit-date-and-time-value{
-text-align:left;margin:0
+text-align:center;margin:0;width:100%
 }
+select option{text-align:center}
+input::placeholder,textarea::placeholder{text-align:center}
 textarea{min-height:80px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;align-items:start}
 button{display:block;width:100%;max-width:100%;min-height:48px;padding:13px;border:0;border-radius:13px;font-size:15px;font-weight:800;box-sizing:border-box}.primary{background:var(--gold);color:#2b1700;border-radius:16px}.secondary{background:#17304a;color:#fff}.green{background:var(--green);color:#042822}.danger{background:#52232a;color:#ffdce1}
 .hidden{display:none!important}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;background:#091522}.location-card{border:1px solid #5a4514;border-radius:15px;padding:12px;margin-top:12px;background:#151b22}
@@ -68,7 +72,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta 7</div>
+<div class="version">v1.0 Beta 8</div>
 </header>
 
 <section id="home" class="active">
