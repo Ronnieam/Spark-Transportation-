@@ -1,15 +1,12 @@
-Spark Transportation v1.2.5 — Explicit Reorder Mode
+Spark Transportation v1.2.6 — Three-Column Activity Grid
 
-This version removes the unreliable long-press behavior.
+Changes:
+- Removed the horizontal swipe activity bar.
+- Displays every activity at the same time.
+- Uses three activity icons per row.
+- Tap an activity normally to open it.
+- Tap Reorder, then drag any icon to any grid position.
+- Tap Done to save the customized layout.
+- The saved order remains in sparkTransportationData.
 
-Normal mode:
-- Swipe left/right without opening an activity.
-- An activity opens only after a clean, stationary tap.
-
-Reorder mode:
-1. Tap Reorder.
-2. Drag any activity immediately.
-3. Tap Done when finished.
-
-The custom order remains saved in sparkTransportationData.
 Upload all individual files to the root of the existing GitHub repository.
