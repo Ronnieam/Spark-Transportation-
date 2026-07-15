@@ -1,13 +1,15 @@
-Spark Transportation v1.3.1 — Biweekly Pay Period Reports
+Spark Transportation v1.3.2 — Currency Pay Rates
 
-Added:
-- Select the first and last day of each payroll period
-- One-tap Set 14 Days button
-- Saved pay-period dates
-- Full pay-period totals for days, miles, activities, and estimated pay
-- Mileage, activity, and PTO pay breakdown
-- Separate Week 1 and Week 2 totals
-- Activity count and money earned for each individual week
-- Per-activity-type count and pay breakdown for each week
+Driver & Pay Rates updates:
+- Mileage Rate remains a plain numeric field.
+- Weekend Mileage Rate remains a plain numeric field.
+- All other monetary pay-rate fields display a dollar sign.
+- Monetary fields display two decimal places after leaving the field or saving.
+- Wait Time and Breakdown share the same hourly-rate field.
+- Currency formatting does not change the internal pay calculations.
 
-The report uses completed days saved in History and preserves all existing app data.
+Formatted fields:
+Live Load, Live Unload, Wait Time & Breakdown, Manual ADP, Hook, Stop,
+Arrive, Arrive Drop, Layover, Chain, and Regional Pay.
+
+Existing data remains under sparkTransportationData.

@@ -126,7 +126,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.3.1 visual refresh */
+/* v1.3.2 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -225,7 +225,7 @@ padding:8px
 }
 
 
-/* v1.3.1 biweekly reports */
+/* v1.3.2 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -252,6 +252,36 @@ padding:8px
  .week-pay{font-size:21px}
 }
 
+
+/* v1.3.2 currency-formatted pay rates */
+.currency-input{
+  display:flex;
+  align-items:center;
+  width:100%;
+  border:1px solid #35506a;
+  background:#0d1c2d;
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:12px;
+}
+.currency-input:focus-within{
+  border-color:#e0b74a;
+  box-shadow:0 0 0 3px rgba(224,183,74,.12);
+}
+.currency-input span{
+  padding:0 0 0 14px;
+  color:#f4bd28;
+  font-weight:800;
+  font-size:17px;
+}
+.currency-input input{
+  border:0!important;
+  background:transparent!important;
+  margin:0!important;
+  box-shadow:none!important;
+  padding-left:7px!important;
+}
+
 </style>
 <title>Spark Transportation</title>
 </head>
@@ -265,7 +295,7 @@ padding:8px
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.3.1</div>
+  <div class="version">v1.3.2</div>
 </header>
 
 <section id="home" class="active">
@@ -621,17 +651,17 @@ padding:8px
     <label>Driver ID</label><input id="driverId">
     <label>Regular mileage rate</label><input id="mileageRate" type="number" step="0.001">
     <label>Weekend mileage rate</label><input id="weekendRate" type="number" step="0.001">
-    <label>Live Load / hr</label><input id="liveLoadRate" type="number" step="0.01">
-    <label>Live Unload / hr</label><input id="liveUnloadRate" type="number" step="0.01">
-    <label>Wait Time / hr</label><input id="waitRate" type="number" step="0.01">
-    <label>Manual ADP</label><input id="manualAdp" type="number" step="0.01">
-    <label>Hook</label><input id="hookRate" type="number" step="0.01">
-    <label>Stop</label><input id="stopRate" type="number" step="0.01">
-    <label>Arrive</label><input id="arriveRate" type="number" step="0.01">
-    <label>Arrive Drop</label><input id="arriveDropRate" type="number" step="0.01">
-    <label>Layover</label><input id="layoverRate" type="number" step="0.01">
-    <label>Chain</label><input id="chainRate" type="number" step="0.01">
-    <label>Regional Pay</label><input id="regionalRate" type="number" step="0.01">
+    <label>Live Load / hr</label><div class="currency-input"><span>$</span><input id="liveLoadRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Live Unload / hr</label><div class="currency-input"><span>$</span><input id="liveUnloadRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Wait Time & Breakdown / hr</label><div class="currency-input"><span>$</span><input id="waitRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Manual ADP</label><div class="currency-input"><span>$</span><input id="manualAdp" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Hook</label><div class="currency-input"><span>$</span><input id="hookRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Stop</label><div class="currency-input"><span>$</span><input id="stopRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Arrive</label><div class="currency-input"><span>$</span><input id="arriveRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Arrive Drop</label><div class="currency-input"><span>$</span><input id="arriveDropRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Layover</label><div class="currency-input"><span>$</span><input id="layoverRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Chain</label><div class="currency-input"><span>$</span><input id="chainRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
+    <label>Regional Pay</label><div class="currency-input"><span>$</span><input id="regionalRate" type="text" inputmode="decimal" autocomplete="off" data-currency-rate="true"></div>
     <button class="primary" onclick="saveSetup()">Save Setup</button>
   </div>
 </section>
@@ -645,7 +675,7 @@ padding:8px
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.3.1</b></div>
+    <div class="kv"><span>App version</span><b>1.3.2</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -710,7 +740,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.3.1',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.3.2',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -778,6 +808,20 @@ function formatPhone(value){
 }
 function phoneDigits(value){
  return String(value||'').replace(/\D/g,'').slice(0,10);
+}
+
+function parseCurrencyInput(value){
+ const cleaned=String(value??'').replace(/[$,\s]/g,'');
+ const parsed=Number(cleaned);
+ return Number.isFinite(parsed)?parsed:0;
+}
+function formatCurrencyInput(value){
+ return parseCurrencyInput(value).toFixed(2);
+}
+function displayCurrencyFields(){
+ document.querySelectorAll('[data-currency-rate="true"]').forEach(input=>{
+  input.value=formatCurrencyInput(input.value);
+ });
 }
 
 const pageOrder=['home','day','locations','history','reports','setup','data'];
@@ -930,7 +974,13 @@ function callLocation(phone,ext){const p=cleanPhone(phone);if(!p){alert('No phon
 function mapLocation(l){const q=[l.address,l.city,l.state].filter(Boolean).join(', ');if(!q){alert('No address saved.');return;}window.location.href='https://maps.apple.com/?q='+encodeURIComponent(q);}
 
 function saveSetup(){
- Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','driverId'].includes(k)?$(k).value:num($(k).value));
+ const currencyFields=new Set(['liveLoadRate','liveUnloadRate','waitRate','manualAdp','hookRate','stopRate','arriveRate','arriveDropRate','layoverRate','chainRate','regionalRate']);
+ Object.keys(defaults).forEach(k=>{
+  if(['driverName','driverId'].includes(k))state.setup[k]=$(k).value;
+  else if(currencyFields.has(k))state.setup[k]=parseCurrencyInput($(k).value);
+  else state.setup[k]=num($(k).value);
+ });
+ displayCurrencyFields();
  save();showPage('home');
 }
 function exportBackup(){exportState(state);}
@@ -1179,7 +1229,11 @@ function render(){
  $('migrationStatus').textContent=localStorage.getItem(MIGRATION_FLAG)||'None';
 }
 
-Object.keys(defaults).forEach(k=>{if($(k))$(k).value=state.setup[k]});
+Object.keys(defaults).forEach(k=>{
+ if(!$(k))return;
+ const currencyFields=['liveLoadRate','liveUnloadRate','waitRate','manualAdp','hookRate','stopRate','arriveRate','arriveDropRate','layoverRate','chainRate','regionalRate'];
+ $(k).value=currencyFields.includes(k)?num(state.setup[k]).toFixed(2):state.setup[k];
+});
 $('dayDate').value=new Date().toISOString().slice(0,10);
 document.addEventListener('input',e=>{
  if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render();
@@ -1191,6 +1245,20 @@ document.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchStar
 document.addEventListener('touchend',e=>{if(touchStartX===null)return;const t=e.changedTouches[0],dx=t.screenX-touchStartX,dy=t.screenY-touchStartY;touchStartX=touchStartY=null;if(Math.abs(dx)<60||Math.abs(dx)<=Math.abs(dy))return;const i=pageOrder.indexOf(currentPage);if(dx<0&&i<pageOrder.length-1)showPage(pageOrder[i+1]);else if(dx>0&&i>0)showPage(pageOrder[i-1]);},{passive:true});
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+document.querySelectorAll('[data-currency-rate="true"]').forEach(input=>{
+ input.addEventListener('focus',()=>{
+  input.value=String(parseCurrencyInput(input.value));
+  input.select();
+ });
+ input.addEventListener('input',()=>{
+  input.value=input.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1');
+ });
+ input.addEventListener('blur',()=>{
+  input.value=formatCurrencyInput(input.value);
+ });
+});
+displayCurrencyFields();
+
 $('savedPhone').addEventListener('input',e=>{
  const cursor=e.target.selectionStart;
  const before=e.target.value;
