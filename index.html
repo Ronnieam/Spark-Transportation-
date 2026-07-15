@@ -35,7 +35,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="app">
 <header>
 <div class="brand"><img src="icon-192.png" class="logo"><div><h1>Spark Transportation</h1><div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div></div></div>
-<div class="version">v1.0 Beta</div>
+<div class="version">v1.0 Beta 2</div>
 </header>
 
 <section id="home" class="active">
@@ -130,8 +130,14 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <label>Name</label><input id="savedName">
 <label>Address</label><input id="savedAddress">
 <div class="row"><div><label>City</label><input id="savedCity"></div><div><label>State</label><input id="savedState"></div></div>
-<label>Notes</label><textarea id="savedNotes"></textarea>
-<button class="primary" onclick="saveLocation()">Save Location</button>
+<div class="row"><div><label>Phone number</label><input id="savedPhone" type="tel" placeholder="555-555-5555"></div><div><label>Extension</label><input id="savedExtension" placeholder="Optional"></div></div>
+<label>Contact person</label><input id="savedContact">
+<label>Receiving hours</label><input id="savedHours" placeholder="Example: Mon–Fri 6 AM–2 PM">
+<div class="row"><div><label>Gate code</label><input id="savedGateCode"></div><div><label>Appointment number</label><input id="savedAppointment"></div></div>
+<label>Driver notes</label><textarea id="savedNotes" placeholder="Guard shack, receiving door, check-in instructions..."></textarea>
+<input id="editingSavedLocationIndex" type="hidden" value="">
+<button id="saveLocationButton" class="primary" onclick="saveLocation()">Save Location</button>
+<button id="cancelLocationEditButton" class="secondary hidden" style="margin-top:8px" onclick="cancelLocationEdit()">Cancel Edit</button>
 </div>
 <div class="card"><h3>Saved Locations</h3><div id="savedLocationList" class="muted">No saved locations.</div></div>
 </section>
@@ -195,10 +201,77 @@ function ptoPreview(){return ptoType.value==='none'?0:num(ptoHours.value)*(num(s
 function running(){return activityTotal()+mileagePreview()+ptoPreview()}
 function saveDay(){const date=editDayDate.value,bm=num(editBeginMileage.value),em=num(endMileage.value),st=editStartTime.value,et=endTime.value;if(!date||!bm||!em||!st||!et){alert('Complete the day fields.');return}if(em<bm){alert('Ending mileage cannot be lower.');return}const d=new Date(date+'T12:00:00'),r=(d.getDay()===0||d.getDay()===6)?num(state.setup.weekendRate):num(state.setup.mileageRate),miles=em-bm,mp=miles*r,ap=activityTotal(),pp=ptoPreview();state.entries.push({date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay:mp,locations:JSON.parse(JSON.stringify(state.locations)),activityPay:ap,ptoType:ptoType.value,ptoHours:num(ptoHours.value),ptoPay:pp,total:mp+ap+pp});state.active=null;state.locations=[];state.activeLocationIndex=null;save();show('home')}
 function cancelDay(){if(confirm('Cancel this day?')){state.active=null;state.locations=[];state.activeLocationIndex=null;save()}}
-function saveLocation(){if(!savedNumber.value.trim()){alert('Enter a location number.');return}state.savedLocations.push({id:Date.now().toString(),type:savedType.value,number:savedNumber.value.trim(),name:savedName.value.trim(),address:savedAddress.value.trim(),city:savedCity.value.trim(),state:savedState.value.trim(),notes:savedNotes.value.trim()});savedNumber.value=savedName.value=savedAddress.value=savedCity.value=savedState.value=savedNotes.value='';save()}
+function saveLocation(){
+ if(!savedNumber.value.trim()){alert('Enter a location number.');return}
+ const location={
+   id:Date.now().toString(),
+   type:savedType.value,
+   number:savedNumber.value.trim(),
+   name:savedName.value.trim(),
+   address:savedAddress.value.trim(),
+   city:savedCity.value.trim(),
+   state:savedState.value.trim(),
+   phone:savedPhone.value.trim(),
+   extension:savedExtension.value.trim(),
+   contact:savedContact.value.trim(),
+   hours:savedHours.value.trim(),
+   gateCode:savedGateCode.value.trim(),
+   appointment:savedAppointment.value.trim(),
+   notes:savedNotes.value.trim()
+ }
+ const idx=editingSavedLocationIndex.value
+ if(idx===''){state.savedLocations.push(location)}
+ else{
+   const old=state.savedLocations[Number(idx)]
+   location.id=old.id
+   state.savedLocations[Number(idx)]=location
+ }
+ clearSavedLocationForm()
+ save()
+}
+function editSavedLocation(i){
+ const l=state.savedLocations[i]
+ savedType.value=l.type
+ savedNumber.value=l.number
+ savedName.value=l.name||''
+ savedAddress.value=l.address||''
+ savedCity.value=l.city||''
+ savedState.value=l.state||''
+ savedPhone.value=l.phone||''
+ savedExtension.value=l.extension||''
+ savedContact.value=l.contact||''
+ savedHours.value=l.hours||''
+ savedGateCode.value=l.gateCode||''
+ savedAppointment.value=l.appointment||''
+ savedNotes.value=l.notes||''
+ editingSavedLocationIndex.value=i
+ saveLocationButton.textContent='Update Location'
+ cancelLocationEditButton.classList.remove('hidden')
+ show('locations')
+ window.scrollTo({top:0,behavior:'smooth'})
+}
+function cancelLocationEdit(){clearSavedLocationForm()}
+function clearSavedLocationForm(){
+ savedNumber.value=savedName.value=savedAddress.value=savedCity.value=savedState.value=savedPhone.value=savedExtension.value=savedContact.value=savedHours.value=savedGateCode.value=savedAppointment.value=savedNotes.value=''
+ savedType.value='Store'
+ editingSavedLocationIndex.value=''
+ saveLocationButton.textContent='Save Location'
+ cancelLocationEditButton.classList.add('hidden')
+}
 function deleteSavedLocation(i){state.savedLocations.splice(i,1);save()}
 function saveSetup(){Object.keys(defaults).forEach(k=>state.setup[k]=['driverName','regionName'].includes(k)?$(k).value:num($(k).value));save();show('home')}
 function toggleHistory(i){const e=$('history'+i);if(e)e.classList.toggle('hidden')}
+function cleanPhone(phone){return String(phone||'').replace(/[^0-9+]/g,'')}
+function callLocation(phone,ext){
+ const p=cleanPhone(phone)
+ if(!p){alert('No phone number saved.');return}
+ window.location.href='tel:'+p+(ext?','+String(ext).replace(/[^0-9]/g,''):'')
+}
+function mapLocation(l){
+ const parts=[l.address,l.city,l.state].filter(Boolean).join(', ')
+ if(!parts){alert('No address saved.');return}
+ window.location.href='https://maps.apple.com/?q='+encodeURIComponent(parts)
+}
 function render(){
  driverLine.textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.regionName||'Driver Pay & Activity Tracker')
  startBox.classList.toggle('hidden',!!state.active);activeBox.classList.toggle('hidden',!state.active)
@@ -208,12 +281,27 @@ function render(){
  milesToday.textContent=state.active&&endMileage.value?Math.max(0,num(endMileage.value)-num(editBeginMileage.value||state.active.beginMileage)):0
  locationsToday.textContent=state.locations.length;activitiesToday.textContent=state.locations.reduce((s,l)=>s+l.activities.length,0);adpToday.textContent=money(state.setup.manualAdp)
  dayCount.textContent=state.entries.length;totalPay.textContent=money(state.entries.reduce((s,e)=>s+e.total,0))
- savedLocationSelect.innerHTML='<option value="">Choose saved location</option>'+state.savedLocations.map(l=>`<option value="${l.id}">${l.type} #${l.number} ${l.name}</option>`).join('')
+ savedLocationSelect.innerHTML='<option value="">Choose saved location</option>'+state.savedLocations.map(l=>`<option value="${l.id}">${l.type} #${l.number} ${l.name||''}</option>`).join('')
  activeLocationBox.classList.toggle('hidden',state.activeLocationIndex===null)
  if(state.activeLocationIndex!==null&&state.locations[state.activeLocationIndex]){const l=state.locations[state.activeLocationIndex];activeLocationTitle.textContent=`${l.type} #${l.number}`;activeLocationSubtitle.textContent=l.name||'Activities added here belong to this location.'}
  locationGroups.innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}<div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${l.activities.length}</b></div><div class="kv"><span>Location total</span><b>${money(l.activities.reduce((s,a)=>s+a.pay,0))}</b></div>${l.activities.map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<b>${money(a.pay)}</b><button class="danger" style="margin-top:8px" onclick="removeActivity(${li},${ai})">Remove</button></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added.</div>'
  const mp=mileagePreview(),ap=activityTotal(),pp=ptoPreview();previewMileage.textContent=money(mp);previewActivity.textContent=money(ap);previewPto.textContent=money(pp);previewTotal.textContent=money(mp+ap+pp)
- savedLocationList.innerHTML=state.savedLocations.length?state.savedLocations.map((l,i)=>`<div class="entry"><b>${l.type} #${l.number}</b><div>${l.name||''}</div><div class="muted small">${[l.address,l.city,l.state].filter(Boolean).join(', ')}</div>${l.notes?`<div class="small">${l.notes}</div>`:''}<button class="danger" style="margin-top:8px" onclick="deleteSavedLocation(${i})">Delete</button></div>`).join(''):'No saved locations.'
+ savedLocationList.innerHTML=state.savedLocations.length?state.savedLocations.map((l,i)=>`<div class="entry">
+<b>${l.type} #${l.number}</b>
+<div>${l.name||''}</div>
+<div class="muted small">${[l.address,l.city,l.state].filter(Boolean).join(', ')}</div>
+${l.phone?`<div class="kv"><span>Phone</span><b>${l.phone}${l.extension?' ext. '+l.extension:''}</b></div>`:''}
+${l.contact?`<div class="kv"><span>Contact</span><b>${l.contact}</b></div>`:''}
+${l.hours?`<div class="kv"><span>Receiving hours</span><b>${l.hours}</b></div>`:''}
+${l.gateCode?`<div class="kv"><span>Gate code</span><b>${l.gateCode}</b></div>`:''}
+${l.appointment?`<div class="kv"><span>Appointment</span><b>${l.appointment}</b></div>`:''}
+${l.notes?`<div class="small" style="margin-top:8px">${l.notes}</div>`:''}
+<div class="actions">
+${l.phone?`<button class="green" onclick="callLocation('${l.phone.replace(/'/g,"\\'")}','${(l.extension||'').replace(/'/g,"\\'")}')">Call</button>`:'<button class="secondary" disabled>No Phone</button>'}
+${l.address||l.city?`<button class="primary" onclick='mapLocation(${JSON.stringify(l)})'>Directions</button>`:'<button class="secondary" disabled>No Address</button>'}
+</div>
+<div class="actions"><button class="secondary" onclick="editSavedLocation(${i})">Edit</button><button class="danger" onclick="deleteSavedLocation(${i})">Delete</button></div>
+</div>`).join(''):'No saved locations.'
  historyList.innerHTML=state.entries.length?[...state.entries].reverse().map((e,rev)=>{const i=state.entries.length-1-rev;return `<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${e.locations.length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><button class="secondary" onclick="toggleHistory(${i})">View Details</button><div id="history${i}" class="hidden">${e.locations.map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${l.activities.map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${a.hours.toFixed(2)} hrs • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`}).join(''):'No entries.'
 }
 document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render()})
