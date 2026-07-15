@@ -1,13 +1,11 @@
-Spark Transportation v1.0 Beta 6
+Spark Transportation v1.0 Beta 7
 
-Changes:
-- Region has been changed to Driver ID.
-- Driver ID now appears in Driver & Pay Rates and in the app header.
-- Existing saved Region data is automatically copied into Driver ID so it is not lost.
-- Day page paired fields now use equal-width columns.
-- Labels and controls align more consistently.
-- Inputs no longer overhang or compress unevenly.
-- Small iPhones still stack fields into a single column.
+Visual fixes:
+- Date, Beginning Mileage, and Start Time are now the same height.
+- iPhone date and time controls use consistent sizing and alignment.
+- Version badge stays on one line.
+- Header spacing is tighter.
+- Start Day button has a more polished rounded shape.
 
 Replace the existing GitHub Pages files with:
 index.html
