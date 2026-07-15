@@ -1,22 +1,10 @@
-Spark Transportation v1.2.0 — Today's Run Dashboard
+Spark Transportation v1.2.1 — Swipe & Reorder Quick Activities
 
-This release builds the approved dashboard into the working app while preserving the permanent localStorage key: sparkTransportationData.
+New in this release:
+- Swipe left and right through every Quick Add Activity.
+- Press and hold an activity icon for about half a second, then drag it to a new position.
+- The custom order is saved in the permanent Spark Transportation app data.
+- Reset Order restores the original activity arrangement.
+- Includes all activities: Live Load, Live Unload, Wait Time, Hook, Stop, Arrive, Arrive Drop, Layover, Chain, Regional Pay, Meeting, Survey, and Training.
 
-Upload these individual files to the ROOT of the existing GitHub repository:
-index.html
-manifest.json
-sw.js
-logo.png
-icon-192.png
-icon-512.png
-
-New dashboard features:
-- Dynamic greeting and current date
-- Ready / On Duty status
-- Live estimated pay, miles, locations, and activity count
-- Current location card with Call, Directions, and expandable details
-- Pay summary
-- Quick Add activity buttons
-- Start / Resume Day action
-
-Existing Day, Locations, History, Reports, Setup, Data, backup/restore, and swipe navigation remain available.
+Upload all individual files to the root of the existing GitHub repository. Do not upload only the ZIP file. Existing records continue to use the permanent localStorage key sparkTransportationData.

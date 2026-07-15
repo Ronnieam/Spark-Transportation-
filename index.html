@@ -79,7 +79,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
 .current-location-main{display:flex;gap:12px;align-items:center}.location-icon{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;background:#ffc247;color:#2b1700;font-size:24px;flex:0 0 auto}.location-copy{min-width:0;flex:1}.location-copy b{font-size:18px}.location-copy div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .location-actions{grid-template-columns:repeat(2,1fr)}.location-details{margin-top:12px;padding-top:5px;border-top:1px solid var(--line)}
 .pay-card .kv{padding:10px 0}.pay-card .total-row{font-size:20px;color:#ffd166}.pay-card .total-row b{font-size:24px}
-.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.quick-btn{min-height:78px;background:#10243a;border:1px solid #35506a;color:#fff;padding:8px 5px}.quick-btn .quick-icon{display:block;font-size:24px;margin-bottom:5px}.quick-btn.more{background:#2b3440;color:#fff}
+.quick-help{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-3px 0 10px;color:var(--muted);font-size:12px}.quick-edit-badge{display:none;padding:4px 8px;border-radius:999px;background:#3b290c;color:#ffd166;font-weight:800}.quick-edit-badge.show{display:inline-block}.quick-scroller{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;padding:3px 2px 10px;touch-action:pan-x}.quick-scroller::-webkit-scrollbar{height:5px}.quick-scroller::-webkit-scrollbar-thumb{background:#35506a;border-radius:999px}.quick-btn{position:relative;flex:0 0 104px;min-height:84px;background:#10243a;border:1px solid #35506a;color:#fff;padding:9px 6px;scroll-snap-align:start;user-select:none;-webkit-user-select:none;touch-action:pan-x;transition:transform .14s ease,opacity .14s ease,border-color .14s ease}.quick-btn .quick-icon{display:block;font-size:25px;margin-bottom:5px}.quick-btn.dragging{opacity:.92;transform:scale(1.06);border-color:#ffb000;z-index:20;box-shadow:0 8px 22px rgba(0,0,0,.38);touch-action:none}.quick-btn.drag-target{border-color:#ffd166}.quick-btn .drag-hint{position:absolute;top:5px;right:7px;color:#90a7ba;font-size:12px;line-height:1}.quick-btn.dragging .drag-hint{color:#ffd166}.quick-reset{width:auto;min-height:34px;padding:6px 10px;border-radius:999px;background:#17304a;color:#fff;font-size:12px}.quick-edge-cue{text-align:right;color:#ffd166;font-size:12px;margin-top:-6px}
 .primary-dashboard{min-height:59px;font-size:18px;box-shadow:0 9px 20px rgba(255,176,0,.15)}
 .dashboard-note{text-align:center;color:var(--muted);font-size:12px;margin:-4px 0 10px}
 
@@ -89,7 +89,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
   .card,.day-group{padding:13px}
   .logo{width:60px;height:60px}
   .nav button{font-size:9px}
-  .today-title{font-size:27px}.dashboard-hero .big{font-size:40px}.quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .today-title{font-size:27px}.dashboard-hero .big{font-size:40px}.quick-btn{flex-basis:96px}
 }
 
 </style>
@@ -105,7 +105,7 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
       <div class="muted small" id="driverLine">Driver Pay & Activity Tracker</div>
     </div>
   </div>
-  <div class="version">v1.2.0</div>
+  <div class="version">v1.2.1</div>
 </header>
 
 <section id="home" class="active">
@@ -166,15 +166,10 @@ button{display:block;width:100%;min-height:48px;border:0;border-radius:14px;padd
   </div>
 
   <div class="card">
-    <h2>Quick Add Activity</h2>
-    <div class="quick-grid">
-      <button class="quick-btn" onclick="quickAddActivity('Live Load')"><span class="quick-icon">📦</span>Live Load</button>
-      <button class="quick-btn" onclick="quickAddActivity('Live Unload')"><span class="quick-icon">📤</span>Live Unload</button>
-      <button class="quick-btn" onclick="quickAddActivity('Wait Time')"><span class="quick-icon">⏱️</span>Wait Time</button>
-      <button class="quick-btn" onclick="quickAddActivity('Hook')"><span class="quick-icon">🔗</span>Hook</button>
-      <button class="quick-btn" onclick="quickAddActivity('Stop')"><span class="quick-icon">🛑</span>Stop</button>
-      <button class="quick-btn more" onclick="showPage('day')"><span class="quick-icon">•••</span>More</button>
-    </div>
+    <div class="section-title-row"><h2>Quick Add Activity</h2><button class="quick-reset" type="button" onclick="resetQuickActivityOrder()">Reset Order</button></div>
+    <div class="quick-help"><span>Swipe to see all activities. Hold an icon, then drag it to rearrange.</span><span class="quick-edit-badge" id="quickEditBadge">Moving</span></div>
+    <div class="quick-scroller" id="quickActivityScroller" aria-label="Quick activities"></div>
+    <div class="quick-edge-cue">Swipe left or right ↔</div>
   </div>
 
   <button class="primary primary-dashboard" id="dashboardPrimaryButton" onclick="dashboardPrimaryAction()">Start Day</button>
@@ -495,12 +490,13 @@ const defaults={
  hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,
  layoverRate:42,chainRate:60,regionalRate:6
 };
-const baseState={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null};
+const baseState={setup:{...defaults},active:null,locations:[],activeLocationIndex:null,entries:[],savedLocations:[],editingEntryIndex:null,quickActivityOrder:[]};
 let state=loadPersistentState(baseState);
 state.setup={...defaults,...(state.setup||{})};
 state.entries=Array.isArray(state.entries)?state.entries:[];
 state.savedLocations=Array.isArray(state.savedLocations)?state.savedLocations:[];
 state.locations=Array.isArray(state.locations)?state.locations:[];
+state.quickActivityOrder=Array.isArray(state.quickActivityOrder)?state.quickActivityOrder:[];
 
 const $=id=>document.getElementById(id);
 const num=v=>Number(v||0);
@@ -509,6 +505,69 @@ const pageOrder=['home','day','locations','history','reports','setup','data'];
 let currentPage='home';
 
 function save(){savePersistentState(state);render();}
+
+const QUICK_ACTIVITIES=[
+ {type:'Live Load',icon:'📦'},{type:'Live Unload',icon:'📤'},{type:'Wait Time',icon:'⏱️'},
+ {type:'Hook',icon:'🔗'},{type:'Stop',icon:'🛑'},{type:'Arrive',icon:'📍'},
+ {type:'Arrive Drop',icon:'📥'},{type:'Layover',icon:'🌙'},{type:'Chain',icon:'⛓️'},
+ {type:'Regional Pay',icon:'🛣️'},{type:'Meeting',icon:'👥'},{type:'Survey',icon:'📝'},
+ {type:'Training',icon:'🎓'}
+];
+const DEFAULT_QUICK_ORDER=QUICK_ACTIVITIES.map(a=>a.type);
+function normalizedQuickOrder(){
+ const known=new Set(DEFAULT_QUICK_ORDER);
+ const saved=(state.quickActivityOrder||[]).filter(x=>known.has(x));
+ return [...new Set([...saved,...DEFAULT_QUICK_ORDER])];
+}
+function persistQuickOrder(order){state.quickActivityOrder=[...order];savePersistentState(state);}
+function resetQuickActivityOrder(){
+ state.quickActivityOrder=[...DEFAULT_QUICK_ORDER];
+ savePersistentState(state);renderQuickActivities();
+}
+function renderQuickActivities(){
+ const scroller=$('quickActivityScroller');if(!scroller)return;
+ const order=normalizedQuickOrder();state.quickActivityOrder=[...order];
+ scroller.innerHTML=order.map(type=>{const item=QUICK_ACTIVITIES.find(a=>a.type===type);return `<button type="button" class="quick-btn" data-activity="${type}" aria-label="${type}. Hold and drag to rearrange."><span class="drag-hint">⋮⋮</span><span class="quick-icon">${item.icon}</span>${type}</button>`}).join('');
+ bindQuickActivityDrag();
+}
+function bindQuickActivityDrag(){
+ const scroller=$('quickActivityScroller');if(!scroller)return;
+ scroller.querySelectorAll('.quick-btn').forEach(btn=>{
+  let timer=null,dragging=false,startX=0,startY=0,pointerId=null;
+  const clear=()=>{if(timer){clearTimeout(timer);timer=null;}};
+  btn.addEventListener('pointerdown',e=>{
+   if(e.pointerType==='mouse'&&e.button!==0)return;
+   pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;
+   timer=setTimeout(()=>{dragging=true;btn.classList.add('dragging');$('quickEditBadge').classList.add('show');btn.setPointerCapture(pointerId);if(navigator.vibrate)navigator.vibrate(30);},450);
+  });
+  btn.addEventListener('pointermove',e=>{
+   const dx=e.clientX-startX,dy=e.clientY-startY;
+   if(!dragging&&Math.hypot(dx,dy)>12){clear();return;}
+   if(!dragging)return;
+   e.preventDefault();
+   const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.quick-btn');
+   if(target&&target!==btn&&target.parentElement===scroller){
+    const r=target.getBoundingClientRect();
+    scroller.insertBefore(btn,e.clientX<r.left+r.width/2?target:target.nextSibling);
+   }
+   const sr=scroller.getBoundingClientRect();
+   if(e.clientX<sr.left+42)scroller.scrollLeft-=12;else if(e.clientX>sr.right-42)scroller.scrollLeft+=12;
+  });
+  const finish=e=>{
+   clear();
+   if(dragging){
+    e.preventDefault();dragging=false;btn.classList.remove('dragging');$('quickEditBadge').classList.remove('show');
+    persistQuickOrder([...scroller.querySelectorAll('.quick-btn')].map(x=>x.dataset.activity));
+    setTimeout(()=>btn.dataset.suppressClick='0',250);btn.dataset.suppressClick='1';
+   }
+   try{if(pointerId!==null&&btn.hasPointerCapture(pointerId))btn.releasePointerCapture(pointerId);}catch(_){}
+   pointerId=null;
+  };
+  btn.addEventListener('pointerup',finish);btn.addEventListener('pointercancel',finish);
+  btn.addEventListener('click',e=>{if(btn.dataset.suppressClick==='1'){e.preventDefault();return;}quickAddActivity(btn.dataset.activity);});
+  btn.addEventListener('contextmenu',e=>e.preventDefault());
+ });
+}
 
 function dashboardPrimaryAction(){showPage('day');}
 function quickAddActivity(type){
@@ -666,6 +725,7 @@ function renderHistory(){
 }
 
 function render(){
+ renderQuickActivities();
  $('driverLine').textContent=(state.setup.driverName?state.setup.driverName+' • ':'')+(state.setup.driverId||'Driver Pay & Activity Tracker');
  $('startBox').classList.toggle('hidden',!!state.active);$('activeBox').classList.toggle('hidden',!state.active);
  $('dayHeading').textContent=state.editingEntryIndex===null?'Start / Edit Day':'Edit Saved Day';
@@ -736,7 +796,7 @@ $('dayDate').value=new Date().toISOString().slice(0,10);
 document.addEventListener('input',e=>{if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render();});
 
 let touchStartX=null,touchStartY=null;
-document.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchStartX=t.screenX;touchStartY=t.screenY;},{passive:true});
+document.addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('#quickActivityScroller')){touchStartX=touchStartY=null;return;}const t=e.changedTouches[0];touchStartX=t.screenX;touchStartY=t.screenY;},{passive:true});
 document.addEventListener('touchend',e=>{if(touchStartX===null)return;const t=e.changedTouches[0],dx=t.screenX-touchStartX,dy=t.screenY-touchStartY;touchStartX=touchStartY=null;if(Math.abs(dx)<60||Math.abs(dx)<=Math.abs(dy))return;const i=pageOrder.indexOf(currentPage);if(dx<0&&i<pageOrder.length-1)showPage(pageOrder[i+1]);else if(dx>0&&i>0)showPage(pageOrder[i-1]);},{passive:true});
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
