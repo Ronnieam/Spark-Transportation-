@@ -126,7 +126,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.4.0 visual refresh */
+/* v1.4.1 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -225,7 +225,7 @@ padding:8px
 }
 
 
-/* v1.4.0 biweekly reports */
+/* v1.4.1 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -253,7 +253,7 @@ padding:8px
 }
 
 
-/* v1.4.0 currency-formatted pay rates */
+/* v1.4.1 currency-formatted pay rates */
 .currency-input{
   display:flex;
   align-items:center;
@@ -283,7 +283,7 @@ padding:8px
 }
 
 
-/* v1.4.0 official branding */
+/* v1.4.1 official branding */
 .brand img,
 .logo img,
 .app-logo,
@@ -304,7 +304,7 @@ header{
 }
 
 
-/* v1.4.0 Home header redesign */
+/* v1.4.1 Home header redesign */
 .hero-header{
   display:block!important;
   padding:12px 16px 14px!important;
@@ -364,7 +364,7 @@ header{
 }
 
 
-/* v1.4.0 currency-value visibility fix */
+/* v1.4.1 currency-value visibility fix */
 .currency-input{
   min-height:56px!important;
 }
@@ -387,7 +387,7 @@ header{
 }
 
 
-/* v1.4.0 payroll archive */
+/* v1.4.1 payroll archive */
 .pay-period-archive{display:grid;gap:10px;margin-top:12px}
 .pay-period-item{border:1px solid #35506a;border-radius:16px;overflow:hidden;background:#0b1927}
 .pay-period-date-button{
@@ -404,7 +404,7 @@ header{
 .archived-week h3{margin:0 0 4px}
 
 
-/* v1.4.0 PTO Manager */
+/* v1.4.1 PTO Manager */
 .nav{grid-template-columns:repeat(8,1fr)!important}
 .nav button[data-page="pto"]::before{content:"🏖️"}
 .pto-hero{background:linear-gradient(135deg,#17365a,#0d2744)!important;border-color:#c99718!important}
@@ -888,7 +888,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v1.4.0</b></div>
+    <div class="kv"><span>Version</span><b>v1.4.1</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -908,7 +908,7 @@ header{
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.4.0</b></div>
+    <div class="kv"><span>App version</span><b>1.4.1</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -974,7 +974,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.4.0',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.4.1',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1050,13 +1050,13 @@ state.payPeriods=Array.isArray(state.payPeriods)?state.payPeriods:[];
 state.selectedPayPeriodId=state.selectedPayPeriodId||null;
 state.pto=state.pto&&typeof state.pto==='object'?state.pto:{};
 state.pto={
- balance:num(state.pto.balance),
- earnedThisFiscalYear:num(state.pto.earnedThisFiscalYear),
- usedThisFiscalYear:num(state.pto.usedThisFiscalYear),
- safetyEarnedHours:num(state.pto.safetyEarnedHours),
- carryoverHours:num(state.pto.carryoverHours),
- workedHoursProgress:num(state.pto.workedHoursProgress),
- earnedDaysThisFiscalYear:num(state.pto.earnedDaysThisFiscalYear),
+ balance:Number(state.pto.balance||0),
+ earnedThisFiscalYear:Number(state.pto.earnedThisFiscalYear||0),
+ usedThisFiscalYear:Number(state.pto.usedThisFiscalYear||0),
+ safetyEarnedHours:Number(state.pto.safetyEarnedHours||0),
+ carryoverHours:Number(state.pto.carryoverHours||0),
+ workedHoursProgress:Number(state.pto.workedHoursProgress||0),
+ earnedDaysThisFiscalYear:Number(state.pto.earnedDaysThisFiscalYear||0),
  safetyQuarters:state.pto.safetyQuarters||{},
  ledger:Array.isArray(state.pto.ledger)?state.pto.ledger:[],
  fiscalArchives:Array.isArray(state.pto.fiscalArchives)?state.pto.fiscalArchives:[],
@@ -1140,12 +1140,20 @@ function lastCompletedDay(){
 
 
 function showPage(id){
+ const target=$(id);
+ if(!target){
+  console.warn('Page not found:',id);
+  return;
+ }
  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
- $(id).classList.add('active');
+ target.classList.add('active');
  currentPage=id;
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
  if(id==='setup')populateSetupFields();
- render();
+ try{render();}catch(error){
+  console.error('Render error:',error);
+  alert('The page could not finish loading. Your saved data is still protected.');
+ }
 }
 function decimalHours(a,b){if(!a||!b)return 0;const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let m=(bh*60+bm)-(ah*60+am);if(m<0)m+=1440;return Math.round((m/60)*100)/100;}
 function hasUnpaid45MinuteThreshold(t){return ['Live Load','Live Unload','Wait Time','Breakdown'].includes(t);}
