@@ -126,7 +126,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.4.1 visual refresh */
+/* v1.4.2 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -225,7 +225,7 @@ padding:8px
 }
 
 
-/* v1.4.1 biweekly reports */
+/* v1.4.2 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -253,7 +253,7 @@ padding:8px
 }
 
 
-/* v1.4.1 currency-formatted pay rates */
+/* v1.4.2 currency-formatted pay rates */
 .currency-input{
   display:flex;
   align-items:center;
@@ -283,7 +283,7 @@ padding:8px
 }
 
 
-/* v1.4.1 official branding */
+/* v1.4.2 official branding */
 .brand img,
 .logo img,
 .app-logo,
@@ -304,7 +304,7 @@ header{
 }
 
 
-/* v1.4.1 Home header redesign */
+/* v1.4.2 Home header redesign */
 .hero-header{
   display:block!important;
   padding:12px 16px 14px!important;
@@ -364,7 +364,7 @@ header{
 }
 
 
-/* v1.4.1 currency-value visibility fix */
+/* v1.4.2 currency-value visibility fix */
 .currency-input{
   min-height:56px!important;
 }
@@ -387,7 +387,7 @@ header{
 }
 
 
-/* v1.4.1 payroll archive */
+/* v1.4.2 payroll archive */
 .pay-period-archive{display:grid;gap:10px;margin-top:12px}
 .pay-period-item{border:1px solid #35506a;border-radius:16px;overflow:hidden;background:#0b1927}
 .pay-period-date-button{
@@ -404,7 +404,7 @@ header{
 .archived-week h3{margin:0 0 4px}
 
 
-/* v1.4.1 PTO Manager */
+/* v1.4.2 PTO Manager */
 .nav{grid-template-columns:repeat(8,1fr)!important}
 .nav button[data-page="pto"]::before{content:"🏖️"}
 .pto-hero{background:linear-gradient(135deg,#17365a,#0d2744)!important;border-color:#c99718!important}
@@ -430,6 +430,18 @@ header{
  .nav button::before{font-size:18px!important}
  .safety-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* v1.4.2 paid leave benefits */
+.leave-quick-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.leave-quick-buttons button{min-height:54px;padding:8px}
+.leave-quick-buttons small{font-size:11px;font-weight:500}
+.benefit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.benefit-card{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:14px;text-align:center}
+.benefit-card span{display:block;color:#aebdca;font-size:13px;min-height:34px}
+.benefit-card b{display:block;color:#f4bd28;font-size:20px;margin:6px 0}
+.benefit-card small{color:#aebdca}
+@media(max-width:390px){.benefit-grid{grid-template-columns:1fr}}
 
 </style>
 <title>Spark Transportation</title>
@@ -634,10 +646,22 @@ header{
             <input id="endTime" type="time">
           </div>
         </div>
-        <label>PTO</label>
-        <select id="ptoType"><option value="none">None</option><option>Vacation</option><option>Sick</option><option>Safety</option></select>
-        <label>PTO hours</label>
+        <label>Paid leave</label>
+        <select id="ptoType" onchange="updatePaidLeaveHelp()">
+          <option value="none">None</option>
+          <option>Vacation</option>
+          <option>Sick</option>
+          <option>Safety</option>
+          <option>Bereavement</option>
+          <option value="Family Medical Leave">Family Medical Leave</option>
+        </select>
+        <label>Paid leave hours</label>
         <input id="ptoHours" type="number" step="0.25" value="0" inputmode="decimal">
+        <div class="leave-quick-buttons">
+          <button type="button" class="secondary" onclick="$('ptoHours').value=10;render()">1 Day<br><small>10 hrs</small></button>
+          <button type="button" class="secondary" onclick="$('ptoHours').value=5;render()">Half Day<br><small>5 hrs</small></button>
+        </div>
+        <div id="paidLeaveHelp" class="muted small top-gap-sm">Vacation, Sick, and Safety reduce the PTO balance.</div>
       </div>
 
       <div class="card inset">
@@ -809,6 +833,23 @@ header{
   </div>
 
   <div class="card">
+    <div class="section-title-row"><h2>Other Paid Leave</h2><span id="benefitCalendarYear" class="pill">Calendar year</span></div>
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <span>Family Medical Leave</span>
+        <b id="fmlRemaining">50.00 hrs</b>
+        <small id="fmlUsed">0.00 hrs used</small>
+      </div>
+      <div class="benefit-card">
+        <span>Bereavement Leave</span>
+        <b id="bereavementUsed">0.00 hrs</b>
+        <small>used this calendar year</small>
+      </div>
+    </div>
+    <p class="muted small top-gap-sm">Family Medical Leave provides 50 paid hours (5 ten-hour days) each calendar year. Bereavement is paid at ADP and tracked separately without reducing PTO.</p>
+  </div>
+
+  <div class="card">
     <h2>Accrual Progress</h2>
     <div class="kv"><span>Current PTO tier</span><b id="ptoTier">Not set</b></div>
     <div class="kv"><span>Worked hours for 1 PTO day</span><b id="ptoHoursPerDay">—</b></div>
@@ -851,6 +892,11 @@ header{
   </div>
 
   <div class="card">
+    <h2>Paid Leave History</h2>
+    <div id="benefitsLedger" class="pto-ledger"></div>
+  </div>
+
+  <div class="card">
     <h2>PTO Ledger</h2>
     <div id="ptoLedger" class="pto-ledger"></div>
   </div>
@@ -888,7 +934,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v1.4.1</b></div>
+    <div class="kv"><span>Version</span><b>v1.4.2</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -908,7 +954,7 @@ header{
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.4.1</b></div>
+    <div class="kv"><span>App version</span><b>1.4.2</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -974,7 +1020,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.4.1',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.4.2',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1034,6 +1080,14 @@ const baseState={
   fiscalArchives:[],
   fiscalYearStart:'',
   lastProcessedEntryIds:[]
+ },
+ benefits:{
+  calendarYear:new Date().getFullYear(),
+  fmlAnnualHours:50,
+  fmlUsedHours:0,
+  bereavementUsedHours:0,
+  ledger:[],
+  calendarArchives:[]
  }
 };
 let state=loadPersistentState(baseState);
@@ -1062,6 +1116,15 @@ state.pto={
  fiscalArchives:Array.isArray(state.pto.fiscalArchives)?state.pto.fiscalArchives:[],
  fiscalYearStart:state.pto.fiscalYearStart||state.setup.fiscalYearStart||'',
  lastProcessedEntryIds:Array.isArray(state.pto.lastProcessedEntryIds)?state.pto.lastProcessedEntryIds:[]
+};
+state.benefits=state.benefits&&typeof state.benefits==='object'?state.benefits:{};
+state.benefits={
+ calendarYear:Number(state.benefits.calendarYear||new Date().getFullYear()),
+ fmlAnnualHours:Number(state.benefits.fmlAnnualHours||50),
+ fmlUsedHours:Number(state.benefits.fmlUsedHours||0),
+ bereavementUsedHours:Number(state.benefits.bereavementUsedHours||0),
+ ledger:Array.isArray(state.benefits.ledger)?state.benefits.ledger:[],
+ calendarArchives:Array.isArray(state.benefits.calendarArchives)?state.benefits.calendarArchives:[]
 };
 
 
@@ -1238,8 +1301,8 @@ function saveDay(){
  const entry={date,beginMileage:bm,endMileage:em,startTime:st,endTime:et,miles,mileagePay:mp,locations:JSON.parse(JSON.stringify(state.locations)),activityPay:ap,ptoType:$('ptoType').value,ptoHours:num($('ptoHours').value),ptoPay:pp,total:mp+ap+pp};
  const isNewEntry=state.editingEntryIndex===null;
  if(isNewEntry){
+  if(!applyPaidLeaveUsage(entry.ptoType,entry.ptoHours,entry.date))return;
   processPtoAccrual(entry);
-  applyPtoUsage(entry.ptoType,entry.ptoHours,entry.date);
   state.entries.push(entry);
  }else state.entries[state.editingEntryIndex]=entry;
  state.active=null;state.locations=[];state.activeLocationIndex=null;state.editingEntryIndex=null;save();showPage('history');
@@ -1306,6 +1369,10 @@ function importBackup(){
    carryoverHours:0,workedHoursProgress:0,earnedDaysThisFiscalYear:0,
    safetyQuarters:{},ledger:[],fiscalArchives:[],fiscalYearStart:'',lastProcessedEntryIds:[]
   };
+  restored.benefits=restored.benefits&&typeof restored.benefits==='object'?restored.benefits:{
+   calendarYear:new Date().getFullYear(),fmlAnnualHours:50,fmlUsedHours:0,
+   bereavementUsedHours:0,ledger:[],calendarArchives:[]
+  };
   if(restored.payPeriodStart&&restored.payPeriodEnd){
    const id=payPeriodId(restored.payPeriodStart,restored.payPeriodEnd);
    if(!restored.payPeriods.some(period=>period.id===id)){
@@ -1328,7 +1395,7 @@ function renderSavedLocations(){
 function renderHistory(){
  const q=($('historySearch').value||'').toLowerCase();
  const rows=state.entries.map((e,i)=>({e,i})).filter(({e})=>[e.date,...(e.locations||[]).flatMap(l=>[l.type,l.number,l.name])].join(' ').toLowerCase().includes(q));
- $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div><div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
+ $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div>${e.ptoType&&e.ptoType!=='none'?`<div class="kv"><span>${e.ptoType}</span><b>${num(e.ptoHours).toFixed(2)} hrs • ${money(e.ptoPay)}</b></div>`:''}<div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
 }
 
 
@@ -1390,12 +1457,68 @@ function addPtoLedger(type,hours,note,date){
   type,hours:num(hours),note:note||'',balanceAfter:state.pto.balance
  });
 }
-function applyPtoUsage(type,hours,date){
+function ensureBenefitsCalendarYear(referenceDate){
+ const date=referenceDate?dateFromISO(referenceDate):new Date();
+ const year=date?date.getFullYear():new Date().getFullYear();
+ if(year===state.benefits.calendarYear)return;
+ state.benefits.calendarArchives.push({
+  year:state.benefits.calendarYear,
+  fmlUsedHours:state.benefits.fmlUsedHours,
+  bereavementUsedHours:state.benefits.bereavementUsedHours
+ });
+ state.benefits.calendarYear=year;
+ state.benefits.fmlUsedHours=0;
+ state.benefits.bereavementUsedHours=0;
+}
+function addBenefitLedger(type,hours,note,date){
+ state.benefits.ledger.push({
+  id:Date.now().toString()+Math.random().toString(16).slice(2),
+  date:date||new Date().toISOString().slice(0,10),
+  type,hours:num(hours),note:note||''
+ });
+}
+function applyPaidLeaveUsage(type,hours,date){
  const used=Math.max(0,num(hours));
- if(!used||type==='none')return;
- state.pto.balance=Math.max(0,state.pto.balance-used);
- state.pto.usedThisFiscalYear+=used;
- addPtoLedger('PTO Used',-used,`${type} PTO`,date);
+ if(!used||type==='none')return true;
+ ensureBenefitsCalendarYear(date);
+
+ if(['Vacation','Sick','Safety'].includes(type)){
+  if(used>state.pto.balance&&!confirm(`Only ${state.pto.balance.toFixed(2)} PTO hours are available. Record ${used.toFixed(2)} hours anyway?`))return false;
+  state.pto.balance=Math.max(0,state.pto.balance-used);
+  state.pto.usedThisFiscalYear+=used;
+  addPtoLedger('PTO Used',-used,`${type} leave`,date);
+  addBenefitLedger(type,-used,'Deducted from PTO balance',date);
+  return true;
+ }
+
+ if(type==='Bereavement'){
+  state.benefits.bereavementUsedHours+=used;
+  addBenefitLedger('Bereavement',used,'Paid at ADP; PTO balance unchanged',date);
+  return true;
+ }
+
+ if(type==='Family Medical Leave'){
+  const remaining=Math.max(0,state.benefits.fmlAnnualHours-state.benefits.fmlUsedHours);
+  if(used>remaining&&!confirm(`Only ${remaining.toFixed(2)} Family Medical Leave hours remain for ${state.benefits.calendarYear}. Record ${used.toFixed(2)} hours anyway?`))return false;
+  state.benefits.fmlUsedHours+=used;
+  addBenefitLedger('Family Medical Leave',used,'Paid at ADP; PTO balance unchanged',date);
+  return true;
+ }
+ return true;
+}
+function updatePaidLeaveHelp(){
+ const type=$('ptoType')?.value||'none';
+ const help=$('paidLeaveHelp');
+ if(!help)return;
+ const messages={
+  none:'No paid leave selected.',
+  Vacation:'Vacation reduces the available PTO balance and pays at ADP.',
+  Sick:'Sick leave reduces the available PTO balance and pays at ADP.',
+  Safety:'Safety leave reduces the available PTO balance and pays at ADP.',
+  Bereavement:'Bereavement pays at ADP and does not reduce PTO.',
+  'Family Medical Leave':`Family Medical Leave pays at ADP and uses the separate 50-hour calendar-year allowance.`
+ };
+ help.textContent=messages[type]||'Paid leave is calculated at ADP.';
 }
 function processPtoAccrual(entry){
  if(!entry||state.editingEntryIndex!==null)return;
@@ -1501,6 +1624,18 @@ function renderPto(){
   button.classList.toggle('earned',!!earned);
   button.querySelector('span').textContent=earned?'Earned':'Not earned';
  });
+ ensureBenefitsCalendarYear();
+ const fmlRemaining=Math.max(0,state.benefits.fmlAnnualHours-state.benefits.fmlUsedHours);
+ if($('benefitCalendarYear'))$('benefitCalendarYear').textContent=String(state.benefits.calendarYear);
+ if($('fmlRemaining'))$('fmlRemaining').textContent=`${fmlRemaining.toFixed(2)} hrs remaining`;
+ if($('fmlUsed'))$('fmlUsed').textContent=`${state.benefits.fmlUsedHours.toFixed(2)} hrs used`;
+ if($('bereavementUsed'))$('bereavementUsed').textContent=`${state.benefits.bereavementUsedHours.toFixed(2)} hrs`;
+ const benefitLedger=[...state.benefits.ledger].reverse();
+ if($('benefitsLedger'))$('benefitsLedger').innerHTML=benefitLedger.length?benefitLedger.map(item=>`<div class="pto-ledger-row">
+  <div><b>${item.type}</b><span>${displayReportDate(item.date)}${item.note?` • ${item.note}`:''}</span></div>
+  <b>${num(item.hours).toFixed(2)} hrs</b>
+ </div>`).join(''):'<div class="muted small">No paid leave transactions yet.</div>';
+ updatePaidLeaveHelp();
  const ledger=[...state.pto.ledger].reverse();
  $('ptoLedger').innerHTML=ledger.length?ledger.map(item=>`<div class="pto-ledger-row">
   <div><b>${item.type}</b><span>${displayReportDate(item.date)}${item.note?` • ${item.note}`:''}</span></div>

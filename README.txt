@@ -1,11 +1,23 @@
-Spark Transportation v1.4.1 — Blank Screen Fix
+Spark Transportation v1.4.2 — Paid Leave Benefits
 
-Fixed:
-- Corrected a PTO initialization error that stopped all JavaScript.
-- Bottom navigation pages now open normally.
-- Added protection against a missing page element causing a blank screen.
-- Existing payroll, PTO, activity, location, and history data remain unchanged.
-- Permanent storage key remains sparkTransportationData.
+Added paid-leave types:
+- Vacation: paid at ADP and deducted from PTO
+- Sick: paid at ADP and deducted from PTO
+- Safety: paid at ADP and deducted from PTO
+- Bereavement: paid at ADP, tracked separately, no PTO deduction
+- Family Medical Leave: paid at ADP, tracked separately, no PTO deduction
 
-Upload all individual files to the root of the existing GitHub repository.
-After GitHub Pages updates, fully close and reopen the installed app.
+Family Medical Leave:
+- 5 ten-hour days / 50 hours per calendar year
+- Remaining balance shown on the PTO/Benefits page
+- Automatically resets when a new calendar year begins
+- Prior calendar-year totals are archived in app data
+
+Also added:
+- One-day and half-day quick-fill buttons
+- Paid Leave History ledger
+- Balance warnings before recording more than available
+- Paid leave details in History
+- Complete benefit data in backup and restore
+
+Permanent storage key remains sparkTransportationData.
