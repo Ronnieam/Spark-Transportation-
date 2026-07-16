@@ -1,21 +1,27 @@
-Spark Transportation v1.3.6 — Payroll Archive and Backup
+Spark Transportation v1.4.0 — PTO Manager
 
-Payroll improvements:
-- Current pay period is saved as part of the main permanent app data.
-- Previous pay periods are kept in a permanent payroll archive.
-- Backups now include the payroll archive, selected dates, and current period.
-- Restoring a backup restores payroll history.
-- When a 14-day period ends, the app archives it and advances to the next period.
-- Previous payroll periods appear on the Reports page as date ranges.
-- Tap a date range to expand Week 1, Week 2, activity counts, and pay totals.
+Added:
+- Hire date and fiscal-year start in Driver Setup
+- Automatic PTO tier selection for the fiscal year
+- Worked-hour accrual from Start Day to End Day
+- 10 PTO hours awarded for each completed PTO day
+- Annual earning caps by service tier
+- Manual quarterly Safety Days (10 hours each)
+- PTO usage deducted from the available balance
+- Manual PTO balance adjustments
+- Fiscal-year rollover with a 100-hour maximum carryover
+- Forfeited-hour calculation above the carryover limit
+- PTO transaction ledger
+- Archived fiscal-year summaries
+- Full PTO backup and restore support
 
-About section:
-- Version v1.3.6
-- Developer
-- Completed workdays
-- Saved locations
-- Saved pay periods
-- Current payroll dates
+PTO tiers:
+0–1: 125 hours / 21 days
+2: 112 hours / 23 days
+3–5: 100 hours / 26 days
+6–9: 83 hours / 31 days
+10–14: 77 hours / 34 days
+15–19: 72 hours / 36 days
+20+: 63 hours / 41 days
 
-Existing work history remains the source of payroll calculations.
-Permanent storage key: sparkTransportationData
+Permanent storage key remains sparkTransportationData.
