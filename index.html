@@ -126,7 +126,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.4.2 visual refresh */
+/* v1.4.3 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -225,7 +225,7 @@ padding:8px
 }
 
 
-/* v1.4.2 biweekly reports */
+/* v1.4.3 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -253,7 +253,7 @@ padding:8px
 }
 
 
-/* v1.4.2 currency-formatted pay rates */
+/* v1.4.3 currency-formatted pay rates */
 .currency-input{
   display:flex;
   align-items:center;
@@ -283,7 +283,7 @@ padding:8px
 }
 
 
-/* v1.4.2 official branding */
+/* v1.4.3 official branding */
 .brand img,
 .logo img,
 .app-logo,
@@ -304,7 +304,7 @@ header{
 }
 
 
-/* v1.4.2 Home header redesign */
+/* v1.4.3 Home header redesign */
 .hero-header{
   display:block!important;
   padding:12px 16px 14px!important;
@@ -364,7 +364,7 @@ header{
 }
 
 
-/* v1.4.2 currency-value visibility fix */
+/* v1.4.3 currency-value visibility fix */
 .currency-input{
   min-height:56px!important;
 }
@@ -387,7 +387,7 @@ header{
 }
 
 
-/* v1.4.2 payroll archive */
+/* v1.4.3 payroll archive */
 .pay-period-archive{display:grid;gap:10px;margin-top:12px}
 .pay-period-item{border:1px solid #35506a;border-radius:16px;overflow:hidden;background:#0b1927}
 .pay-period-date-button{
@@ -404,7 +404,7 @@ header{
 .archived-week h3{margin:0 0 4px}
 
 
-/* v1.4.2 PTO Manager */
+/* v1.4.3 PTO Manager */
 .nav{grid-template-columns:repeat(8,1fr)!important}
 .nav button[data-page="pto"]::before{content:"🏖️"}
 .pto-hero{background:linear-gradient(135deg,#17365a,#0d2744)!important;border-color:#c99718!important}
@@ -432,7 +432,7 @@ header{
 }
 
 
-/* v1.4.2 paid leave benefits */
+/* v1.4.3 paid leave benefits */
 .leave-quick-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
 .leave-quick-buttons button{min-height:54px;padding:8px}
 .leave-quick-buttons small{font-size:11px;font-weight:500}
@@ -442,6 +442,25 @@ header{
 .benefit-card b{display:block;color:#f4bd28;font-size:20px;margin:6px 0}
 .benefit-card small{color:#aebdca}
 @media(max-width:390px){.benefit-grid{grid-template-columns:1fr}}
+
+
+/* v1.4.3 location import and compact saved locations */
+.mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mapping-grid label{margin-top:0}
+.import-preview{display:grid;gap:8px;margin:10px 0 14px}
+.import-preview-row{background:#10243a;border:1px solid #35506a;border-radius:12px;padding:10px}
+.import-preview-row b,.import-preview-row span{display:block}
+.import-preview-row span{color:#aebdca;font-size:12px;margin-top:3px}
+.saved-location-compact{border:1px solid #35506a;border-radius:14px;background:#0b1927;margin-top:9px;overflow:hidden}
+.saved-location-summary{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ min-height:50px!important;padding:11px 13px!important;background:#10243a!important;color:#fff!important;
+ border-radius:0!important;text-align:left!important
+}
+.saved-location-chevron{color:#f4bd28}
+.saved-location-details{padding:12px}
+.saved-location-notes{background:#07111f;border:1px solid #35506a;border-radius:11px;padding:10px;margin-top:8px;font-size:13px}
+@media(max-width:390px){.mapping-grid{grid-template-columns:1fr}}
 
 </style>
 <title>Spark Transportation</title>
@@ -713,8 +732,58 @@ header{
   </div>
 
   <div class="card">
+    <div class="collapse-header" onclick="toggleLocationImportForm()">
+      <h2>Import Locations</h2>
+      <button type="button" id="locationImportToggle" class="collapse-toggle">Show</button>
+    </div>
+    <div id="locationImportForm" class="collapse-content hidden">
+      <p class="muted small">Import Store, DC, or Vendor information from CSV or Excel. CSV works offline. Excel files require the spreadsheet reader to load.</p>
+      <label>Select spreadsheet</label>
+      <input id="locationImportFile" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+      <button type="button" class="secondary" onclick="readLocationImportFile()">Read Spreadsheet</button>
+
+      <div id="locationImportMapping" class="hidden top-gap">
+        <h3>Match Spreadsheet Columns</h3>
+        <div class="mapping-grid">
+          <div><label>Type</label><select id="mapType"></select></div>
+          <div><label>Number</label><select id="mapNumber"></select></div>
+          <div><label>Name</label><select id="mapName"></select></div>
+          <div><label>Address</label><select id="mapAddress"></select></div>
+          <div><label>City</label><select id="mapCity"></select></div>
+          <div><label>State</label><select id="mapState"></select></div>
+          <div><label>Phone</label><select id="mapPhone"></select></div>
+          <div><label>Extension</label><select id="mapExtension"></select></div>
+          <div><label>Contact</label><select id="mapContact"></select></div>
+          <div><label>Receiving hours</label><select id="mapHours"></select></div>
+          <div><label>Gate code</label><select id="mapGateCode"></select></div>
+          <div><label>Appointment</label><select id="mapAppointment"></select></div>
+          <div><label>Notes</label><select id="mapNotes"></select></div>
+        </div>
+
+        <label>Duplicate handling</label>
+        <select id="locationDuplicateMode">
+          <option value="skip">Skip existing Type + Number</option>
+          <option value="merge">Merge missing details into existing locations</option>
+          <option value="replace">Replace existing locations</option>
+        </select>
+
+        <div class="kv"><span>Rows found</span><b id="locationImportRowCount">0</b></div>
+        <div class="kv"><span>Valid preview rows</span><b id="locationImportValidCount">0</b></div>
+
+        <h3>Preview</h3>
+        <div id="locationImportPreview" class="import-preview"></div>
+
+        <button type="button" class="primary" onclick="importMappedLocations()">Import Locations</button>
+        <button type="button" class="ghost top-gap-sm" onclick="downloadLocationImportTemplate()">Download CSV Template</button>
+      </div>
+      <div id="locationImportMessage" class="muted small top-gap-sm"></div>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>Saved Locations</h2>
-    <input id="locationSearch" placeholder="Search saved locations" oninput="renderSavedLocations()">
+    <input id="locationSearch" placeholder="Search by type, number, city, state, name, phone, or contact" oninput="renderSavedLocations()">
+    <div class="muted small top-gap-sm">Tap a location to expand its details.</div>
     <div id="savedLocationList" class="muted top-gap-sm">No saved locations.</div>
   </div>
 </section>
@@ -934,7 +1003,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v1.4.2</b></div>
+    <div class="kv"><span>Version</span><b>v1.4.3</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -954,7 +1023,7 @@ header{
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.4.2</b></div>
+    <div class="kv"><span>App version</span><b>1.4.3</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -971,6 +1040,7 @@ header{
 <button data-page="data" onclick="showPage('data')">Data</button>
 </nav>
 
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 const STORAGE_KEY='sparkTransportationData';
 const MIGRATION_FLAG='sparkTransportationMigratedFrom';
@@ -1020,7 +1090,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.4.2',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.4.3',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1061,6 +1131,7 @@ const baseState={
  activeLocationIndex:null,
  entries:[],
  savedLocations:[],
+ expandedSavedLocationId:null,
  editingEntryIndex:null,
  quickActivityOrder:[...DEFAULT_QUICK_ACTIVITY_ORDER],
  payPeriodStart:'',
@@ -1094,6 +1165,7 @@ let state=loadPersistentState(baseState);
 state.setup={...defaults,...(state.setup||{})};
 state.entries=Array.isArray(state.entries)?state.entries:[];
 state.savedLocations=Array.isArray(state.savedLocations)?state.savedLocations:[];
+state.expandedSavedLocationId=state.expandedSavedLocationId||null;
 state.locations=Array.isArray(state.locations)?state.locations:[];
 state.quickActivityOrder=Array.isArray(state.quickActivityOrder)?state.quickActivityOrder:[];
 state.quickActivityOrder=[
@@ -1386,10 +1458,275 @@ function importBackup(){
  },()=>alert('Invalid backup file.'));
 }
 
+
+let pendingLocationImportRows=[];
+let pendingLocationImportHeaders=[];
+
+function toggleLocationImportForm(){
+ const form=$('locationImportForm');
+ const button=$('locationImportToggle');
+ const open=form.classList.contains('hidden');
+ form.classList.toggle('hidden',!open);
+ button.textContent=open?'Hide':'Show';
+}
+
+function parseCsvText(text){
+ const rows=[];
+ let row=[],cell='',quoted=false;
+ for(let i=0;i<text.length;i++){
+  const char=text[i],next=text[i+1];
+  if(char==='"'){
+   if(quoted&&next==='"'){cell+='"';i++;}
+   else quoted=!quoted;
+  }else if(char===','&&!quoted){
+   row.push(cell);cell='';
+  }else if((char==='\n'||char==='\r')&&!quoted){
+   if(char==='\r'&&next==='\n')i++;
+   row.push(cell);cell='';
+   if(row.some(value=>String(value).trim()!==''))rows.push(row);
+   row=[];
+  }else cell+=char;
+ }
+ row.push(cell);
+ if(row.some(value=>String(value).trim()!==''))rows.push(row);
+ return rows;
+}
+
+function rowsToObjects(rows){
+ if(!rows.length)return {headers:[],data:[]};
+ const headers=rows[0].map((header,index)=>String(header||`Column ${index+1}`).trim());
+ const data=rows.slice(1).map(row=>{
+  const object={};
+  headers.forEach((header,index)=>object[header]=row[index]??'');
+  return object;
+ });
+ return {headers,data};
+}
+
+async function readLocationImportFile(){
+ const input=$('locationImportFile');
+ const file=input.files&&input.files[0];
+ if(!file){alert('Choose a CSV or Excel file first.');return;}
+ $('locationImportMessage').textContent='Reading spreadsheet…';
+
+ try{
+  let parsed;
+  const lower=file.name.toLowerCase();
+  if(lower.endsWith('.csv')){
+   const text=await file.text();
+   parsed=rowsToObjects(parseCsvText(text));
+  }else{
+   if(!window.XLSX){
+    throw new Error('Excel reader unavailable. Save the spreadsheet as CSV and import the CSV file.');
+   }
+   const buffer=await file.arrayBuffer();
+   const workbook=XLSX.read(buffer,{type:'array'});
+   const sheet=workbook.Sheets[workbook.SheetNames[0]];
+   const data=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});
+   const headers=data.length?Object.keys(data[0]):[];
+   parsed={headers,data};
+  }
+
+  pendingLocationImportHeaders=parsed.headers;
+  pendingLocationImportRows=parsed.data;
+  if(!pendingLocationImportHeaders.length||!pendingLocationImportRows.length){
+   throw new Error('No usable rows were found in that spreadsheet.');
+  }
+  populateLocationMappingSelectors();
+  $('locationImportMapping').classList.remove('hidden');
+  $('locationImportRowCount').textContent=pendingLocationImportRows.length;
+  updateLocationImportPreview();
+  $('locationImportMessage').textContent='Spreadsheet loaded. Confirm the column matches below.';
+ }catch(error){
+  console.error(error);
+  $('locationImportMessage').textContent=error.message||'The spreadsheet could not be read.';
+ }
+}
+
+const LOCATION_MAP_FIELDS=[
+ ['mapType',['type','location type','facility type']],
+ ['mapNumber',['number','store #','store number','dc #','dc number','location number','facility number']],
+ ['mapName',['name','store name','facility name','location name']],
+ ['mapAddress',['address','street','street address']],
+ ['mapCity',['city']],
+ ['mapState',['state','st']],
+ ['mapPhone',['phone','phone number','telephone']],
+ ['mapExtension',['extension','ext']],
+ ['mapContact',['contact','contact person','receiving contact']],
+ ['mapHours',['receiving hours','hours','delivery hours']],
+ ['mapGateCode',['gate code','gate']],
+ ['mapAppointment',['appointment','appointment number','appt']],
+ ['mapNotes',['notes','directions','comments']]
+];
+
+function bestHeaderMatch(candidates){
+ const normalized=pendingLocationImportHeaders.map(header=>({header,normalized:String(header).trim().toLowerCase()}));
+ for(const candidate of candidates){
+  const exact=normalized.find(item=>item.normalized===candidate);
+  if(exact)return exact.header;
+ }
+ for(const candidate of candidates){
+  const partial=normalized.find(item=>item.normalized.includes(candidate));
+  if(partial)return partial.header;
+ }
+ return '';
+}
+
+function populateLocationMappingSelectors(){
+ LOCATION_MAP_FIELDS.forEach(([id,candidates])=>{
+  const select=$(id);
+  const selected=bestHeaderMatch(candidates);
+  select.innerHTML='<option value="">Not included</option>'+pendingLocationImportHeaders.map(header=>
+   `<option value="${escapeHtml(header)}"${header===selected?' selected':''}>${escapeHtml(header)}</option>`
+  ).join('');
+  select.onchange=updateLocationImportPreview;
+ });
+ if(!$('mapNumber').value&&pendingLocationImportHeaders.length)$('mapNumber').value=pendingLocationImportHeaders[0];
+}
+
+function escapeHtml(value){
+ return String(value??'').replace(/[&<>"']/g,char=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+ })[char]);
+}
+
+function mappedValue(row,selectId){
+ const header=$(selectId).value;
+ return header?String(row[header]??'').trim():'';
+}
+
+function normalizeLocationType(value){
+ const raw=String(value||'').trim().toLowerCase();
+ if(raw.includes('distribution')||raw==='dc'||raw.startsWith('dc '))return 'DC';
+ if(raw.includes('vendor'))return 'Vendor';
+ if(raw.includes('store')||raw==='wm'||raw==='walmart')return 'Store';
+ return value?String(value).trim():'Store';
+}
+
+function mappedLocation(row,index){
+ const number=mappedValue(row,'mapNumber');
+ return {
+  id:`import-${Date.now()}-${index}-${Math.random().toString(16).slice(2)}`,
+  type:normalizeLocationType(mappedValue(row,'mapType')),
+  number,
+  name:mappedValue(row,'mapName'),
+  address:mappedValue(row,'mapAddress'),
+  city:mappedValue(row,'mapCity'),
+  state:mappedValue(row,'mapState').toUpperCase(),
+  phone:formatPhone(mappedValue(row,'mapPhone')),
+  extension:mappedValue(row,'mapExtension'),
+  contact:mappedValue(row,'mapContact'),
+  hours:mappedValue(row,'mapHours'),
+  gateCode:mappedValue(row,'mapGateCode'),
+  appointment:mappedValue(row,'mapAppointment'),
+  notes:mappedValue(row,'mapNotes')
+ };
+}
+
+function mappedLocations(){
+ return pendingLocationImportRows.map(mappedLocation).filter(location=>location.number);
+}
+
+function updateLocationImportPreview(){
+ const locations=mappedLocations();
+ $('locationImportValidCount').textContent=locations.length;
+ const preview=locations.slice(0,5);
+ $('locationImportPreview').innerHTML=preview.length?preview.map(location=>`
+  <div class="import-preview-row">
+   <b>${escapeHtml(location.type)} #${escapeHtml(location.number)}</b>
+   <span>${escapeHtml([location.name,location.city,location.state].filter(Boolean).join(' • ')||'No additional details')}</span>
+  </div>`).join(''):'<div class="muted small">Map a location-number column to create the preview.</div>';
+}
+
+function mergeLocationDetails(existing,incoming){
+ const merged={...existing};
+ ['name','address','city','state','phone','extension','contact','hours','gateCode','appointment','notes'].forEach(key=>{
+  if(!merged[key]&&incoming[key])merged[key]=incoming[key];
+ });
+ return merged;
+}
+
+function importMappedLocations(){
+ const locations=mappedLocations();
+ if(!locations.length){alert('No valid locations are ready to import. The Number column is required.');return;}
+ const mode=$('locationDuplicateMode').value;
+ let added=0,updated=0,skipped=0;
+
+ locations.forEach(location=>{
+  const index=state.savedLocations.findIndex(existing=>
+   String(existing.type).toLowerCase()===String(location.type).toLowerCase()&&
+   String(existing.number).trim()===String(location.number).trim()
+  );
+  if(index===-1){
+   state.savedLocations.push(location);added++;return;
+  }
+  if(mode==='skip'){skipped++;return;}
+  if(mode==='replace'){
+   location.id=state.savedLocations[index].id||location.id;
+   state.savedLocations[index]=location;
+   updated++;return;
+  }
+  state.savedLocations[index]=mergeLocationDetails(state.savedLocations[index],location);
+  updated++;
+ });
+
+ savePersistentState(state);
+ renderSavedLocations();
+ $('locationImportMessage').textContent=`Import complete: ${added} added, ${updated} updated, ${skipped} skipped.`;
+ alert(`Locations imported.\n\nAdded: ${added}\nUpdated: ${updated}\nSkipped: ${skipped}`);
+}
+
+function downloadLocationImportTemplate(){
+ const headers=['Type','Number','Name','Address','City','State','Phone','Extension','Contact','Receiving Hours','Gate Code','Appointment','Notes'];
+ const example=['Store','1234','Example Store','100 Main St','Phoenix','AZ','602-818-4551','','Receiving','05:00-14:00','','','Use receiving entrance'];
+ const csv=[headers,example].map(row=>row.map(value=>`"${String(value).replace(/"/g,'""')}"`).join(',')).join('\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+ const link=document.createElement('a');
+ link.href=URL.createObjectURL(blob);
+ link.download='spark-location-import-template.csv';
+ link.click();
+ setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+}
+
+function toggleSavedLocationDetails(id){
+ state.expandedSavedLocationId=state.expandedSavedLocationId===id?null:id;
+ savePersistentState(state);
+ renderSavedLocations();
+}
+
 function renderSavedLocations(){
  const q=($('locationSearch').value||'').toLowerCase();
- const rows=state.savedLocations.map((l,i)=>({l,i})).filter(({l})=>[l.type,l.number,l.name,l.city,l.state,l.phone].join(' ').toLowerCase().includes(q));
- $('savedLocationList').innerHTML=rows.length?rows.map(({l,i})=>`<div class="entry"><b>${l.type} #${l.number}</b><div>${l.name||''}</div><div class="muted small">${[l.address,l.city,l.state].filter(Boolean).join(', ')}</div>${l.phone?`<div class="kv"><span>Phone</span><b>${l.phone}${l.extension?' ext. '+l.extension:''}</b></div>`:''}${l.contact?`<div class="kv"><span>Contact</span><b>${l.contact}</b></div>`:''}${l.hours?`<div class="kv"><span>Receiving hours</span><b>${l.hours}</b></div>`:''}${l.gateCode?`<div class="kv"><span>Gate code</span><b>${l.gateCode}</b></div>`:''}${l.appointment?`<div class="kv"><span>Appointment</span><b>${l.appointment}</b></div>`:''}${l.notes?`<div class="small top-gap-sm">${l.notes}</div>`:''}<div class="actions">${l.phone?`<button class="green" onclick="callLocation('${l.phone.replace(/'/g,"\\'")}','${(l.extension||'').replace(/'/g,"\\'")}')">Call</button>`:'<button class="secondary" disabled>No Phone</button>'}<button class="primary" onclick='mapLocation(${JSON.stringify(l)})'>Directions</button></div><div class="actions"><button class="secondary" onclick="editSavedLocation(${i})">Edit</button><button class="danger" onclick="deleteSavedLocation(${i})">Delete</button></div></div>`).join(''):'No saved locations.';
+ const rows=state.savedLocations.map((location,index)=>({location,index})).filter(({location})=>
+  [location.type,location.number,location.name,location.city,location.state,location.phone,location.contact]
+   .join(' ').toLowerCase().includes(q)
+ );
+ $('savedLocationList').innerHTML=rows.length?rows.map(({location,index})=>{
+  const open=state.expandedSavedLocationId===location.id;
+  return `<div class="saved-location-compact">
+   <button type="button" class="saved-location-summary" onclick="toggleSavedLocationDetails('${location.id}')">
+    <span><b>${escapeHtml(location.type)} #${escapeHtml(location.number)}</b></span>
+    <span class="saved-location-chevron">${open?'▲':'▼'}</span>
+   </button>
+   <div class="saved-location-details ${open?'':'hidden'}">
+    ${location.name?`<div class="kv"><span>Name</span><b>${escapeHtml(location.name)}</b></div>`:''}
+    ${location.address||location.city||location.state?`<div class="kv"><span>Address</span><b>${escapeHtml([location.address,location.city,location.state].filter(Boolean).join(', '))}</b></div>`:''}
+    ${location.phone?`<div class="kv"><span>Phone</span><b>${escapeHtml(location.phone)}${location.extension?' ext. '+escapeHtml(location.extension):''}</b></div>`:''}
+    ${location.contact?`<div class="kv"><span>Contact</span><b>${escapeHtml(location.contact)}</b></div>`:''}
+    ${location.hours?`<div class="kv"><span>Receiving hours</span><b>${escapeHtml(location.hours)}</b></div>`:''}
+    ${location.gateCode?`<div class="kv"><span>Gate code</span><b>${escapeHtml(location.gateCode)}</b></div>`:''}
+    ${location.appointment?`<div class="kv"><span>Appointment</span><b>${escapeHtml(location.appointment)}</b></div>`:''}
+    ${location.notes?`<div class="saved-location-notes">${escapeHtml(location.notes)}</div>`:''}
+    <div class="actions">
+     ${location.phone?`<button class="green" onclick="callLocation('${String(location.phone).replace(/'/g,"\\'")}','${String(location.extension||'').replace(/'/g,"\\'")}')">Call</button>`:'<button class="secondary" disabled>No Phone</button>'}
+     <button class="primary" onclick='mapLocation(${JSON.stringify(location)})'>Directions</button>
+    </div>
+    <div class="actions">
+     <button class="secondary" onclick="editSavedLocation(${index})">Edit</button>
+     <button class="danger" onclick="deleteSavedLocation(${index})">Delete</button>
+    </div>
+   </div>
+  </div>`;
+ }).join(''):'<div class="muted small">No saved locations.</div>';
 }
 
 function renderHistory(){
