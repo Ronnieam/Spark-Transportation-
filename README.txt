@@ -1,9 +1,10 @@
-Spark Transportation v1.5.1 — Startup Freeze Fix
+Spark Transportation v1.5.2 — Home Activity Rates
 
-Fix:
-- Corrected a startup JavaScript error introduced in v1.5.0.
-- Live Load and Live Unload migration now runs only after the numeric helper is initialized.
-- Live Load remains a flat-rate activity at $12.75 by default.
-- Live Unload remains a flat-rate activity at $12.75 by default.
-- Manual Wait Time remains optional and separate.
-- Existing data remains stored under sparkTransportationData.
+Changes:
+- Every activity button on the Home screen displays its configured pay rate.
+- Every displayed rate includes a dollar sign and two decimal places.
+- Hourly activities include /hr.
+- Flat-rate activities show the per-activity amount.
+- Rates refresh after Driver Setup changes are saved.
+- Live Load and Live Unload remain $12.75 flat-rate activities by default.
+- Existing saved data remains under sparkTransportationData.
