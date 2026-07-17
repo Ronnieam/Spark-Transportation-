@@ -1,9 +1,11 @@
-Spark Transportation v1.4.5 — Today's Total Wait Time
+Spark Transportation v1.4.6 — Full Wait-Time Pay
 
-Added:
-- Today's Estimated Pay now shows Total Wait in decimal hours.
-- The total includes all wait time entered for the active day.
-- When no day is active, it shows wait time from the most recently completed day.
-- Total Wait includes the full recorded wait, including the unpaid first 0.75 hours.
-- Estimated pay continues to count only paid wait hours.
-- Existing history and permanent storage remain compatible.
+Correction:
+- Wait Time no longer subtracts the first 45 minutes.
+- The complete decimal amount entered is used as paid wait time.
+- Wait pay equals decimal wait hours multiplied by the configured wait-time rate.
+- Example: 1.25 hours entered = 1.25 paid hours.
+- Today's Estimated Pay and Total Wait update using the full entered amount.
+- Existing saved Wait Time records are recalculated under the corrected rule when loaded.
+- Other timed activities retain their existing rules.
+- Permanent storage key remains sparkTransportationData.
