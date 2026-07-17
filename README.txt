@@ -1,10 +1,9 @@
-Spark Transportation v1.5.3 — PTO Tier Setting
+Spark Transportation v1.5.4 — Hire-Date PTO Tier
 
 Changes:
-- Added a PTO Tier Setting to Driver & Pay Rates.
-- Automatic mode calculates the tier from hire date and fiscal-year dates.
-- Manual override options are available for every existing PTO tier.
-- The PTO Manager identifies the tier as Automatic or Manual.
-- Manual selection immediately controls PTO accrual hours and annual maximum.
-- Existing users default to Automatic, preserving the previous behavior.
-- Existing data remains stored under sparkTransportationData.
+- Automatic PTO tier now uses the hire date only.
+- Fiscal-year start is no longer required to determine the PTO tier.
+- The automatic calculation uses completed years of service as of today.
+- Manual PTO tier override remains available.
+- PTO Manager wording now clearly identifies automatic or manual selection.
+- Existing saved data remains stored under sparkTransportationData.
