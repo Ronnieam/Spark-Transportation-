@@ -46,7 +46,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'3.0.1',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'3.0.2',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -134,30 +134,66 @@ state.builtInLocationVersion=state.builtInLocationVersion||'';
 function loadBuiltInLocationDatabase(){
  try{
   if(!Array.isArray(state.savedLocations))state.savedLocations=[];
-  if(!Array.isArray(window.BUILT_IN_DC_LOCATIONS))return;
+  const builtIns=Array.isArray(window.BUILT_IN_DC_LOCATIONS)?window.BUILT_IN_DC_LOCATIONS:[];
+  if(!builtIns.length){
+   console.error('Built-in location database is unavailable.');
+   return;
+  }
+
   let changed=false;
-  window.BUILT_IN_DC_LOCATIONS.forEach(location=>{
+  const existingByKey=new Map(
+   state.savedLocations.map((location,index)=>[
+    `${String(location&&location.type||'').toLowerCase()}|${String(location&&location.number||'').trim()}`,
+    index
+   ])
+  );
+
+  builtIns.forEach(location=>{
    if(!location||!location.number)return;
-   const existingIndex=state.savedLocations.findIndex(existing=>
-    String(existing&&existing.type||'').toLowerCase()==='dc' &&
-    String(existing&&existing.number||'').trim()===String(location.number).trim()
-   );
-   if(existingIndex===-1){
-    state.savedLocations.push({...location});
+   const key=`dc|${String(location.number).trim()}`;
+   const existingIndex=existingByKey.get(key);
+
+   if(existingIndex===undefined){
+    state.savedLocations.push({...location,builtIn:true});
+    existingByKey.set(key,state.savedLocations.length-1);
     changed=true;
-   }else{
-    const existing=state.savedLocations[existingIndex]||{};
-    ['latitude','longitude','city','state','name','address','phone','notes'].forEach(key=>{
-     if(!existing[key]&&location[key])existing[key]=location[key];
-    });
-    existing.builtIn=true;
-    state.savedLocations[existingIndex]=existing;
+    return;
    }
+
+   const existing=state.savedLocations[existingIndex]||{};
+   ['latitude','longitude','city','state','name','address','phone','extension','contact','hours','gateCode','appointment','notes'].forEach(keyName=>{
+    if((existing[keyName]===undefined||existing[keyName]===null||existing[keyName]==='')&&location[keyName]){
+     existing[keyName]=location[keyName];
+     changed=true;
+    }
+   });
+
+   if(existing.builtIn!==true){
+    existing.builtIn=true;
+    changed=true;
+   }
+
+   if(!existing.id){
+    existing.id=location.id;
+    changed=true;
+   }
+
+   state.savedLocations[existingIndex]=existing;
   });
+
+  const actualBuiltInCount=state.savedLocations.filter(location=>
+   location&&location.builtIn===true&&String(location.type||'').toLowerCase()==='dc'
+  ).length;
+
+  if(actualBuiltInCount<Math.min(416,builtIns.length)){
+   console.warn(`Only ${actualBuiltInCount} built-in DCs are present after loading.`);
+  }
+
   if(state.builtInLocationVersion!==window.BUILT_IN_LOCATION_VERSION){
    state.builtInLocationVersion=window.BUILT_IN_LOCATION_VERSION;
    changed=true;
   }
+
   if(changed)savePersistentState(state);
  }catch(error){
   console.error('Location database load failed:',error);
@@ -525,13 +561,17 @@ function editSavedLocation(i){
  $('editingSavedLocationIndex').value=i;$('saveLocationButton').textContent='Update Location';$('cancelLocationEditButton').classList.remove('hidden');toggleSavedLocationForm(true);window.scrollTo({top:0,behavior:'smooth'});
 }
 function cancelLocationEdit(){clearSavedLocationForm();}
-function deleteSavedLocation(i){if(confirm('Delete this saved location?')){state.savedLocations.splice(i,1);save();}}
-function cleanPhone(p){return String(p||'').replace(/[^0-9+]/g,'');}
-function callLocation(phone,ext){const p=cleanPhone(phone);if(!p){alert('No phone number saved.');return;}window.location.href='tel:'+p+(ext?','+String(ext).replace(/[^0-9]/g,''):'');}
-function rememberRecentLocation(id){
- if(!id)return;
- state.recentLocationIds=[id,...state.recentLocationIds.filter(item=>item!==id)].slice(0,25);
+function deleteSavedLocation(i){
+ const location=state.savedLocations[i];
+ if(!location)return;
+ if(location.builtIn){
+  alert('Built-in Walmart locations cannot be deleted. You can remove them from Favorites instead.');
+  return;
+ }
+ if(!confirm('Delete this saved location?'))return;
+ state.savedLocations.splice(i,1);
  savePersistentState(state);
+ renderSavedLocations();
 }
 function mapLocation(l){
  rememberRecentLocation(l.id);
@@ -866,6 +906,12 @@ function renderSavedLocations(){
  if($('directoryTotalCount'))$('directoryTotalCount').textContent=total;
  if($('directoryDcCount'))$('directoryDcCount').textContent=dcCount;
  if($('directoryFavoriteCount'))$('directoryFavoriteCount').textContent=favoriteCount;
+ if($('directoryDatabaseStatus')){
+  const builtInCount=state.savedLocations.filter(location=>location&&location.builtIn===true&&location.type==='DC').length;
+  $('directoryDatabaseStatus').textContent=builtInCount
+   ?`${builtInCount} built-in DC locations available offline.`
+   :'Built-in DC directory is unavailable. Refresh after uploading database.js.';
+ }
 
  $('savedLocationList').innerHTML=rows.length?rows.map(({location,index})=>{
   const open=state.expandedSavedLocationId===location.id;
