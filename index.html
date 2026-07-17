@@ -134,7 +134,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.5.4 visual refresh */
+/* v2.0.0 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -233,7 +233,7 @@ padding:8px
 }
 
 
-/* v1.5.4 biweekly reports */
+/* v2.0.0 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -261,7 +261,7 @@ padding:8px
 }
 
 
-/* v1.5.4 currency-formatted pay rates */
+/* v2.0.0 currency-formatted pay rates */
 .currency-input{
   display:flex;
   align-items:center;
@@ -291,7 +291,7 @@ padding:8px
 }
 
 
-/* v1.5.4 official branding */
+/* v2.0.0 official branding */
 .brand img,
 .logo img,
 .app-logo,
@@ -312,7 +312,7 @@ header{
 }
 
 
-/* v1.5.4 Home header redesign */
+/* v2.0.0 Home header redesign */
 .hero-header{
   display:block!important;
   padding:12px 16px 14px!important;
@@ -372,7 +372,7 @@ header{
 }
 
 
-/* v1.5.4 currency-value visibility fix */
+/* v2.0.0 currency-value visibility fix */
 .currency-input{
   min-height:56px!important;
 }
@@ -395,7 +395,7 @@ header{
 }
 
 
-/* v1.5.4 payroll archive */
+/* v2.0.0 payroll archive */
 .pay-period-archive{display:grid;gap:10px;margin-top:12px}
 .pay-period-item{border:1px solid #35506a;border-radius:16px;overflow:hidden;background:#0b1927}
 .pay-period-date-button{
@@ -412,7 +412,7 @@ header{
 .archived-week h3{margin:0 0 4px}
 
 
-/* v1.5.4 PTO Manager */
+/* v2.0.0 PTO Manager */
 .nav{grid-template-columns:repeat(8,1fr)!important}
 .nav button[data-page="pto"]::before{content:"🏖️"}
 .pto-hero{background:linear-gradient(135deg,#17365a,#0d2744)!important;border-color:#c99718!important}
@@ -440,7 +440,7 @@ header{
 }
 
 
-/* v1.5.4 paid leave benefits */
+/* v2.0.0 paid leave benefits */
 .leave-quick-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
 .leave-quick-buttons button{min-height:54px;padding:8px}
 .leave-quick-buttons small{font-size:11px;font-weight:500}
@@ -452,7 +452,7 @@ header{
 @media(max-width:390px){.benefit-grid{grid-template-columns:1fr}}
 
 
-/* v1.5.4 location import and compact saved locations */
+/* v2.0.0 location import and compact saved locations */
 .mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .mapping-grid label{margin-top:0}
 .import-preview{display:grid;gap:8px;margin:10px 0 14px}
@@ -471,7 +471,7 @@ header{
 @media(max-width:390px){.mapping-grid{grid-template-columns:1fr}}
 
 
-/* v1.5.4 embedded wait time */
+/* v2.0.0 embedded wait time */
 .wait-time-toggle{
   margin-top:12px;
   background:#17365a!important;
@@ -959,6 +959,8 @@ header{
   <div class="card">
     <h2>Accrual Progress</h2>
     <div class="kv"><span>Current PTO tier</span><b id="ptoTier">Not set</b></div>
+    <div class="kv"><span>Hire date used</span><b id="ptoHireDateUsed">Not set</b></div>
+    <div class="kv"><span>Completed years of service</span><b id="ptoYearsService">—</b></div>
     <div class="kv"><span>Worked hours for 1 PTO day</span><b id="ptoHoursPerDay">—</b></div>
     <div class="kv"><span>Maximum PTO days this fiscal year</span><b id="ptoMaxDays">—</b></div>
     <div class="kv"><span>Worked hours toward next PTO day</span><b id="ptoProgressText">0 / 0</b></div>
@@ -1031,7 +1033,7 @@ header{
       <option value="5">15–19 years — 72 worked hrs per PTO day</option>
       <option value="6">20+ years — 63 worked hrs per PTO day</option>
     </select>
-    <div class="muted small">Automatic uses your hire date only. Choose a tier manually only when your official PTO information differs.</div>
+    <div class="muted small">Automatic calculates your tier from your saved hire date and today's date. Choose a tier manually only when your official PTO information differs.</div>
     <label>Current fiscal-year start</label><input id="fiscalYearStart" type="date">
     <div class="muted small">The app suggests the first Saturday of February, but you can enter the official reset date.</div>
     <label>Regular mileage rate</label><input id="mileageRate" type="number" step="0.001">
@@ -1053,7 +1055,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v1.5.4</b></div>
+    <div class="kv"><span>Version</span><b>v2.0.0</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -1073,7 +1075,7 @@ header{
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.5.4</b></div>
+    <div class="kv"><span>App version</span><b>2.0.0</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -1140,7 +1142,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.5.4',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'2.0.0',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1213,6 +1215,9 @@ const baseState={
 };
 let state=loadPersistentState(baseState);
 state.setup={...defaults,...(state.setup||{})};
+if(!state.setup.hireDate&&state.hireDate)state.setup.hireDate=state.hireDate;
+if(!String(state.setup.ptoTierOverride||'').trim())state.setup.ptoTierOverride='auto';
+
 state.entries=Array.isArray(state.entries)?state.entries:[];
 state.savedLocations=Array.isArray(state.savedLocations)?state.savedLocations:[];
 state.expandedSavedLocationId=state.expandedSavedLocationId||null;
@@ -1581,8 +1586,12 @@ function saveSetup(){
   else state.setup[k]=num($(k).value);
  });
  displayCurrencyFields();
+ if(!String(state.setup.ptoTierOverride||'').trim())state.setup.ptoTierOverride='auto';
  state.pto.fiscalYearStart=state.setup.fiscalYearStart||state.pto.fiscalYearStart;
- save();showPage('home');
+ savePersistentState(state);
+ render();
+ renderPto();
+ showPage('home');
 }
 function exportBackup(){
  ensureCurrentPayPeriod();
@@ -1927,25 +1936,42 @@ function completedYearsAt(hireDate,targetDate){
  if(t<anniversary)years--;
  return Math.max(0,years);
 }
+function normalizedHireDate(){
+ const candidates=[
+  state.setup&&state.setup.hireDate,
+  state.hireDate,
+  document.getElementById('hireDate')?document.getElementById('hireDate').value:''
+ ];
+ for(const value of candidates){
+  const text=String(value||'').trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(text))return text;
+ }
+ return '';
+}
 function ptoServiceYearsFromHireDate(){
- if(!state.setup.hireDate)return null;
- const hire=new Date(`${state.setup.hireDate}T00:00:00`);
+ const hireText=normalizedHireDate();
+ if(!hireText)return null;
+ const parts=hireText.split('-').map(Number);
+ const hire=new Date(parts[0],parts[1]-1,parts[2],12,0,0);
  const today=new Date();
- if(Number.isNaN(hire.getTime()))return null;
+ if(Number.isNaN(hire.getTime())||hire>today)return null;
  let completedYears=today.getFullYear()-hire.getFullYear();
- const anniversaryThisYear=new Date(today.getFullYear(),hire.getMonth(),hire.getDate());
- if(today<anniversaryThisYear)completedYears--;
+ const anniversary=new Date(today.getFullYear(),hire.getMonth(),hire.getDate(),12,0,0);
+ if(today<anniversary)completedYears--;
  return Math.max(0,completedYears);
 }
 function ptoTier(){
- const override=String(state.setup.ptoTierOverride??'auto');
+ const rawOverride=String((state.setup&&state.setup.ptoTierOverride)||'auto').trim();
+ const override=rawOverride===''?'auto':rawOverride;
  if(override!=='auto'){
   const index=Number(override);
-  if(Number.isInteger(index)&&PTO_TIERS[index])return {...PTO_TIERS[index],manual:true,tierIndex:index};
+  if(Number.isInteger(index)&&index>=0&&PTO_TIERS[index]){
+   return {...PTO_TIERS[index],manual:true,tierIndex:index};
+  }
  }
- const serviceYear=ptoServiceYearsFromHireDate();
- if(serviceYear===null)return null;
- const tier=PTO_TIERS.find(t=>serviceYear>=t.min&&serviceYear<=t.max)||PTO_TIERS[PTO_TIERS.length-1];
+ const years=ptoServiceYearsFromHireDate();
+ if(years===null)return null;
+ const tier=PTO_TIERS.find(item=>years>=item.min&&years<=item.max)||PTO_TIERS[PTO_TIERS.length-1];
  return {...tier,manual:false,tierIndex:PTO_TIERS.indexOf(tier)};
 }
 function workedHoursBetween(start,stop){
@@ -2113,7 +2139,11 @@ function renderPto(){
  $('ptoSafety').textContent=state.pto.safetyEarnedHours.toFixed(2);
  $('ptoCarryover').textContent=state.pto.carryoverHours.toFixed(2);
  $('ptoFiscalLabel').textContent=fiscal?displayReportDate(fiscal):'Fiscal year not set';
- $('ptoTier').textContent=tier?`${tier.label}${tier.manual?' (Manual)':' (Automatic)'}`:'Set hire date';
+ const hireDateUsed=normalizedHireDate();
+ const serviceYears=ptoServiceYearsFromHireDate();
+ $('ptoTier').textContent=tier?`${tier.label}${tier.manual?' (Manual)':' (Automatic)'}`:'Not set';
+ $('ptoHireDateUsed').textContent=hireDateUsed?displayReportDate(hireDateUsed):'Not set';
+ $('ptoYearsService').textContent=serviceYears===null?'—':String(serviceYears);
  $('ptoHoursPerDay').textContent=tier?`${tier.hours} hrs`:'—';
  $('ptoMaxDays').textContent=tier?`${tier.maxDays} days (${tier.maxDays*10} hrs)`:'—';
  $('ptoProgressText').textContent=tier?`${state.pto.workedHoursProgress.toFixed(2)} / ${tier.hours} hrs`:'0 / 0';
@@ -2123,7 +2153,9 @@ function renderPto(){
  const serviceYear=ptoServiceYearsFromHireDate();
  $('ptoNextTierText').textContent=tier&&tier.manual
   ?`Manual PTO tier selected in Setup: ${tier.label}.`
-  :serviceYear?`Automatic PTO service years based on your hire date: ${serviceYear}`:'Enter a hire date in Setup, or select a manual PTO tier.';
+  :serviceYear!==null
+   ?`Automatic tier calculated from ${serviceYear} completed year${serviceYear===1?'':'s'} of service.`
+   :'Enter and save your hire date in Setup, or select a manual PTO tier.';
  [1,2,3,4].forEach(q=>{
   const button=$(`safetyQ${q}`);if(!button)return;
   const earned=fiscal&&state.pto.safetyQuarters[`${fiscal}-Q${q}`];
