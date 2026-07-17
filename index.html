@@ -134,7 +134,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v2.0.0 visual refresh */
+/* v2.0.1 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -233,7 +233,7 @@ padding:8px
 }
 
 
-/* v2.0.0 biweekly reports */
+/* v2.0.1 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -261,7 +261,7 @@ padding:8px
 }
 
 
-/* v2.0.0 currency-formatted pay rates */
+/* v2.0.1 currency-formatted pay rates */
 .currency-input{
   display:flex;
   align-items:center;
@@ -291,7 +291,7 @@ padding:8px
 }
 
 
-/* v2.0.0 official branding */
+/* v2.0.1 official branding */
 .brand img,
 .logo img,
 .app-logo,
@@ -312,7 +312,7 @@ header{
 }
 
 
-/* v2.0.0 Home header redesign */
+/* v2.0.1 Home header redesign */
 .hero-header{
   display:block!important;
   padding:12px 16px 14px!important;
@@ -372,7 +372,7 @@ header{
 }
 
 
-/* v2.0.0 currency-value visibility fix */
+/* v2.0.1 currency-value visibility fix */
 .currency-input{
   min-height:56px!important;
 }
@@ -395,7 +395,7 @@ header{
 }
 
 
-/* v2.0.0 payroll archive */
+/* v2.0.1 payroll archive */
 .pay-period-archive{display:grid;gap:10px;margin-top:12px}
 .pay-period-item{border:1px solid #35506a;border-radius:16px;overflow:hidden;background:#0b1927}
 .pay-period-date-button{
@@ -412,7 +412,7 @@ header{
 .archived-week h3{margin:0 0 4px}
 
 
-/* v2.0.0 PTO Manager */
+/* v2.0.1 PTO Manager */
 .nav{grid-template-columns:repeat(8,1fr)!important}
 .nav button[data-page="pto"]::before{content:"🏖️"}
 .pto-hero{background:linear-gradient(135deg,#17365a,#0d2744)!important;border-color:#c99718!important}
@@ -440,7 +440,7 @@ header{
 }
 
 
-/* v2.0.0 paid leave benefits */
+/* v2.0.1 paid leave benefits */
 .leave-quick-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
 .leave-quick-buttons button{min-height:54px;padding:8px}
 .leave-quick-buttons small{font-size:11px;font-weight:500}
@@ -452,7 +452,7 @@ header{
 @media(max-width:390px){.benefit-grid{grid-template-columns:1fr}}
 
 
-/* v2.0.0 location import and compact saved locations */
+/* v2.0.1 location import and compact saved locations */
 .mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .mapping-grid label{margin-top:0}
 .import-preview{display:grid;gap:8px;margin:10px 0 14px}
@@ -471,7 +471,7 @@ header{
 @media(max-width:390px){.mapping-grid{grid-template-columns:1fr}}
 
 
-/* v2.0.0 embedded wait time */
+/* v2.0.1 embedded wait time */
 .wait-time-toggle{
   margin-top:12px;
   background:#17365a!important;
@@ -1055,7 +1055,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v2.0.0</b></div>
+    <div class="kv"><span>Version</span><b>v2.0.1</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -1075,7 +1075,7 @@ header{
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>2.0.0</b></div>
+    <div class="kv"><span>App version</span><b>2.0.1</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -1142,7 +1142,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'2.0.0',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'2.0.1',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1168,7 +1168,7 @@ function importState(file,onSuccess,onError){
 
 const defaults={
  driverName:'',driverId:'',hireDate:'',ptoTierOverride:'auto',fiscalYearStart:'',mileageRate:.679,weekendRate:.749,
- liveLoadRate:17,liveUnloadRate:17,waitRate:17,manualAdp:0,
+ liveLoadRate:12.75,liveUnloadRate:12.75,waitRate:17,manualAdp:0,
  hookRate:10,stopRate:12.75,arriveRate:12.75,arriveDropRate:12.75,
  layoverRate:42,chainRate:60,regionalRate:6
 };
@@ -1215,6 +1215,10 @@ const baseState={
 };
 let state=loadPersistentState(baseState);
 state.setup={...defaults,...(state.setup||{})};
+// Correct legacy Live Load / Live Unload values that were mistakenly saved as $17.
+if(num(state.setup.liveLoadRate)===17||!num(state.setup.liveLoadRate))state.setup.liveLoadRate=12.75;
+if(num(state.setup.liveUnloadRate)===17||!num(state.setup.liveUnloadRate))state.setup.liveUnloadRate=12.75;
+
 if(!state.setup.hireDate&&state.hireDate)state.setup.hireDate=state.hireDate;
 if(!String(state.setup.ptoTierOverride||'').trim())state.setup.ptoTierOverride='auto';
 
@@ -1316,6 +1320,9 @@ function formatCurrencyInput(value){
  return parseCurrencyInput(value).toFixed(2);
 }
 function displayCurrencyFields(){
+ state.setup.liveLoadRate=12.75;
+ state.setup.liveUnloadRate=12.75;
+
  document.querySelectorAll('[data-currency-rate="true"]').forEach(input=>{
   input.value=formatCurrencyInput(input.value);
  });
@@ -1337,6 +1344,8 @@ function populateSetupFields(){
    input.value=state.setup[key]??'';
   }
  });
+ state.setup.liveLoadRate=12.75;
+ state.setup.liveUnloadRate=12.75;
  displayCurrencyFields();
 }
 
@@ -1392,8 +1401,8 @@ function paidTimedHours(t,totalHours){
 }
 function isTimed(t){return ['Breakdown','Meeting','Survey','Training'].includes(t);}
 function defaultRate(t){
- if(t==='Live Load')return num(state.setup.liveLoadRate||12.75);
- if(t==='Live Unload')return num(state.setup.liveUnloadRate||12.75);
+ if(t==='Live Load')return 12.75;
+ if(t==='Live Unload')return 12.75;
  if(t==='Breakdown')return num(state.setup.waitRate);
  if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;
  return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0;
@@ -1579,6 +1588,9 @@ function callLocation(phone,ext){const p=cleanPhone(phone);if(!p){alert('No phon
 function mapLocation(l){const q=[l.address,l.city,l.state].filter(Boolean).join(', ');if(!q){alert('No address saved.');return;}window.location.href='https://maps.apple.com/?q='+encodeURIComponent(q);}
 
 function saveSetup(){
+ state.setup.liveLoadRate=12.75;
+ state.setup.liveUnloadRate=12.75;
+
  const currencyFields=new Set(CURRENCY_SETUP_FIELDS);
  Object.keys(defaults).forEach(k=>{
   if(['driverName','driverId','hireDate','ptoTierOverride','fiscalYearStart'].includes(k))state.setup[k]=$(k).value;

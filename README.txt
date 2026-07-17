@@ -1,12 +1,9 @@
-Spark Transportation v2.0.0 — PTO Rebuild
+Spark Transportation v2.0.1 — Live Rate Fix
 
-- Automatic PTO tier uses the saved hire date and today's date only.
-- Fiscal-year start is not required for PTO tier calculation.
-- Blank or invalid tier settings safely revert to Automatic.
-- Legacy hire dates are migrated when available.
-- PTO now displays the exact hire date being used.
-- PTO now displays completed years of service.
-- Zero completed years correctly selects the 0–1 year tier.
-- Saving Setup immediately recalculates PTO.
-- Manual tier override remains available.
-- Existing app data remains under sparkTransportationData.
+- Live Load is fixed at $12.75.
+- Live Unload is fixed at $12.75.
+- The Home screen now always displays $12.75 for both activities.
+- Legacy saved $17.00 values are automatically corrected to $12.75.
+- Activity pay calculations use $12.75 per occurrence.
+- Both remain flat-rate activities with no timer.
+- Existing app data remains stored under sparkTransportationData.
