@@ -126,7 +126,7 @@ padding:8px
 .quick-grid.reorder-mode .quick-btn:active{cursor:grabbing}
 
 
-/* v1.4.3 visual refresh */
+/* v1.4.4 visual refresh */
 .activity-section-header{
   display:flex;
   align-items:center;
@@ -225,7 +225,7 @@ padding:8px
 }
 
 
-/* v1.4.3 biweekly reports */
+/* v1.4.4 biweekly reports */
 .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .report-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .report-metric{background:#10243a;border:1px solid #35506a;border-radius:16px;padding:13px;text-align:center}
@@ -253,7 +253,7 @@ padding:8px
 }
 
 
-/* v1.4.3 currency-formatted pay rates */
+/* v1.4.4 currency-formatted pay rates */
 .currency-input{
   display:flex;
   align-items:center;
@@ -283,7 +283,7 @@ padding:8px
 }
 
 
-/* v1.4.3 official branding */
+/* v1.4.4 official branding */
 .brand img,
 .logo img,
 .app-logo,
@@ -304,7 +304,7 @@ header{
 }
 
 
-/* v1.4.3 Home header redesign */
+/* v1.4.4 Home header redesign */
 .hero-header{
   display:block!important;
   padding:12px 16px 14px!important;
@@ -364,7 +364,7 @@ header{
 }
 
 
-/* v1.4.3 currency-value visibility fix */
+/* v1.4.4 currency-value visibility fix */
 .currency-input{
   min-height:56px!important;
 }
@@ -387,7 +387,7 @@ header{
 }
 
 
-/* v1.4.3 payroll archive */
+/* v1.4.4 payroll archive */
 .pay-period-archive{display:grid;gap:10px;margin-top:12px}
 .pay-period-item{border:1px solid #35506a;border-radius:16px;overflow:hidden;background:#0b1927}
 .pay-period-date-button{
@@ -404,7 +404,7 @@ header{
 .archived-week h3{margin:0 0 4px}
 
 
-/* v1.4.3 PTO Manager */
+/* v1.4.4 PTO Manager */
 .nav{grid-template-columns:repeat(8,1fr)!important}
 .nav button[data-page="pto"]::before{content:"🏖️"}
 .pto-hero{background:linear-gradient(135deg,#17365a,#0d2744)!important;border-color:#c99718!important}
@@ -432,7 +432,7 @@ header{
 }
 
 
-/* v1.4.3 paid leave benefits */
+/* v1.4.4 paid leave benefits */
 .leave-quick-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
 .leave-quick-buttons button{min-height:54px;padding:8px}
 .leave-quick-buttons small{font-size:11px;font-weight:500}
@@ -444,7 +444,7 @@ header{
 @media(max-width:390px){.benefit-grid{grid-template-columns:1fr}}
 
 
-/* v1.4.3 location import and compact saved locations */
+/* v1.4.4 location import and compact saved locations */
 .mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .mapping-grid label{margin-top:0}
 .import-preview{display:grid;gap:8px;margin:10px 0 14px}
@@ -461,6 +461,23 @@ header{
 .saved-location-details{padding:12px}
 .saved-location-notes{background:#07111f;border:1px solid #35506a;border-radius:11px;padding:10px;margin-top:8px;font-size:13px}
 @media(max-width:390px){.mapping-grid{grid-template-columns:1fr}}
+
+
+/* v1.4.4 embedded wait time */
+.wait-time-toggle{
+  margin-top:12px;
+  background:#17365a!important;
+  color:#f4bd28!important;
+  border:1px solid #c99718!important;
+}
+.embedded-wait-fields{
+  margin-top:10px;
+  padding:12px;
+  border:1px solid #35506a;
+  border-radius:14px;
+  background:#0b1927;
+}
+.embedded-wait-fields label{margin-top:0}
 
 </style>
 <title>Spark Transportation</title>
@@ -535,7 +552,6 @@ header{
     <div class="quick-grid" id="quickActivityRow" aria-label="Quick activities">
       <button class="quick-btn" data-activity="Live Load"><span class="quick-icon">🚚</span>Live Load</button>
       <button class="quick-btn" data-activity="Live Unload"><span class="quick-icon">📥</span>Live Unload</button>
-      <button class="quick-btn" data-activity="Wait Time"><span class="quick-icon">⏱️</span>Wait Time</button>
       <button class="quick-btn" data-activity="Breakdown"><span class="quick-icon">🔧</span>Breakdown</button>
       <button class="quick-btn" data-activity="Hook"><span class="quick-icon">🪝</span>Hook</button>
       <button class="quick-btn" data-activity="Stop"><span class="quick-icon">🛑</span>Stop</button>
@@ -620,14 +636,14 @@ header{
           <label>Activity</label>
           <select id="activityType" onchange="updateActivityFields()">
             <option value="">Select activity</option>
-            <option>Live Load</option><option>Live Unload</option><option>Wait Time</option><option>Breakdown</option>
+            <option>Live Load</option><option>Live Unload</option><option>Breakdown</option>
             <option>Meeting</option><option>Survey</option><option>Training</option>
             <option>Hook</option><option>Stop</option><option>Arrive</option><option>Arrive Drop</option>
             <option>Layover</option><option>Chain</option><option>Regional Pay</option>
           </select>
 
           <div id="timedFields" class="hidden">
-          <div class="muted small">Live Load, Live Unload, Wait Time, and Breakdown begin paying after the first 45 minutes.</div>
+          <div class="muted small">Live Load, Live Unload, and Breakdown begin paying after the first 45 minutes.</div>
             <div class="row">
               <div><label>Start time</label><input id="activityStart" type="time"></div>
               <div><label>Stop time</label><input id="activityStop" type="time"></div>
@@ -644,6 +660,14 @@ header{
           </div>
 
           <div id="commonFields" class="hidden">
+            <button type="button" id="embeddedWaitToggle" class="wait-time-toggle" onclick="toggleEmbeddedWaitTime()">+ Add Wait Time</button>
+            <div id="embeddedWaitFields" class="embedded-wait-fields hidden">
+              <label>Total wait time in decimal hours</label>
+              <input id="embeddedWaitHours" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Example: 1.25">
+              <div class="kv"><span>Unpaid threshold</span><b>0.75 hrs</b></div>
+              <div class="kv"><span>Estimated paid wait hours</span><b id="embeddedWaitPaidHours">0.00 hrs</b></div>
+              <div class="kv"><span>Estimated wait pay</span><b id="embeddedWaitPay">$0.00</b></div>
+            </div>
             <label>Activity notes</label>
             <input id="activityNote" placeholder="Optional">
             <button class="secondary top-gap-sm" onclick="addActivity()">Save Activity</button>
@@ -1003,7 +1027,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v1.4.3</b></div>
+    <div class="kv"><span>Version</span><b>v1.4.4</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -1023,7 +1047,7 @@ header{
     <input id="importFile" type="file" accept=".json,application/json">
     <button class="secondary top-gap-sm" onclick="importBackup()">Import Backup</button>
     <div class="kv top-gap"><span>Storage status</span><b>Permanent</b></div>
-    <div class="kv"><span>App version</span><b>1.4.3</b></div>
+    <div class="kv"><span>App version</span><b>1.4.4</b></div>
     <div class="kv"><span>Last migration</span><b id="migrationStatus">None</b></div>
   </div>
 </section>
@@ -1090,7 +1114,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'1.4.3',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'1.4.4',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1121,7 +1145,7 @@ const defaults={
  layoverRate:42,chainRate:60,regionalRate:6
 };
 const DEFAULT_QUICK_ACTIVITY_ORDER=[
- 'Live Load','Live Unload','Wait Time','Breakdown','Hook','Stop','Arrive',
+ 'Live Load','Live Unload','Breakdown','Hook','Stop','Arrive',
  'Arrive Drop','Layover','Chain','Regional Pay','Meeting','Survey','Training'
 ];
 const baseState={
@@ -1296,23 +1320,51 @@ function paidTimedHours(t,totalHours){
  const unpaid=hasUnpaid45MinuteThreshold(t)?0.75:0;
  return Math.max(0,Math.round((num(totalHours)-unpaid)*100)/100);
 }
-function isTimed(t){return ['Live Load','Live Unload','Wait Time','Breakdown','Meeting','Survey','Training'].includes(t);}
+function isTimed(t){return ['Live Load','Live Unload','Breakdown','Meeting','Survey','Training'].includes(t);}
 function defaultRate(t){
  if(t==='Live Load')return num(state.setup.liveLoadRate);
  if(t==='Live Unload')return num(state.setup.liveUnloadRate);
- if(t==='Wait Time')return num(state.setup.waitRate);
  if(t==='Breakdown')return num(state.setup.waitRate);
  if(['Meeting','Survey','Training'].includes(t))return num(state.setup.manualAdp)/10;
  return {'Hook':state.setup.hookRate,'Stop':state.setup.stopRate,'Arrive':state.setup.arriveRate,'Arrive Drop':state.setup.arriveDropRate,'Layover':state.setup.layoverRate,'Chain':state.setup.chainRate,'Regional Pay':state.setup.regionalRate}[t]||0;
 }
+
+function toggleEmbeddedWaitTime(forceOpen=null){
+ const fields=$('embeddedWaitFields');
+ const button=$('embeddedWaitToggle');
+ const open=forceOpen===null?fields.classList.contains('hidden'):forceOpen;
+ fields.classList.toggle('hidden',!open);
+ button.textContent=open?'Remove Wait Time':'+ Add Wait Time';
+ if(!open){
+  $('embeddedWaitHours').value='';
+  updateEmbeddedWaitPreview();
+ }
+}
+function embeddedWaitValues(){
+ const totalHours=Math.max(0,num($('embeddedWaitHours')?.value));
+ const paidHours=paidTimedHours('Wait Time',totalHours);
+ const rate=num(state.setup.waitRate);
+ return {totalHours,paidHours,rate,pay:paidHours*rate};
+}
+function updateEmbeddedWaitPreview(){
+ if(!$('embeddedWaitPaidHours'))return;
+ const values=embeddedWaitValues();
+ $('embeddedWaitPaidHours').textContent=`${values.paidHours.toFixed(2)} hrs`;
+ $('embeddedWaitPay').textContent=money(values.pay);
+}
+
 function updateActivityFields(){
  const t=$('activityType').value;
  $('timedFields').classList.toggle('hidden',!isTimed(t));
  $('flatFields').classList.toggle('hidden',!t||isTimed(t));
  $('commonFields').classList.toggle('hidden',!t);
- if(!t)return;
+ if(!t){
+  toggleEmbeddedWaitTime(false);
+  return;
+ }
  if(isTimed(t))$('activityHourlyRate').value=defaultRate(t);
  else $('activityFlatRate').value=defaultRate(t);
+ updateEmbeddedWaitPreview();
 }
 function startDay(){
  if(!$('dayDate').value||!$('beginMileage').value||!$('startTime').value){alert('Enter date, beginning mileage and start time.');return;}
@@ -1346,9 +1398,32 @@ function addActivity(){
   const q=Math.max(1,num($('activityQty').value)),r=num($('activityFlatRate').value);
   a={type:t,kind:'flat',qty:q,rate:r,note:$('activityNote').value,pay:q*r};
  }
- state.locations[state.activeLocationIndex].activities.push(a);
- ['activityStart','activityStop','activityHourlyRate','activityFlatRate','activityNote'].forEach(id=>$(id).value='');
- $('activityType').value='';$('activityQty').value=1;updateActivityFields();save();
+ const activities=state.locations[state.activeLocationIndex].activities;
+ activities.push(a);
+
+ if(!$('embeddedWaitFields').classList.contains('hidden')){
+  const wait=embeddedWaitValues();
+  if(wait.totalHours>0){
+   activities.push({
+    type:'Wait Time',
+    kind:'decimal-wait',
+    linkedActivityType:t,
+    hours:wait.totalHours,
+    paidHours:wait.paidHours,
+    unpaidThresholdHours:0.75,
+    rate:wait.rate,
+    note:`Wait time added with ${t}${$('activityNote').value?': '+$('activityNote').value:''}`,
+    pay:wait.pay
+   });
+  }
+ }
+
+ ['activityStart','activityStop','activityHourlyRate','activityFlatRate','activityNote','embeddedWaitHours'].forEach(id=>$(id).value='');
+ toggleEmbeddedWaitTime(false);
+ $('activityType').value='';
+ $('activityQty').value=1;
+ updateActivityFields();
+ save();
 }
 function selectLocation(i){state.activeLocationIndex=i;save();}
 function removeActivity(li,ai){state.locations[li].activities.splice(ai,1);save();}
@@ -1732,7 +1807,9 @@ function renderSavedLocations(){
 function renderHistory(){
  const q=($('historySearch').value||'').toLowerCase();
  const rows=state.entries.map((e,i)=>({e,i})).filter(({e})=>[e.date,...(e.locations||[]).flatMap(l=>[l.type,l.number,l.name])].join(' ').toLowerCase().includes(q));
- $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div>${e.ptoType&&e.ptoType!=='none'?`<div class="kv"><span>${e.ptoType}</span><b>${num(e.ptoHours).toFixed(2)} hrs • ${money(e.ptoPay)}</b></div>`:''}<div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
+ $('historyList').innerHTML=rows.length?rows.reverse().map(({e,i})=>`<div class="entry"><b>${e.date}</b><div class="muted small">${e.beginMileage} → ${e.endMileage} • ${e.startTime}–${e.endTime}</div><div class="kv"><span>Locations</span><b>${(e.locations||[]).length}</b></div><div class="kv"><span>Total</span><b>${money(e.total)}</b></div>${e.ptoType&&e.ptoType!=='none'?`<div class="kv"><span>${e.ptoType}</span><b>${num(e.ptoHours).toFixed(2)} hrs • ${money(e.ptoPay)}</b></div>`:''}<div class="actions"><button class="secondary" onclick="toggleHistory(${i})">View Details</button><button class="primary" onclick="editHistoryDay(${i})">Edit Day</button></div><button class="danger top-gap-sm" onclick="deleteHistoryDay(${i})">Delete Day</button><div id="history${i}" class="hidden">${(e.locations||[]).map(l=>`<div class="location-card"><b>${l.type} #${l.number}</b><div class="muted small">${l.name||''}</div>${(l.activities||[]).map(a=>`<div class="entry"><b>${a.type}</b><div class="muted small">${['timed','decimal-wait'].includes(a.kind)?`${a.kind==='decimal-wait'
+ ?`${num(a.hours).toFixed(2)} total hrs • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours('Wait Time',a.hours)).toFixed(2)} paid hrs • ${money(a.rate)}/hr${a.linkedActivityType?` • with ${a.linkedActivityType}`:''}`
+ :`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`}`:`Qty ${a.qty} • ${money(a.rate)} each`}</div><b>${money(a.pay)}</b></div>`).join('')}</div>`).join('')}</div></div>`).join(''):'No entries.';
 }
 
 
@@ -2332,7 +2409,9 @@ function render(){
   const l=state.locations[state.activeLocationIndex];$('activeLocationTitle').textContent=`${l.type} #${l.number}`;$('activeLocationSubtitle').textContent=l.name||'Activities added here belong to this location.';
  }
 
- $('locationGroups').innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}<div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${(l.activities||[]).length}</b></div><div class="kv"><span>Location total</span><b>${money((l.activities||[]).reduce((s,a)=>s+num(a.pay),0))}</b></div>${(l.activities||[]).map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${a.kind==='timed'?`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<b>${money(a.pay)}</b><button class="danger top-gap-sm" onclick="removeActivity(${li},${ai})">Remove</button></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added.</div>';
+ $('locationGroups').innerHTML=state.locations.length?state.locations.map((l,li)=>`<div class="location-card"><b>${l.type} #${l.number}</b> ${state.activeLocationIndex===li?'<span class="pill">Active</span>':''}<div class="muted small">${l.name||''}</div><div class="kv"><span>Activities</span><b>${(l.activities||[]).length}</b></div><div class="kv"><span>Location total</span><b>${money((l.activities||[]).reduce((s,a)=>s+num(a.pay),0))}</b></div>${(l.activities||[]).map((a,ai)=>`<div class="entry"><b>${a.type}</b><div class="muted small">${['timed','decimal-wait'].includes(a.kind)?`${a.kind==='decimal-wait'
+ ?`${num(a.hours).toFixed(2)} total hrs • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours('Wait Time',a.hours)).toFixed(2)} paid hrs • ${money(a.rate)}/hr${a.linkedActivityType?` • with ${a.linkedActivityType}`:''}`
+ :`${a.start}–${a.stop} • ${num(a.hours).toFixed(2)} total hrs${hasUnpaid45MinuteThreshold(a.type)?` • ${num(a.paidHours!==undefined?a.paidHours:paidTimedHours(a.type,a.hours)).toFixed(2)} paid hrs`:''} • ${money(a.rate)}/hr`}`:`Qty ${a.qty} • ${money(a.rate)} each`}</div>${a.note?`<div>${a.note}</div>`:''}<b>${money(a.pay)}</b><button class="danger top-gap-sm" onclick="removeActivity(${li},${ai})">Remove</button></div>`).join('')}<div class="actions"><button class="secondary" onclick="selectLocation(${li})">Add More Here</button><button class="danger" onclick="removeLocation(${li})">Remove Location</button></div></div>`).join(''):'<div class="muted small">No locations added.</div>';
 
  const mp=mileagePreview(),ap=activityTotal(),pp=ptoPreview();
  $('previewMileage').textContent=money(mp);$('previewActivity').textContent=money(ap);$('previewPto').textContent=money(pp);$('previewTotal').textContent=money(mp+ap+pp);
@@ -2362,6 +2441,7 @@ $('dayDate').value=new Date().toISOString().slice(0,10);
 document.addEventListener('input',e=>{
  if(['editBeginMileage','editDayDate','endMileage','ptoType','ptoHours'].includes(e.target.id))render();
  if(['payPeriodStart','payPeriodEnd'].includes(e.target.id))renderPayPeriodReport();
+ if(e.target.id==='embeddedWaitHours')updateEmbeddedWaitPreview();
 });
 
 let touchStartX=null,touchStartY=null;

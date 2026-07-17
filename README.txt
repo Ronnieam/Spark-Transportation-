@@ -1,20 +1,17 @@
-Spark Transportation v1.4.3 — Location Import Center
+Spark Transportation v1.4.4 — Embedded Wait Time
 
-Added:
-- CSV location import that works offline
-- Excel .xlsx and .xls import when the spreadsheet reader is available
-- Column mapping for Type, Number, Name, Address, City, State, Phone, Extension,
-  Contact, Receiving Hours, Gate Code, Appointment, and Notes
-- Import preview
-- Duplicate handling: Skip, Merge, or Replace
-- Downloadable CSV template
-- Imported locations are stored in sparkTransportationData and included in backups
+Changed:
+- Removed Wait Time from the Quick Add activity grid.
+- Removed Wait Time from the standalone activity selector.
+- Every remaining activity now includes an Add Wait Time button.
+- Wait Time is entered as total decimal hours.
+- The first 0.75 hours remain unpaid.
+- Paid wait hours and estimated wait pay are previewed before saving.
+- Wait Time is saved as a linked activity under the same location.
+- Wait Time continues to appear in activity totals, pay summaries, reports, history, and backups.
 
-Saved Locations redesign:
-- Each location is collapsed by default
-- Collapsed row shows only Type and Number
-- Tap to expand full details
-- Call, Directions, Edit, and Delete remain available in expanded view
+Example:
+1.25 total wait hours - 0.75 unpaid = 0.50 paid hours.
 
-Excel support uses the official SheetJS standalone browser script.
-CSV import remains available if the Excel reader cannot load.
+Existing Wait Time history remains readable.
+Permanent storage key remains sparkTransportationData.
