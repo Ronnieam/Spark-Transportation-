@@ -1,9 +1,10 @@
-Spark Transportation v2.0.1 — Live Rate Fix
+Spark Transportation v2.0.2 — Freeze and Live Rate Fix
 
-- Live Load is fixed at $12.75.
-- Live Unload is fixed at $12.75.
-- The Home screen now always displays $12.75 for both activities.
-- Legacy saved $17.00 values are automatically corrected to $12.75.
-- Activity pay calculations use $12.75 per occurrence.
-- Both remain flat-rate activities with no timer.
-- Existing app data remains stored under sparkTransportationData.
+- Fixes the startup freeze introduced in v2.0.1.
+- Saved-rate correction now runs only after numeric helpers initialize.
+- Live Load displays and calculates at $12.75.
+- Live Unload displays and calculates at $12.75.
+- Legacy $17 values are corrected safely.
+- Both activities remain flat-rate with no timer.
+- PTO rebuild from v2.0.0 remains included.
+- Existing data remains under sparkTransportationData.
