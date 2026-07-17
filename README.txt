@@ -1,11 +1,14 @@
-Spark Transportation v1.4.6 — Full Wait-Time Pay
+Spark Transportation v1.5.0 — Flat Live Load and Live Unload
 
-Correction:
-- Wait Time no longer subtracts the first 45 minutes.
-- The complete decimal amount entered is used as paid wait time.
-- Wait pay equals decimal wait hours multiplied by the configured wait-time rate.
-- Example: 1.25 hours entered = 1.25 paid hours.
-- Today's Estimated Pay and Total Wait update using the full entered amount.
-- Existing saved Wait Time records are recalculated under the corrected rule when loaded.
-- Other timed activities retain their existing rules.
+Changes:
+- Live Load is now a flat-rate activity.
+- Live Unload is now a flat-rate activity.
+- Default rate for each is $12.75.
+- Pay equals quantity multiplied by the configured flat rate.
+- Start and stop times are no longer required for these activities.
+- Manual Wait Time can still be added separately with the Add Wait Time control.
+- Wait Time uses the full decimal amount entered.
+- Existing saved Live Load and Live Unload records are converted to one flat-rate occurrence when loaded.
+- Live Load and Live Unload rates remain editable in Driver Setup.
+- Breakdown keeps its existing timed calculation.
 - Permanent storage key remains sparkTransportationData.
