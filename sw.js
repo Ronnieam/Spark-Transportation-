@@ -1,10 +1,9 @@
-const CACHE='spark-v3-0-2-location-persistence';
+const CACHE='spark-v3-0-3-embedded-locations';
 const ASSETS=[
  './',
  'index.html',
- 'style.css?v=3.0.2',
- 'database.js?v=3.0.2',
- 'app.js?v=3.0.2',
+ 'style.css?v=3.0.3',
+ 'app.js?v=3.0.3',
  'manifest.json',
  'logo.png',
  'icon-192.png',

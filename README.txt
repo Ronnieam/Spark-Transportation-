@@ -1,10 +1,12 @@
-Spark Transportation v3.0.2 — Location Persistence Fix
+Spark Transportation v3.0.3 — Embedded Locations
 
-Fixes:
-- The app verifies and restores missing built-in DC locations every time it opens.
-- It no longer trusts only the saved database-version flag.
-- Built-in locations cannot be accidentally deleted.
-- The Locations screen shows how many built-in DCs are actually available.
-- Cache-busting URLs force Safari and the installed PWA to load the latest database and app code.
+- All 416 Walmart DC locations are embedded directly in app.js.
+- database.js is no longer required.
+- This fixes the 404 deployment problem on GitHub Pages.
+- The app verifies and restores missing built-in locations on every launch.
+- Built-in locations remain available offline.
 - Existing personal locations and saved app data remain preserved.
 - Live Load and Live Unload remain $12.75.
+
+Upload every file in this ZIP to the same GitHub Pages folder.
+There is no database.js file in this version.
