@@ -1,9 +1,9 @@
-Spark Transportation v3.0.5 — Direct Directory
+Spark Transportation v3.0.6 — Location Controls and Maps
 
-- The 416 built-in DCs are read directly from the embedded database.
-- Built-in locations are no longer copied into localStorage.
-- This avoids the startup initialization failure and storage-size issues.
-- Personal saved locations remain in localStorage.
-- Favorites and recent locations still work with built-in DCs.
-- Built-in locations cannot be edited or deleted.
-- All logic, styling, and DC data remain inside index.html.
+- Tap the location name or arrow to open details.
+- The star only adds or removes a Favorite.
+- Apple Maps opens with a driving destination.
+- Google Maps is provided as a second navigation option.
+- Map links open outside the installed app for more reliable navigation.
+- Duplicate coordinate notes are hidden.
+- All 416 DCs remain built in and available offline.

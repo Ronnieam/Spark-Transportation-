@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="spark-build" content="3.0.5-direct-directory">
+<meta name="spark-build" content="3.0.6-location-controls">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
@@ -464,6 +464,15 @@ header{
 .location-summary-text{min-width:0;flex:1;text-align:left}
 .location-summary-sub{display:block;color:#9db0c2;font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .directory-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.location-card-header{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;width:100%;padding:16px;background:#142a40;color:inherit;text-align:left}
+.location-card-main{min-width:0;cursor:pointer}
+.location-card-toggle,.location-card-favorite{min-width:48px;height:48px;padding:0;border-radius:12px;background:#0b1b2a;border:1px solid #36536e;color:#f4bd28;font-size:24px;display:flex;align-items:center;justify-content:center}
+.map-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.map-link{display:flex;align-items:center;justify-content:center;text-decoration:none;min-height:54px;border-radius:14px;font-weight:800;padding:12px}
+.map-link.apple{background:#ffb000;color:#111}
+.map-link.google{background:#173a5d;color:#fff;border:1px solid #36536e}
+@media(max-width:420px){.map-actions{grid-template-columns:1fr}}
+
 @media(max-width:420px){.location-directory-stats{grid-template-columns:1fr}.location-filter-row{grid-template-columns:1fr}.directory-actions{grid-template-columns:1fr}}
 
 /* v3.0.1 location import and compact saved locations */
@@ -1090,7 +1099,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v3.0.5</b></div>
+    <div class="kv"><span>Version</span><b>v3.0.6</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -1175,7 +1184,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'3.0.5',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'3.0.6',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1650,12 +1659,23 @@ function deleteSavedLocation(i){
  savePersistentState(state);
  renderSavedLocations();
 }
+function locationQuery(l){
+ if(l&&l.latitude&&l.longitude)return `${l.latitude},${l.longitude}`;
+ return [l&&l.address,l&&l.city,l&&l.state].filter(Boolean).join(', ');
+}
+function appleMapsUrl(l){
+ const q=locationQuery(l);
+ return q?`https://maps.apple.com/?daddr=${encodeURIComponent(q)}&dirflg=d`:'#';
+}
+function googleMapsUrl(l){
+ const q=locationQuery(l);
+ return q?`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`:'#';
+}
 function mapLocation(l){
  rememberRecentLocation(l.id);
- const coordinates=l.latitude&&l.longitude?`${l.latitude},${l.longitude}`:'';
- const q=coordinates||[l.address,l.city,l.state].filter(Boolean).join(', ');
- if(!q){alert('No address or coordinates saved.');return;}
- window.location.href='https://maps.apple.com/?q='+encodeURIComponent(q);
+ const url=appleMapsUrl(l);
+ if(url==='#'){alert('No address or coordinates saved.');return;}
+ window.location.assign(url);
 }
 function toggleLocationFavorite(id,event){
  if(event)event.stopPropagation();
@@ -2000,14 +2020,14 @@ function renderSavedLocations(){
   const subtitle=[location.name,location.city,location.state].filter(Boolean).join(' • ');
   const isBuiltIn=location.builtIn===true;
   return `<div class="saved-location-compact">
-   <button type="button" class="saved-location-summary" onclick="toggleSavedLocationDetails('${location.id}')">
-    <span class="location-summary-text">
+   <div class="location-card-header">
+    <div class="location-card-main" onclick="toggleSavedLocationDetails('${location.id}')">
       <b>${escapeHtml(location.type)} #${escapeHtml(location.number)}</b>
       <span class="location-summary-sub">${escapeHtml(subtitle||'Location details')}</span>
-    </span>
-    <span class="favorite-location" onclick="toggleLocationFavorite('${location.id}',event)" aria-label="Favorite">${favorite?'★':'☆'}</span>
-    <span class="saved-location-chevron">${open?'▲':'▼'}</span>
-   </button>
+    </div>
+    <button type="button" class="location-card-favorite" onclick="toggleLocationFavorite('${location.id}',event)" aria-label="${favorite?'Remove favorite':'Add favorite'}">${favorite?'★':'☆'}</button>
+    <button type="button" class="location-card-toggle" onclick="toggleSavedLocationDetails('${location.id}')" aria-label="${open?'Collapse':'Expand'}">${open?'▲':'▼'}</button>
+   </div>
    <div class="saved-location-details ${open?'':'hidden'}">
     ${location.name?`<div class="kv"><span>Name</span><b>${escapeHtml(location.name)}</b></div>`:''}
     ${location.address||location.city||location.state?`<div class="kv"><span>Address</span><b>${escapeHtml([location.address,location.city,location.state].filter(Boolean).join(', '))}</b></div>`:''}
@@ -2017,12 +2037,15 @@ function renderSavedLocations(){
     ${location.hours?`<div class="kv"><span>Receiving hours</span><b>${escapeHtml(location.hours)}</b></div>`:''}
     ${location.gateCode?`<div class="kv"><span>Gate code</span><b>${escapeHtml(location.gateCode)}</b></div>`:''}
     ${location.appointment?`<div class="kv"><span>Appointment</span><b>${escapeHtml(location.appointment)}</b></div>`:''}
-    ${location.notes?`<div class="saved-location-notes">${escapeHtml(location.notes)}</div>`:''}
-    <div class="directory-actions">
-     ${location.phone?`<button class="green" onclick="callLocation('${String(location.phone).replace(/'/g,"\\'")}','${String(location.extension||'').replace(/'/g,"\\'")}')">Call</button>`:'<button class="secondary" disabled>No Phone</button>'}
-     <button class="primary" onclick='mapLocation(${JSON.stringify(location)})'>Directions</button>
-     <button class="secondary" onclick="toggleLocationFavorite('${location.id}',event)">${favorite?'Unfavorite':'Favorite'}</button>
+    ${location.notes&&!/^Coordinates:/i.test(location.notes)?`<div class="saved-location-notes">${escapeHtml(location.notes)}</div>`:''}
+    ${location.phone
+      ?`<button class="green full-width" onclick="callLocation('${String(location.phone).replace(/'/g,"\\'")}','${String(location.extension||'').replace(/'/g,"\\'")}')">Call</button>`
+      :'<button class="secondary full-width" disabled>No Phone</button>'}
+    <div class="map-actions top-gap-sm">
+      <a class="map-link apple" href="${appleMapsUrl(location)}" target="_blank" rel="noopener" onclick="rememberRecentLocation('${location.id}')">Apple Maps</a>
+      <a class="map-link google" href="${googleMapsUrl(location)}" target="_blank" rel="noopener" onclick="rememberRecentLocation('${location.id}')">Google Maps</a>
     </div>
+    <button class="secondary full-width top-gap-sm" onclick="toggleLocationFavorite('${location.id}',event)">${favorite?'Remove Favorite':'Add Favorite'}</button>
     ${isBuiltIn
       ?'<div class="muted small top-gap-sm">Built-in directory location</div>'
       :`<div class="actions">
