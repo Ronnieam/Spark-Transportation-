@@ -1,14 +1,5 @@
-const CACHE='spark-v3-0-3-embedded-locations';
-const ASSETS=[
- './',
- 'index.html',
- 'style.css?v=3.0.3',
- 'app.js?v=3.0.3',
- 'manifest.json',
- 'logo.png',
- 'icon-192.png',
- 'icon-512.png'
-];
+const CACHE='spark-v3-0-4-single-file';
+const ASSETS=['./','index.html','manifest.json','logo.png','icon-192.png','icon-512.png'];
 
 self.addEventListener('install',event=>{
  self.skipWaiting();
@@ -24,6 +15,16 @@ self.addEventListener('activate',event=>{
 
 self.addEventListener('fetch',event=>{
  if(event.request.method!=='GET')return;
+ if(event.request.mode==='navigate'){
+  event.respondWith(
+   fetch(event.request,{cache:'no-store'}).then(response=>{
+    const copy=response.clone();
+    caches.open(CACHE).then(cache=>cache.put('index.html',copy));
+    return response;
+   }).catch(()=>caches.match('index.html'))
+  );
+  return;
+ }
  event.respondWith(
   fetch(event.request,{cache:'no-store'}).then(response=>{
    const copy=response.clone();
