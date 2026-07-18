@@ -1,16 +1,9 @@
-Spark Transportation v3.0.4 — Single-File Build
+Spark Transportation v3.0.5 — Direct Directory
 
-This version eliminates external app.js, style.css, and database.js dependencies.
-
-Upload:
-- index.html
-- sw.js
-- manifest.json
-- logo.png
-- icon-192.png
-- icon-512.png
-
-All app logic, styling, and 416 built-in DC locations are inside index.html.
-
-Verification marker:
-spark-build" content="3.0.4-single-file"
+- The 416 built-in DCs are read directly from the embedded database.
+- Built-in locations are no longer copied into localStorage.
+- This avoids the startup initialization failure and storage-size issues.
+- Personal saved locations remain in localStorage.
+- Favorites and recent locations still work with built-in DCs.
+- Built-in locations cannot be edited or deleted.
+- All logic, styling, and DC data remain inside index.html.
