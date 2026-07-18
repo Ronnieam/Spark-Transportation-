@@ -1,4 +1,4 @@
-const CACHE='spark-v3-0-6-location-controls';
+const CACHE='spark-v3-0-7-expand-fix';
 const ASSETS=['./','index.html','manifest.json','logo.png','icon-192.png','icon-512.png'];
 
 self.addEventListener('install',event=>{

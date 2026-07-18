@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="spark-build" content="3.0.6-location-controls">
+<meta name="spark-build" content="3.0.7-expand-fix">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
@@ -1099,7 +1099,7 @@ header{
   <div class="card">
     <h2>About Spark Transportation</h2>
     <div class="kv"><span>App</span><b>Spark Transportation</b></div>
-    <div class="kv"><span>Version</span><b>v3.0.6</b></div>
+    <div class="kv"><span>Version</span><b>v3.0.7</b></div>
     <div class="kv"><span>Developer</span><b>Ronald Malnar</b></div>
     <div class="kv"><span>Data status</span><b id="aboutDataStatus">Ready</b></div>
     <div class="kv"><span>Completed workdays</span><b id="aboutWorkdays">0</b></div>
@@ -1184,7 +1184,7 @@ function savePersistentState(state){
 }
 
 function exportState(state){
-  const payload={app:'Spark Transportation',version:'3.0.6',exportedAt:new Date().toISOString(),data:state};
+  const payload={app:'Spark Transportation',version:'3.0.7',exportedAt:new Date().toISOString(),data:state};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1276,12 +1276,21 @@ function loadBuiltInLocationDatabase(){
  // Nothing is copied into localStorage during startup.
  return Array.isArray(BUILT_IN_DC_LOCATIONS)?BUILT_IN_DC_LOCATIONS.length:0;
 }
+function locationDirectoryKey(location,index=0){
+ if(location&&location._directoryKey)return location._directoryKey;
+ if(location&&location.builtIn){
+  return `builtin-${String(location.type||'DC').toLowerCase()}-${String(location.number||'')}-${index}`;
+ }
+ return String(location&&location.id||`personal-${index}`);
+}
 function allDirectoryLocations(){
- const personal=Array.isArray(state.savedLocations)?state.savedLocations:[];
+ const personal=(Array.isArray(state.savedLocations)?state.savedLocations:[])
+  .map((location,index)=>({...location,_directoryKey:locationDirectoryKey(location,index)}));
  const personalKeys=new Set(personal.map(location=>
   `${String(location&&location.type||'').toLowerCase()}|${String(location&&location.number||'').trim()}`
  ));
  const builtIns=(Array.isArray(BUILT_IN_DC_LOCATIONS)?BUILT_IN_DC_LOCATIONS:[])
+  .map((location,index)=>({...location,_directoryKey:`builtin-dc-${String(location.number||'')}-${index}`}))
   .filter(location=>!personalKeys.has(`dc|${String(location.number||'').trim()}`));
  return [...personal,...builtIns];
 }
@@ -1672,15 +1681,17 @@ function googleMapsUrl(l){
  return q?`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`:'#';
 }
 function mapLocation(l){
- rememberRecentLocation(l.id);
+ rememberRecentLocation(l._directoryKey||l.id);
  const url=appleMapsUrl(l);
  if(url==='#'){alert('No address or coordinates saved.');return;}
  window.location.assign(url);
 }
-function toggleLocationFavorite(id,event){
- if(event)event.stopPropagation();
- const exists=state.locationFavorites.includes(id);
- state.locationFavorites=exists?state.locationFavorites.filter(item=>item!==id):[...state.locationFavorites,id];
+function toggleLocationFavorite(key,event){
+ if(event){event.preventDefault();event.stopPropagation();}
+ const exists=state.locationFavorites.includes(key);
+ state.locationFavorites=exists
+  ?state.locationFavorites.filter(item=>item!==key)
+  :[...state.locationFavorites,key];
  savePersistentState(state);
  renderSavedLocations();
 }
@@ -1962,9 +1973,9 @@ function downloadLocationImportTemplate(){
  setTimeout(()=>URL.revokeObjectURL(link.href),1000);
 }
 
-function toggleSavedLocationDetails(id){
- state.expandedSavedLocationId=state.expandedSavedLocationId===id?null:id;
- if(state.expandedSavedLocationId)rememberRecentLocation(id);
+function toggleSavedLocationDetails(key){
+ state.expandedSavedLocationId=state.expandedSavedLocationId===key?null:key;
+ if(state.expandedSavedLocationId)rememberRecentLocation(key);
  else savePersistentState(state);
  renderSavedLocations();
 }
@@ -2003,7 +2014,7 @@ function renderSavedLocations(){
 
  const total=directory.length;
  const dcCount=directory.filter(location=>location.type==='DC').length;
- const favoriteCount=state.locationFavorites.filter(id=>directory.some(location=>location.id===id)).length;
+ const favoriteCount=state.locationFavorites.filter(key=>directory.some(location=>location._directoryKey===key)).length;
  if($('directoryTotalCount'))$('directoryTotalCount').textContent=total;
  if($('directoryDcCount'))$('directoryDcCount').textContent=dcCount;
  if($('directoryFavoriteCount'))$('directoryFavoriteCount').textContent=favoriteCount;
@@ -2015,18 +2026,19 @@ function renderSavedLocations(){
  }
 
  $('savedLocationList').innerHTML=rows.length?rows.map(({location,personalIndex})=>{
-  const open=state.expandedSavedLocationId===location.id;
-  const favorite=state.locationFavorites.includes(location.id);
+  const key=location._directoryKey;
+  const open=state.expandedSavedLocationId===key;
+  const favorite=state.locationFavorites.includes(key);
   const subtitle=[location.name,location.city,location.state].filter(Boolean).join(' • ');
   const isBuiltIn=location.builtIn===true;
   return `<div class="saved-location-compact">
    <div class="location-card-header">
-    <div class="location-card-main" onclick="toggleSavedLocationDetails('${location.id}')">
+    <div class="location-card-main" data-location-action="toggle" data-location-key="${escapeHtml(key)}">
       <b>${escapeHtml(location.type)} #${escapeHtml(location.number)}</b>
       <span class="location-summary-sub">${escapeHtml(subtitle||'Location details')}</span>
     </div>
-    <button type="button" class="location-card-favorite" onclick="toggleLocationFavorite('${location.id}',event)" aria-label="${favorite?'Remove favorite':'Add favorite'}">${favorite?'★':'☆'}</button>
-    <button type="button" class="location-card-toggle" onclick="toggleSavedLocationDetails('${location.id}')" aria-label="${open?'Collapse':'Expand'}">${open?'▲':'▼'}</button>
+    <button type="button" class="location-card-favorite" data-location-action="favorite" data-location-key="${escapeHtml(key)}" aria-label="${favorite?'Remove favorite':'Add favorite'}">${favorite?'★':'☆'}</button>
+    <button type="button" class="location-card-toggle" data-location-action="toggle" data-location-key="${escapeHtml(key)}" aria-label="${open?'Collapse':'Expand'}">${open?'▲':'▼'}</button>
    </div>
    <div class="saved-location-details ${open?'':'hidden'}">
     ${location.name?`<div class="kv"><span>Name</span><b>${escapeHtml(location.name)}</b></div>`:''}
@@ -2042,10 +2054,10 @@ function renderSavedLocations(){
       ?`<button class="green full-width" onclick="callLocation('${String(location.phone).replace(/'/g,"\\'")}','${String(location.extension||'').replace(/'/g,"\\'")}')">Call</button>`
       :'<button class="secondary full-width" disabled>No Phone</button>'}
     <div class="map-actions top-gap-sm">
-      <a class="map-link apple" href="${appleMapsUrl(location)}" target="_blank" rel="noopener" onclick="rememberRecentLocation('${location.id}')">Apple Maps</a>
-      <a class="map-link google" href="${googleMapsUrl(location)}" target="_blank" rel="noopener" onclick="rememberRecentLocation('${location.id}')">Google Maps</a>
+      <a class="map-link apple" href="${appleMapsUrl(location)}" target="_blank" rel="noopener" onclick="rememberRecentLocation('${key}')">Apple Maps</a>
+      <a class="map-link google" href="${googleMapsUrl(location)}" target="_blank" rel="noopener" onclick="rememberRecentLocation('${key}')">Google Maps</a>
     </div>
-    <button class="secondary full-width top-gap-sm" onclick="toggleLocationFavorite('${location.id}',event)">${favorite?'Remove Favorite':'Add Favorite'}</button>
+    <button class="secondary full-width top-gap-sm" data-location-action="favorite" data-location-key="${escapeHtml(key)}">${favorite?'Remove Favorite':'Add Favorite'}</button>
     ${isBuiltIn
       ?'<div class="muted small top-gap-sm">Built-in directory location</div>'
       :`<div class="actions">
@@ -2056,6 +2068,20 @@ function renderSavedLocations(){
   </div>`;
  }).join(''):'<div class="muted small">No locations match your search or filters.</div>';
 }
+
+
+function handleLocationDirectoryClick(event){
+ const control=event.target.closest('[data-location-action]');
+ if(!control)return;
+ const action=control.dataset.locationAction;
+ const key=control.dataset.locationKey;
+ if(!key)return;
+ event.preventDefault();
+ event.stopPropagation();
+ if(action==='toggle')toggleSavedLocationDetails(key);
+ if(action==='favorite')toggleLocationFavorite(key,event);
+}
+document.addEventListener('click',handleLocationDirectoryClick);
 
 function render(){
  renderHomeActivityRates();

@@ -1,9 +1,8 @@
-Spark Transportation v3.0.6 — Location Controls and Maps
+Spark Transportation v3.0.7 — Expand Fix
 
-- Tap the location name or arrow to open details.
-- The star only adds or removes a Favorite.
-- Apple Maps opens with a driving destination.
-- Google Maps is provided as a second navigation option.
-- Map links open outside the installed app for more reliable navigation.
-- Duplicate coordinate notes are hidden.
-- All 416 DCs remain built in and available offline.
+- Every directory row now receives a unique internal key.
+- Duplicate DC numbers no longer share the same expand state.
+- The card title and arrow use a delegated tap handler for reliable iPhone behavior.
+- The Favorite star remains separate from Expand/Collapse.
+- Apple Maps and Google Maps links remain included.
+- All 416 built-in DC records remain available offline.
